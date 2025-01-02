@@ -1,0 +1,45 @@
+{% macro trade_remedy_with_dumping_modal(commodity_code, uk_tariff, common_tariff) -%}
+    <div class="govuk-table__cell--modal">
+        <h3>A trade remedy applies to {{ commodity_code }} for goods arriving from specific countries.</h3>
+        <p>UK Global Tariff rate: {{ uk_tariff }}</p>
+        <p>This will apply from 1 January 2021</p>
+        <p>Read more about <a href="https://www.gov.uk/guidance/trade-remedies-transition-policy">trade remedies</a>.</p>
+        <a class="govuk-button govuk-button--secondary govuk-table__cell--modal-button" data-module="govuk-button" href="">
+            Close
+        </a>
+    </div>
+{% endmacro %}
+
+{% macro trade_remedy_modal(commodity_code, uk_tariff, common_tariff) -%}
+    <div class="govuk-table__cell--modal">
+        <h3>A trade remedy applies to {{ commodity_code }} for goods arriving from specific countries.</h3>
+        <p>UK Global Tariff rate: {{ uk_tariff }}</p>
+        <p>Common External Tariff rate: {{ common_tariff }} - this will continue to apply until transition reviews of all products in scope of this measure have been completed.  will then apply.</p>
+        <p>Read more about <a href="https://www.gov.uk/guidance/trade-remedies-transition-policy">trade remedies</a>.</p>
+        <a class="govuk-button govuk-button--secondary govuk-table__cell--modal-button" data-module="govuk-button" href="">
+            Close
+        </a>
+    </div>
+{% endmacro %}
+
+{% macro suspension_modal(uk_tariff) -%}
+    <div class="govuk-table__cell--modal">
+        <p>UK Global Tariff rate: {{ uk_tariff }}</p>
+        <p>An Autonomous Suspension applies, this will be reviewed in due course.</p>
+        <a class="govuk-button govuk-button--secondary govuk-table__cell--modal-button" data-module="govuk-button" href="">
+            Close
+        </a>
+    </div>
+{% endmacro %}
+
+
+{% macro atq_modal(uk_tariff) -%}
+    <div class="govuk-table__cell--modal">
+        <p>UK Global Tariff rate: {{ uk_tariff }}</p>
+        <p>A New Autonomous Quota of 260,000 tons will apply to the following commodity codes: 1701 13 10 and 1701 14 10 from 1 Jan 2021, for 12 months, with an in quota rate of 0.00%.</p>
+        <p>This will be reviewed in line with the UK’s suspensions policy in due course.</p>
+        <a class="govuk-button govuk-button--secondary govuk-table__cell--modal-button" data-module="govuk-button" href="">
+            Close
+        </a>
+    </div>
+{% endmacro %}
