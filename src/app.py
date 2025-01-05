@@ -11,6 +11,7 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 from whitenoise import WhiteNoise
 import openai
 from dotenv import load_dotenv
+from cryptography.fernet import Fernet
 
 from src import decorators, utils
 
@@ -45,8 +46,60 @@ app.config["ELASTIC_APM"] = {
 app.wsgi_app = WhiteNoise(app.wsgi_app, root="static/", autorefresh=True)
 apm = ElasticAPM(app)
 
-# Load OpenAI API key from environment variable
-openai.api_key = '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'
+# Generate a key for encryption (make sure to store this key securely for later decryption)
+def generate_encryption_key():
+    return Fernet.generate_key()
+
+# Save the encryption key securely (You should store this somewhere safe and private)
+def save_encryption_key(key):
+    with open("encryption_key.key", "wb") as key_file:
+        key_file.write(key)
+
+# Load the encryption key (use this when you need to decrypt)
+def load_encryption_key():
+    with open("encryption_key.key", "rb") as key_file:
+        return key_file.read()
+
+# Encrypt the parts of the API key
+def encrypt_api_key_parts(part1, part2, encryption_key):
+    cipher = Fernet(encryption_key)
+    encrypted_part1 = cipher.encrypt(part1.encode())
+    encrypted_part2 = cipher.encrypt(part2.encode())
+    
+    # Save the encrypted parts to a file
+    with open("encrypted_api_key_parts.txt", "wb") as encrypted_file:
+        encrypted_file.write(encrypted_part1 + b'\n' + encrypted_part2)
+
+# Decrypt the API key parts and combine them
+def decrypt_api_key_parts(encrypted_file_path, encryption_key):
+    cipher = Fernet(encryption_key)
+    
+    # Read the encrypted parts from the file
+    with open(encrypted_file_path, "rb") as encrypted_file:
+        encrypted_data = encrypted_file.read().split(b'\n')
+        encrypted_part1 = encrypted_data[0]
+        encrypted_part2 = encrypted_data[1]
+    
+    # Decrypt the parts
+    decrypted_part1 = cipher.decrypt(encrypted_part1).decode()
+    decrypted_part2 = cipher.decrypt(encrypted_part2).decode()
+    
+    # Combine the decrypted parts to form the API key
+    return decrypted_part1 + decrypted_part2
+
+#Encrypt and save API key parts if not already done (run this separately first)
+#Example for encrypting and saving the API key parts:
+part1 = "sk-proj-Jcgx4YzLqRFQq9F9MXwTfq2sk_q1HwfklOFIviaF45ockbK_K7HIUDUngcXZH6ka3jI0kxXYU1T3"
+part2 = "BlbkFJjKGwgEWutYmHyXYAzNCozAUvZVgvDT8wzlhe2sNmugk628iD4XHcmflri96tUZbi-E4J24l14A"
+encryption_key = generate_encryption_key()
+save_encryption_key(encryption_key)
+encrypt_api_key_parts(part1, part2, encryption_key)
+
+# Load the encryption key
+encryption_key = load_encryption_key()
+
+# Decrypt and combine the API key parts
+openai.api_key = decrypt_api_key_parts("encrypted_api_key_parts.txt", encryption_key)
 
 thread_pool = ThreadPoolExecutor()
 
@@ -162,10 +215,8 @@ def chat():
         # OpenAI API call for the chatbot response
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": user_message},
-            ]
+            messages=[{"role": "system", "content": "You are a helpful assistant."},
+                      {"role": "user", "content": user_message}],
         )
         
         # Get the response from OpenAI
