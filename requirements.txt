@@ -1,4 +1,4 @@
-﻿appdirs==1.4.4
+﻿﻿appdirs==1.4.4
 atomicwrites==1.4.1
 attrs==24.3.0
 beautifulsoup4==4.9.1
@@ -20,6 +20,7 @@ itsdangerous==2.1.2
 Jinja2==3.0.3
 MarkupSafe==3.0.2
 more-itertools==10.5.0
+openai
 packaging==24.2
 pathspec==0.12.1
 pluggy==0.13.1
@@ -42,3 +43,4 @@ xlrd==1.2.0
 XlsxWriter==1.2.8
 zope.event==5.0
 zope.interface==7.2
+python-dotenv
