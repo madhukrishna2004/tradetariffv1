@@ -46,7 +46,7 @@ app.wsgi_app = WhiteNoise(app.wsgi_app, root="static/", autorefresh=True)
 apm = ElasticAPM(app)
 
 # Load OpenAI API key from environment variable
-openai.api_key = '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'
+openai.api_key = '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'
 
 thread_pool = ThreadPoolExecutor()
 
