@@ -22,28 +22,28 @@ def data() -> list:
             "description": "Pure-bred breeding horses",
             "cet_duty_rate": "0.00%",
             "ukgt_duty_rate": "0.00%",
-            "change": "No change",
+            "product_specific_rule_of_origin": "No change",  # updated column name
         },
         {
             "commodity": "01022130",
-            "description": "Pure-bred breeding cows (excl. heifers)	",
+            "description": "Pure-bred breeding cows (excl. heifers)",
             "cet_duty_rate": "0.00%",
             "ukgt_duty_rate": "0.00%",
-            "change": "Liberalised",
+            "product_specific_rule_of_origin": "Liberalised",  # updated column name
         },
         {
             "commodity": "01022190",
-            "description": "Pure-bred cattle for breeding (excl. heifers and cows)	",
+            "description": "Pure-bred cattle for breeding (excl. heifers and cows)",
             "cet_duty_rate": "0.00%",
             "ukgt_duty_rate": "0.00%",
-            "change": "Liberalised",
+            "product_specific_rule_of_origin": "Liberalised",  # updated column name
         },
         {
             "commodity": "84821010",
-            "description": "Ball bearings with greatest external diameter <= 30 mm	",
+            "description": "Ball bearings with greatest external diameter <= 30 mm",
             "cet_duty_rate": "8.00%",
             "ukgt_duty_rate": "8.00%",
-            "change": "Liberalised",
+            "product_specific_rule_of_origin": "Liberalised",  # updated column name
         },
     ]
 
@@ -135,7 +135,7 @@ def test_tariff_api_with_filter(
             "description",
             "cet_duty_rate",
             "ukgt_duty_rate",
-            "change",
+            "product_specific_rule_of_origin",  # updated column name
         }
 
 

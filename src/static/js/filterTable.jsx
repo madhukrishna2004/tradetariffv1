@@ -92,9 +92,9 @@ const FilterTable = (props) => {
                        searchImage={props.filterOptions.searchImage} />
         <br />
         <br />
-        <div className="govuk-body"> your commodity code you can use the <a
+        <div className="govuk-body"><a
             href="https://www.gov.uk/guidance/using-the-trade-tariff-tool-to-find-a-commodity-code"
-            className="govuk-link govuk-link--no-visited-state">trade tariff tool</a>.
+            className="govuk-link govuk-link--no-visited-state"></a>.
         </div>
 
         <DataTable rows={displayData} filter={filter}/>
@@ -107,18 +107,7 @@ const FilterTable = (props) => {
                     pageOptions={pageOptions}
                     setPage={handlePageChange}/>
 
-        <div className="dt-buttons">
-            <a href={`/api/global-uk-tariff.csv?q=${filter}`}
-               className="dt-button govuk-button buttons-csv buttons-html5" tabIndex="0" aria-controls="alltable"
-               type="button">
-                
-            </a>
-            <a href={`/api/global-uk-tariff.xlsx?q=${filter}`}
-               className="dt-button govuk-button buttons-excel buttons-html5" tabIndex="0" aria-controls="alltable"
-               type="button">
-                
-            </a>
-        </div>
+        
     </div>
 };
 

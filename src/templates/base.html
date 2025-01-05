@@ -2,95 +2,208 @@
 <html lang="en" class="govuk-template">
 <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>{% block title %}Enhanced Chatbot UI{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#0b0c0c">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{{ url_for('static', filename='assets/images/favicon.ico') }}" type="image/x-icon">
-    <link rel="mask-icon" href="{{ url_for('static', filename='assets/images/govuk-mask-icon.svg') }}" color="#0b0c0c">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/images/govuk-apple-touch-icon-180x180.png') }}">
-    <link rel="apple-touch-icon" sizes="167x167" href="{{ url_for('static', filename='assets/images/govuk-apple-touch-icon-167x167.png') }}">
-    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='assets/images/govuk-apple-touch-icon-152x152.png') }}">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='assets/images/govuk-apple-touch-icon.png') }}">
-    <link href="{{ url_for('static', filename='css/govuk-frontend-3.4.0.min.css') }}" rel="stylesheet">
-    <!--[if IE 8]>
-        <link href="{{ url_for('static', filename='css/govuk-frontend-ie8-3.4.0.min.css') }}" rel="stylesheet" />
-        <link href="{{ url_for('static', filename='css/govuk-frontend-ie8-3.4.0.min.css') }}" rel="stylesheet" />
-    <![endif]-->
-    <link href="{{ url_for('static', filename='css/application.css') }}" rel="stylesheet">
-    <!--[if lt IE 9]>
-        <script src="/html5-shiv/html5shiv.js"></script>
-    <![endif]-->
-    <meta property="og:image" content="{{ url_for('static', filename='assets/images/govuk-opengraph-image.png')}}">
+    <link rel="stylesheet" href="static/css/govuk-frontend-3.4.0.min.css?v=20250105">
+    <link rel="stylesheet" href="static/css/application.css?v=20250105">
+    <link rel="stylesheet" href="static/css/chatbot.css?v=20250105">
+    <link rel="icon" href="static/assets/images/favicon.ico?v=20250105">
 
+    <style>
+        /* General body and font settings */
+        body {
+            background-color: hsl(180, 1%, 15%);
+            color: white;
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Sidebar styles */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: hsl(180, 3%, 6%);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            transition: left 0.3s ease;
+            z-index: 999;
+        }
+
+        #sidebar.open {
+            left: 0;
+        }
+
+        #sidebar .menu {
+            list-style-type: none;
+            padding: 10px 0;
+            margin: 0;
+        }
+
+        #sidebar .menu-item {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 16px;
+            color: white;
+        }
+
+        #sidebar .menu-item a {
+            text-decoration: none;
+            color: white;
+            display: block;
+            font-weight: bold;
+        }
+
+        #sidebar .menu-item a:hover {
+            text-decoration: underline;
+        }
+
+        #sidebar-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #3d3e3f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Sidebar headings styles */
+        .menu-heading {
+            padding: 15px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Main Content Styling */
+        #main-content {
+            background-color: hsl(180, 1%, 15%);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: white;
+            line-height: 1.6;
+        }
+
+        a {
+            color: #00bcd4;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Chatbot styles */
+        #chatbot-container button {
+            background-color: #3d3e3f;
+        }
+    </style>
 </head>
 <body class="govuk-template__body js-enabled">
-    <script>
-        document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
-    </script>
     <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
-    <header class="govuk-header" role="banner" data-module="govuk-header">
-        <div class="govuk-header__container govuk-width-container">
-            <div class="govuk-header__logo">
-                <a href="" class="govuk-header__link govuk-header__link--homepage">
-                    <span class="govuk-header__logotype">
-                        <img src="{{ url_for('static', filename='/assets/images/govuk-logotype-crown.png') }}" class="govuk-header__logotype-crown-fallback-image" width="180" height="160" alt="GovUK logo">
-                        <span class="govuk-header__logotype-text"></span>
-                    </span>
-                </a>
-            </div>
-        </div>
-    </header>
-                <a href="" class="govuk-header__link govuk-header__link--homepage">
-                    <span class="env_gt"></span>
-                </a>
-            </div>
-        </div>
-    </header>
-    <div class="govuk-width-container">
-        <main class="govuk-main-wrapper" id="main-content" role="main">
+
+    <!-- Sidebar toggle button -->
+    <button id="sidebar-toggle">☰</button>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <h3 class="menu-heading"></h3>
+        <ul class="menu">
+            <li class="menu-item">
+                <a href="/">Search for Commodity</a>
+            </li>
+            <li class="menu-item">
+                <a href="#">Evaluation of MSS Data (Currently Updating)</a>
+            </li>
+            <li class="menu-item">
+                <a href="#">Request a Dedicated Consultant</a>
+            </li>
+            <li class="menu-item">
+                <a href="#">Profile Details (Google Sign-In)</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="govuk-width-container" id="main-content">
+        <main class="govuk-main-wrapper" role="main">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full">
                     {% block content %}
                     {% endblock %}
-
                 </div>
             </div>
         </main>
     </div>
 
-    <footer class="govuk-footer " role="contentinfo">
-        <div class="govuk-width-container ">
+    <!-- Chatbot Integration -->
+    <div id="chatbot-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+        <button id="chatbot-toggle" 
+            aria-label="Open Chatbot" 
+            style="background-color: #3d3e3f; color: rgb(0, 0, 0); border: none; padding: 15px; border-radius: 50%; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); cursor: pointer;">
+            💬
+        </button>
+    </div>
+    
+    <div id="chatbot-ui" 
+        style="display: none; position: fixed; bottom: 20px; right: 20px; width: 400px; height: 600px; background: rgb(16, 16, 16); border: 1px solid #292828; border-radius: 10px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); overflow: hidden; transform: translateX(100%); transition: transform 0.5s ease-in-out;">
+        <iframe 
+            src="/chatbot.html" 
+            title="Chatbot Assistant" 
+            style="width: 100%; height: 100%; border: none;">
+        </iframe>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Sidebar toggle logic
+            const sidebar = document.getElementById("sidebar");
+            const sidebarToggle = document.getElementById("sidebar-toggle");
+
+            sidebarToggle.addEventListener("click", function () {
+                sidebar.classList.toggle("open");
+            });
+
+            // Chatbot toggle logic
+            const chatbotToggle = document.getElementById("chatbot-toggle");
+            const chatbotUI = document.getElementById("chatbot-ui");
+
+            chatbotToggle.addEventListener("click", () => {
+                // Toggle visibility and animate chatbot window
+                const isOpen = chatbotUI.style.transform === "translateX(0%)";
+                chatbotUI.style.transform = isOpen ? "translateX(100%)" : "translateX(0%)";
+                chatbotUI.style.display = isOpen ? "none" : "block";
+            });
+        });
+    </script>
+
+    <footer class="govuk-footer" role="contentinfo">
+        <div class="govuk-width-container">
             <hr class="govuk-footer__section-break">
-            <div class="govuk-footer__meta">
-                <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
-                    <ul class="govuk-footer__inline-list">
-                        <li class="govuk-footer__inline-list-item">
-                          <a class="govuk-footer__link" href="/accessibility">
-                            
-                          </a>
-                        </li>
-                      </ul>
-                    <svg aria-hidden="true" focusable="false" class="govuk-footer__licence-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 483.2 195.7" height="17" width="41">
-                        <path fill="currentColor" d=""></path>
-                    </svg>
-                    <span class="govuk-footer__licence-description">
-                       
-                        <a class="govuk-footer__link" href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="license"></a>,
-                    </span>
-                </div>
-                <div class="govuk-footer__meta-item">
-                    <a class="govuk-footer__link govuk-footer__copyright-logo">
-                        </a>
-                </div>
-            </div>
         </div>
     </footer>
-    <script src="{{ url_for('static', filename='js/govuk-frontend-3.4.0.min.js') }}"></script>
-    <script>
-        window.GOVUKFrontend.initAll();
-    </script>
-    {% block extra_js %}
-    {% endblock %}
+
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

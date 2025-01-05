@@ -1,18 +1,1 @@
-<svg width="40px" height="40px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="UKGT" transform="translate(-581.000000, -458.000000)">
-            <rect fill="#FFFFFF" x="0" y="0" width="1440" height="2912"></rect>
-            <g id="atoms/forms/search-box" transform="translate(581.000000, 458.000000)">
-                <g id="Search-box">
-                    <polygon id="Search-bg" fill="#005DA6" points="0 3.63797881e-12 40 0 40 40 0 40"></polygon>
-                    <g id="atoms/icons/search" transform="translate(12.000000, 12.000000)" stroke="#FFFFFF">
-                        <g id="Search-Icon" transform="translate(1.600000, 1.700000)">
-                            <ellipse id="Oval" stroke-width="1.28000004" cx="5.888" cy="6.01538462" rx="5.888" ry="6.01538462"></ellipse>
-                            <path d="M9.984,10.7230769 L12.544,13.3384615" id="Line-2" stroke-width="1.92000006" stroke-linecap="round" stroke-linejoin="round"></path>
-                        </g>
-                    </g>
-                </g>
-            </g>
-        </g>
-    </g>
-</svg>
+<svg fill="#1A1A1A" xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 64 64" width="40px" height="40px"><path d="M 8 8 L 8 56 L 56 56 L 56 8 L 8 8 z M 28.115234 14.5 C 35.623234 14.5 41.732422 20.607234 41.732422 28.115234 C 41.732422 31.286234 40.633594 34.202531 38.808594 36.519531 L 49.5 45.5 C 49.5 45.5 50.409844 47.264484 48.964844 48.771484 C 47.529844 50.266484 45.613281 49.466797 45.613281 49.466797 L 36.53125 38.798828 C 34.21225 40.629828 31.292234 41.732422 28.115234 41.732422 C 20.607234 41.732422 14.5 35.623234 14.5 28.115234 C 14.5 20.607234 20.607234 14.5 28.115234 14.5 z M 28.115234 17.5 A 10.616 10.616 0 0 0 28.115234 38.732422 A 10.616 10.616 0 0 0 28.115234 17.5 z"/></svg>

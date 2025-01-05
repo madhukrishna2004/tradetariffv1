@@ -5,15 +5,19 @@ from concurrent.futures.thread import ThreadPoolExecutor
 
 from elasticapm.contrib.flask import ElasticAPM
 import flask
-from flask import request, Response
+from flask import request, Response, jsonify, render_template
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 from whitenoise import WhiteNoise
+import openai
+from dotenv import load_dotenv
 
 from src import decorators, utils
 
-
 logger = logging.getLogger(__name__)
+
+# Load environment variables from .env file
+load_dotenv()
 
 if os.getenv("SENTRY_KEY") and os.getenv("SENTRY_PROJECT") and os.getenv("SENTRY_HOST"):
     sentry_sdk.init(
@@ -21,8 +25,15 @@ if os.getenv("SENTRY_KEY") and os.getenv("SENTRY_PROJECT") and os.getenv("SENTRY
         integrations=[FlaskIntegration()],
     )
 
-
 app = flask.Flask(__name__)
+
+# Enable template auto-reload to refresh templates during development
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+
+# Disable caching for static files during development
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Disable static file caching
+
+# Elastic APM configuration
 app.config["ELASTIC_APM"] = {
     "SERVICE_NAME": "global-uk-tariff",
     "SECRET_TOKEN": os.getenv("APM_TOKEN"),
@@ -30,11 +41,17 @@ app.config["ELASTIC_APM"] = {
     "ENVIRONMENT": os.getenv("ENV_NAME"),
 }
 
-app.wsgi_app = WhiteNoise(app.wsgi_app, root="static/")
+# Disable caching for static files by setting autorefresh to True
+app.wsgi_app = WhiteNoise(app.wsgi_app, root="static/", autorefresh=True)
 apm = ElasticAPM(app)
 
+# Load OpenAI API key from environment variable
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 thread_pool = ThreadPoolExecutor()
+
+# Generate cache-busting version string
+VERSION = f"?v={int(os.path.getmtime(__file__))}"  # Based on the file modification time
 
 
 @app.route("/")
@@ -44,22 +61,7 @@ def home():
 
 @app.route("/accessibility", strict_slashes=False)
 def accessibility():
-    return flask.render_template("accessibility.html")
-
-
-@app.route("/healthcheck")
-def healthcheck():
-    response = flask.Response(
-        """\
-<pingdom_http_custom_check>
-    <status>OK</status>
-    <response_time>1</response_time>
-</pingdom_http_custom_check>"""
-    )
-    response.headers["Content-Type"] = "text/xml"
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-
-    return response
+    return flask.render_template("accessibility.html", version=VERSION)
 
 
 @app.route("/tariff")
@@ -84,6 +86,7 @@ def tariff():
         sample_size=sample_size,
         start_index=(sample_size * (page - 1)) + 1 if len(data) != 0 else 0,
         stop_index=sample_size * page if sample_size * page < total else total,
+        version=VERSION,
     )
 
 
@@ -96,7 +99,7 @@ def tariff_csv():
     filter_arg = request.args.get(utils.FILTER_ARG)
     data = utils.get_data_as_list(filter_arg)
     output = utils.format_data_as_csv(data)
-    return flask.send_file(output, mimetype="text/csv",)
+    return flask.send_file(output, mimetype="text/csv")
 
 
 @app.route("/api/global-uk-tariff.xlsx")
@@ -142,8 +145,46 @@ def dcat_metadata():
     )
 
 
+@app.route("/chatbot.html")
+def chatbot():
+    return flask.render_template("chatbot.html", version=VERSION)
+
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    try:
+        # Get the user message from the request
+        user_message = request.json.get("message", "")
+        
+        if not user_message:
+            return jsonify({"error": "No message provided"}), 400
+        
+        # OpenAI API call for the chatbot response
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": user_message},
+            ]
+        )
+        
+        # Get the response from OpenAI
+        bot_reply = response['choices'][0]['message']['content']
+        
+        return jsonify({"response": bot_reply})
+    except Exception as e:
+        logger.error(f"Error occurred while processing the chatbot message: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
 @app.after_request
-def add_no_robots_header(response: Response):
+def set_cache_control_headers(response: Response):
+    # Add headers to disable caching for all responses
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+
+    # Prevent search engines from indexing the site
     response.headers["X-Robots-Tag"] = "noindex, nofollow"
     return response
 
@@ -177,3 +218,7 @@ def google_analytics(response: Response):
         logger.exception("Google Analytics failed")
         pass
     return response
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
