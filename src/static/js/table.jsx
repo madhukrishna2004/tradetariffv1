@@ -145,62 +145,58 @@ const DataRow = (props) => {
 
 const DataTable = (props) => {
   return (
-    <table className="table table-hover govuk-table sticky dataTable no-footer" id="alltable" role="grid">
-      <thead className="govuk-table__head">
-        <tr className="govuk-table__row" role="row">
-          <th
-            className="nw govuk-table__header govuk-table__cell sorting_asc"
-            style={{ width: 104, color: "white" }}
-            rowSpan="1"
-            colSpan="1"
-            aria-label="Commodity"
-          >
-            Commodity
-          </th>
-          <th
-            className="nw govuk-table__header govuk-table__cell sorting_disabled"
-            style={{ width: 439, color: "white" }}
-            rowSpan="1"
-            colSpan="1"
-            aria-label="Description"
-          >
-            Description
-          </th>
-          <th
-            className="nw govuk-table__header govuk-table__cell sorting_disabled"
-            style={{ width: 181, color: "white" }}
-            rowSpan="1"
-            colSpan="1"
-            aria-label="Common External Tariff"
-          >
-            Common External Tariff
-          </th>
-          <th
-            className="nw govuk-table__header govuk-table__cell sorting_disabled"
-            style={{ width: 121, color: "white" }}
-            rowSpan="1"
-            colSpan="1"
-            aria-label="UK Global Tariff"
-          >
-            UK Global Tariff
-          </th>
-          <th
-            className="nw govuk-table__header r govuk-table__cell sorting_disabled"
-            style={{ width: 94, color: "white" }}
-            rowSpan="1"
-            colSpan="1"
-            aria-label="Product-specific rule of origin"
-          >
-            Product-specific rule of origin
-          </th>
-        </tr>
-      </thead>
-      <tbody className="govuk-table__body">
-        {props.rows.map((row, index) => (
-          <DataRow index={index} filter={props.filter} key={row.commodity + index} {...row} />
-        ))}
-      </tbody>
-    </table>
+    <table style={{ tableLayout: 'fixed', width: '100%' }}>
+  <thead>
+    <tr>
+      <th
+        className="nw govuk-table__header govuk-table__cell sorting_asc"
+        style={{ width: 104, color: "white", wordWrap: "break-word" }}
+        rowSpan="1"
+        colSpan="1"
+        aria-label="Commodity"
+      >
+        Commodity
+      </th>
+      <th
+        className="nw govuk-table__header govuk-table__cell sorting_disabled"
+        style={{ width: 439, color: "white", wordWrap: "break-word" }}
+        rowSpan="1"
+        colSpan="1"
+        aria-label="Description"
+      >
+        Description
+      </th>
+      <th
+        className="nw govuk-table__header govuk-table__cell sorting_disabled"
+        style={{ width: 181, color: "white", wordWrap: "break-word" }}
+        rowSpan="1"
+        colSpan="1"
+        aria-label="Common External Tariff"
+      >
+        Common External Tariff
+      </th>
+      <th
+        className="nw govuk-table__header govuk-table__cell sorting_disabled"
+        style={{ width: 121, color: "white", wordWrap: "break-word" }}
+        rowSpan="1"
+        colSpan="1"
+        aria-label="UK Global Tariff"
+      >
+        UK Global Tariff
+      </th>
+      <th
+        className="nw govuk-table__header r govuk-table__cell sorting_disabled"
+        style={{ width: 94, color: "white", wordWrap: "break-word" }}
+        rowSpan="1"
+        colSpan="1"
+        aria-label="Product-specific rule of origin"
+      >
+        Product-specific rule of origin
+      </th>
+    </tr>
+  </thead>
+</table>
+
   );
 };
 

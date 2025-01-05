@@ -39,12 +39,11 @@ body {
     bottom: 90px;
     right: 20px;
     width: 360px;
-    max-height: 500px;
+    height: 360px; /* Fixed height */
     background: #fff;
     border-radius: 20px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-    display: none;
+    display: flex;
     flex-direction: column;
     z-index: 1000;
 }
@@ -60,6 +59,7 @@ body {
     align-items: center;
 }
 
+/* Close Button */
 .close-btn {
     background: none;
     border: none;
@@ -78,8 +78,9 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    max-height: 400px; /* Set a maximum height to make scrolling effective */
-    padding-right: 15px; /* To prevent content from being hidden behind scrollbar */
+    max-height: 255px; /* Adjust to fit within the 360px height minus header and footer */
+    padding-right: 15px;
+    overflow-x: hidden;
 }
 
 /* Chatbot Message Styles */
@@ -110,8 +111,12 @@ body {
     gap: 10px;
     background: #fff;
     border-top: 1px solid #ddd;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
 }
 
+/* Chatbot Input */
 #chatbot-input {
     flex: 1;
     padding: 10px;
@@ -121,6 +126,7 @@ body {
     font-size: 14px;
 }
 
+/* Send Button */
 .send-btn {
     background: linear-gradient(135deg, #141414, #303031);
     color: #fff;
@@ -138,19 +144,19 @@ body {
 
 /* Scrollbar Styles */
 .chatbot-body::-webkit-scrollbar {
-    width: 8px; /* Increase width for better visibility */
+    width: 8px;
 }
 
 .chatbot-body::-webkit-scrollbar-thumb {
-    background-color: #2a2a2b; /* Set the color for the scrollbar thumb */
-    border-radius: 10px; /* Rounded corners for the scrollbar thumb */
+    background-color: #2a2a2b;
+    border-radius: 10px;
 }
 
 .chatbot-body::-webkit-scrollbar-track {
-    background-color: #f1f1f1; /* Light color for the scrollbar track */
-    border-radius: 10px; /* Rounded corners for the track */
+    background-color: #f1f1f1;
+    border-radius: 10px;
 }
 
 .chatbot-body::-webkit-scrollbar-corner {
-    background-color: #f1f1f1; /* Color for the scrollbar corner */
+    background-color: #f1f1f1;
 }

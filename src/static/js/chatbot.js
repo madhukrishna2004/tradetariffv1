@@ -33,12 +33,28 @@ document.getElementById("chatbot-send").addEventListener("click", function() {
     });
 });
 
+// Function to display messages in the chat
 function displayMessage(message, sender) {
     const messageDiv = document.createElement("div");
     messageDiv.classList.add("chatbot-message");
     messageDiv.classList.add(sender === "bot" ? "bot-message" : "user-message");
     messageDiv.textContent = message;
-    
-    document.getElementById("chatbot-body").appendChild(messageDiv);
-    document.getElementById("chatbot-body").scrollTop = document.getElementById("chatbot-body").scrollHeight; // Scroll to the latest message
+
+    // Append the message to the chatbot body
+    const chatbotBody = document.getElementById("chatbot-body");
+    chatbotBody.appendChild(messageDiv);
+
+    // Ensure the chatbot scrolls to the bottom to show the latest message
+    scrollToBottom();
 }
+
+// Scroll to the bottom of the chatbot body
+function scrollToBottom() {
+    const chatbotBody = document.getElementById("chatbot-body");
+    chatbotBody.scrollTop = chatbotBody.scrollHeight;
+}
+
+// Automatically scroll to the bottom when user starts typing
+document.getElementById("chatbot-input").addEventListener("focus", function() {
+    scrollToBottom();
+});

@@ -1462,10 +1462,6 @@
     border: 0
 }
 
-.govuk-button:hover {
-    background-color: #005a30
-}
-
 .govuk-button:active {
     top: 2px
 }
