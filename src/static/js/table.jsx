@@ -113,9 +113,8 @@ const DataRow = (props) => {
         <span className="hs-cell__heading">{props.commodity.slice(0, 4)}</span>
         <span className="hs-cell__subheading">{props.commodity.slice(4, 6)}</span>
         <span className="hs-cell__subheading">{props.commodity.slice(6, 8)}</span>
-        {props.commodity.length > 8 && (
-          <span className="hs-cell__subdivision">{props.commodity.slice(8)}</span>
-        )}
+        
+        
       </td>
       <td className="govuk-table__cell">{highlight(props.description)}</td>
       <td className="govuk-table__cell">{highlight(props.cet_duty_rate)}</td>
