@@ -8,9 +8,7 @@ def clean_tariff_rate(value):
         value = f"{round(value * 100, 2)}%"  # Assuming the value is a percentage
     return value
 
-def excel_to_json(
-    input_file: str, output_file: str, sheet_name: str = "Sheet1"
-):
+def excel_to_json(input_file: str, output_file: str, sheet_name: str = "Sheet1"):
     workbook = xlrd.open_workbook(input_file)
     
     # List all sheet names and print them for debugging
@@ -28,8 +26,12 @@ def excel_to_json(
         if row_number == 0:  # Skip the header row
             continue
 
+        # Check for errors and print detailed debugging information
         if any(item.ctype == ERROR_CTYPE for item in row):
-            print(f"Row {row_number}: Failed row with code {row[0].value}")
+            print(f"Row {row_number}: Failed row due to an error cell.")
+            for col_number, item in enumerate(row):
+                if item.ctype == ERROR_CTYPE:
+                    print(f"  Column {col_number}: Error value {item.value}")
             continue
 
         # Extract data from rows with added type checks
@@ -70,7 +72,6 @@ def excel_to_json(
     # Write to JSON
     with open(output_file, "w") as f:
         json.dump(data, f, indent=2)
-
 
 if __name__ == "__main__":
     input_file = r"D:\ai project\global-uk-tariffv1\global-uk-tariff.xlsx"
