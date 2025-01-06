@@ -105,6 +105,7 @@ def get_data_as_list(filter_param: str) -> List[List[str]]:
             "description",
             "cet_duty_rate",
             "ukgt_duty_rate",
+            "VAT",
             "Product-specific rule of origin",
         ]
 

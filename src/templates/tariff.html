@@ -3,18 +3,25 @@
 {% set filter = request.args.get('q', '') %}
 
 {% block content %}
-    <h1 class="govuk-heading-m" style="color: white;">
-        Search for your goods
-    </h1>
-    <div class="govuk-body" style="color: white;">
-        You can search using:
-        <ul>
-            <li>A commodity code</li>
-            <li>The product description</li>
-            <li>A combination of these</li>
-        </ul>
-        <p style="color: white;">In most cases, rates in the UKGT have been set at the 8-digit commodity code level. If you have a 10-digit commodity code, use the first 8 digits to search for your product.</p>
-    </div>
+
+<div class="govuk-body" style="color: white;">
+    Leverage this tool to identify the appropriate commodity code for goods being imported to or exported from the UK.  
+    This service also enables you to:
+    <ul>
+        <li>Determine applicable customs duties or VAT</li>
+        <li>Explore tariff suspensions or reductions</li>
+    </ul>
+    <p style="color: white;">To accurately classify your goods and obtain a commodity code, ensure you have detailed information about the product, such as:</p>
+    <ul>
+        <li>The product category and type</li>
+        <li>Its intended purpose or usage</li>
+        <li>The materials it is composed of</li>
+        <li>The manufacturing process involved</li>
+        <li>Its packaging and presentation</li>
+    </ul>
+    <p style="color: white;">In most cases, rates in the UKGT have been set at the 8-digit commodity code level. If you have a 10-digit commodity code, use the first 8 digits to search for your product.</p>
+</div>
+
 
     <div id="dataTable">
         <noscript>
@@ -47,10 +54,10 @@
                         <tr class="govuk-table__row" role="row">
                             <th class="nw govuk-table__header govuk-table__cell sorting_asc" style="width: 104px; color: white;" rowspan="1" colspan="1" aria-label="Commodity">Commodity</th>
                             <th class="nw govuk-table__header govuk-table__cell sorting_disabled" style="width: 439px; color: white;" rowspan="1" colspan="1" aria-label="Description">Description</th>
-                            <th class="nw govuk-table__header govuk-table__cell sorting_disabled" style="width: 181px; color: white;" rowspan="1" colspan="1" aria-label="Common External Tariff">EU External Tariff</th>
+                            <th class="nw govuk-table__header govuk-table__cell sorting_disabled" style="width: 181px; color: white;" rowspan="1" colspan="1" aria-label="EU Tariff">EU External Tariff</th>
                             <th class="nw govuk-table__header govuk-table__cell sorting_disabled" style="width: 121px; color: white;" rowspan="1" colspan="1" aria-label="UK Global Tariff">UK Global Tariff</th>
                             <th class="nw govuk-table__header r govuk-table__cell sorting_disabled" style="width: 94px; color: white;" rowspan="1" colspan="1" aria-label="VAT">VAT</th>
-                            <th class="nw govuk-table__header r govuk-table__cell sorting_disabled" style="width: 94px; color: white;" rowspan="1" colspan="1" aria-label="Product-specific rule of origin">Product-specific rule of origin</th>
+                            <th class="nw govuk-table__header r govuk-table__cell sorting_disabled" style="width: 74px; color: white;" rowspan="1" colspan="1" aria-label="Product-specific rule of origin">Product-specific rule of origin</th>
                         </tr>
                     </thead>
                     <tbody class="govuk-table__body">

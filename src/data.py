@@ -3,12 +3,10 @@ import xlrd
 
 ERROR_CTYPE = 5
 
-
 def clean_tariff_rate(value):
     if isinstance(value, float):
-        value = f"{round(value * 100, 2)}%"
+        value = f"{round(value * 100, 2)}%"  # Assuming the value is a percentage
     return value
-
 
 def excel_to_json(
     input_file: str, output_file: str, sheet_name: str = "Sheet1"
@@ -39,7 +37,13 @@ def excel_to_json(
         description = str(row[1].value).strip() if row[1].value else None
         cet_duty_rate = clean_tariff_rate(row[2].value) if row[2].value else None
         ukgt_duty_rate = clean_tariff_rate(row[3].value) if row[3].value else None
-        product_specific_rule = str(row[4].value).strip() if len(row) > 4 and row[4].value else None
+        change = str(row[4].value).strip() if len(row) > 4 and row[4].value else None
+        trade_remedy_applies = str(row[5].value).strip() if len(row) > 5 and row[5].value else None
+        cet_applies_until_trade_remedy_transition_reviews_concluded = str(row[6].value).strip() if len(row) > 6 and row[6].value else None
+        suspension_applies = str(row[7].value).strip() if len(row) > 7 and row[7].value else None
+        atq_applies = str(row[8].value).strip() if len(row) > 8 and row[8].value else None
+        product_specific_rule_of_origin = str(row[9].value).strip() if len(row) > 9 and row[9].value else None
+        vat_rate = clean_tariff_rate(row[10].value) if len(row) > 10 and row[10].value else None  # Extract VAT Rate
 
         # Skip rows with essential missing data
         if not commodity or not description:
@@ -53,7 +57,13 @@ def excel_to_json(
                 "description": description,
                 "cet_duty_rate": cet_duty_rate,
                 "ukgt_duty_rate": ukgt_duty_rate,
-                "product_specific_rule_of_origin": product_specific_rule,
+                "change": change,
+                "trade_remedy_applies": trade_remedy_applies,
+                "cet_applies_until_trade_remedy_transition_reviews_concluded": cet_applies_until_trade_remedy_transition_reviews_concluded,
+                "suspension_applies": suspension_applies,
+                "atq_applies": atq_applies,
+                "product_specific_rule_of_origin": product_specific_rule_of_origin,
+                "vat_rate": vat_rate,  # Add VAT Rate to JSON structure
             }
         )
 
@@ -63,6 +73,6 @@ def excel_to_json(
 
 
 if __name__ == "__main__":
-    input_file = r"D:\ai project\global-uk-tariff\global-uk-tariff.xlsx"
-    output_file = r"D:\ai project\global-uk-tariff\data.json"
+    input_file = r"D:\ai project\global-uk-tariffv1\global-uk-tariff.xlsx"
+    output_file = r"D:\ai project\global-uk-tariffv1\data.json"
     excel_to_json(input_file, output_file)

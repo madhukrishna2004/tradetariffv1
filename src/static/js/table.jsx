@@ -1,25 +1,3 @@
-import React, { useState } from "react";
-import Modal from './modal.jsx';
-
-const escapeRegExp = (string) => {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escapes special characters for regex
-};
-
-const renderHighlightedContent = (filters, string) => {
-  const filterRegex = new RegExp(`(${filters.map(escapeRegExp).join('|')})`, 'ig');
-  const parts = string.split(filterRegex);
-
-  return (
-    <>
-      {parts.map((part, index) => (
-        <span className={index % 2 === 0 ? null : "highlight"} key={index}>
-          {part}
-        </span>
-      ))}
-    </>
-  );
-};
-
 const DataRow = (props) => {
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -28,6 +6,7 @@ const DataRow = (props) => {
   };
 
   let ukTariffRate;
+  let vatRate;
 
   if (props.trade_remedy_applies && !props.cet_applies_until_trade_remedy_transition_reviews_concluded) {
     ukTariffRate = (
@@ -59,7 +38,7 @@ const DataRow = (props) => {
             <h3>A trade remedy applies to {highlight(props.commodity)} for goods arriving from specific countries</h3>
             <p>UK Global Tariff rate: {highlight(props.ukgt_duty_rate)}</p>
             <p>
-              Common External Tariff rate: {highlight(props.cet_duty_rate)} - this will continue to apply until
+              EU Tariff rate: {highlight(props.cet_duty_rate)} - this will continue to apply until
               transition reviews of all products in scope of this measure have been completed. The UK Global Tariff will
               then apply.
             </p>
@@ -125,6 +104,9 @@ const DataRow = (props) => {
     ukTariffRate = highlight(props.ukgt_duty_rate);
   }
 
+  // VAT Rate (assuming it's coming from props['VAT'])
+  vatRate = highlight(props['VAT']); // Treat 'VAT' prop in the same way as other props.
+
   return (
     <tr className="govuk-table__row" role="row">
       <td className="govuk-table__cell hs-cell">
@@ -138,6 +120,7 @@ const DataRow = (props) => {
       <td className="govuk-table__cell">{highlight(props.description)}</td>
       <td className="govuk-table__cell">{highlight(props.cet_duty_rate)}</td>
       <td className="govuk-table__cell">{ukTariffRate}</td>
+      <td className="govuk-table__cell">{vatRate}</td> {/* New VAT column */}
       <td className="govuk-table__cell r">{highlight(props['Product-specific rule of origin'])}</td>
     </tr>
   );
@@ -146,58 +129,67 @@ const DataRow = (props) => {
 const DataTable = (props) => {
   return (
     <table style={{ tableLayout: 'fixed', width: '100%' }}>
-  <thead>
-    <tr>
-      <th
-        className="nw govuk-table__header govuk-table__cell sorting_asc"
-        style={{ width: 104, color: "white", wordWrap: "break-word" }}
-        rowSpan="1"
-        colSpan="1"
-        aria-label="Commodity"
-      >
-        Commodity
-      </th>
-      <th
-        className="nw govuk-table__header govuk-table__cell sorting_disabled"
-        style={{ width: 439, color: "white", wordWrap: "break-word" }}
-        rowSpan="1"
-        colSpan="1"
-        aria-label="Description"
-      >
-        Description
-      </th>
-      <th
-        className="nw govuk-table__header govuk-table__cell sorting_disabled"
-        style={{ width: 181, color: "white", wordWrap: "break-word" }}
-        rowSpan="1"
-        colSpan="1"
-        aria-label="Common External Tariff"
-      >
-        Common External Tariff
-      </th>
-      <th
-        className="nw govuk-table__header govuk-table__cell sorting_disabled"
-        style={{ width: 121, color: "white", wordWrap: "break-word" }}
-        rowSpan="1"
-        colSpan="1"
-        aria-label="UK Global Tariff"
-      >
-        UK Global Tariff
-      </th>
-      <th
-        className="nw govuk-table__header r govuk-table__cell sorting_disabled"
-        style={{ width: 94, color: "white", wordWrap: "break-word" }}
-        rowSpan="1"
-        colSpan="1"
-        aria-label="Product-specific rule of origin"
-      >
-        Product-specific rule of origin
-      </th>
-    </tr>
-  </thead>
-</table>
-
+      <thead>
+        <tr>
+          <th
+            className="nw govuk-table__header govuk-table__cell sorting_asc"
+            style={{ width: 104, color: "white", wordWrap: "break-word" }}
+            rowSpan="1"
+            colSpan="1"
+            aria-label="Commodity"
+          >
+            Commodity
+          </th>
+          <th
+            className="nw govuk-table__header govuk-table__cell sorting_disabled"
+            style={{ width: 439, color: "white", wordWrap: "break-word" }}
+            rowSpan="1"
+            colSpan="1"
+            aria-label="Description"
+          >
+            Description
+          </th>
+          <th
+            className="nw govuk-table__header govuk-table__cell sorting_disabled"
+            style={{ width: 181, color: "white", wordWrap: "break-word" }}
+            rowSpan="1"
+            colSpan="1"
+            aria-label="EU Tariff"
+          >
+            EU Tariff
+          </th>
+          <th
+            className="nw govuk-table__header govuk-table__cell sorting_disabled"
+            style={{ width: 121, color: "white", wordWrap: "break-word" }}
+            rowSpan="1"
+            colSpan="1"
+            aria-label="UK Global Tariff"
+          >
+            UK Global Tariff
+          </th>
+          <th
+            className="nw govuk-table__header govuk-table__cell sorting_disabled"
+            style={{ width: 121, color: "white", wordWrap: "break-word" }}
+            rowSpan="1"
+            colSpan="1"
+            aria-label="VAT"
+          >
+            VAT {/* New VAT column header */}
+          </th>
+          <th
+            className="nw govuk-table__header r govuk-table__cell sorting_disabled"
+            style={{ width: 94, color: "white", wordWrap: "break-word" }}
+            rowSpan="1"
+            colSpan="1"
+            aria-label="Product-specific rule of origin"
+          >
+            Product-specific rule of origin
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {/* Render rows based on props.data */}
+      </tbody>
+    </table>
   );
 };
-
-export default DataTable;

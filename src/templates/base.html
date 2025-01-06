@@ -2,7 +2,7 @@
 <html lang="en" class="govuk-template">
 <head>
     <meta charset="utf-8">
-    <title>{% block title %}Enhanced Chatbot UI{% endblock %}</title>
+    <title>{% block title %}TradeSphere Dashboard{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#0b0c0c">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -118,6 +118,18 @@
         #chatbot-container button {
             background-color: #3d3e3f;
         }
+
+        /* TradeSphere Global heading styling */
+        .page-heading {
+    font-size: 25px;
+    font-weight: bold;
+    color: #e7ecec; /* Matches the link color */
+    text-align: left; /* Changed from center to left */
+    margin-top: 30px;
+    margin-bottom: 40px;
+    font-family: 'Roboto', sans-serif;
+}
+
     </style>
 </head>
 <body class="govuk-template__body js-enabled">
@@ -128,19 +140,19 @@
 
     <!-- Sidebar -->
     <div id="sidebar">
-        <h3 class="menu-heading"></h3>
+        <h3 class="menu-heading">Main Menu</h3>
         <ul class="menu">
             <li class="menu-item">
                 <a href="/">Search for Commodity</a>
             </li>
             <li class="menu-item">
-                <a href="#"></a><!-- Evaluation of MSS Data (Currently Updating) -->
+                <a href="#">Evaluation of MSS Data</a>
             </li>
             <li class="menu-item">
-                <a href="#"></a><!--Request a Dedicated Consultant-->
+                <a href="#">Request a Dedicated Consultant</a>
             </li>
             <li class="menu-item">
-                <a href="#"></a><!--Profile-->
+                <a href="#">Profile</a>
             </li>
         </ul>
     </div>
@@ -148,9 +160,14 @@
     <!-- Main Content -->
     <div class="govuk-width-container" id="main-content">
         <main class="govuk-main-wrapper" role="main">
+            <!-- Page Heading -->
+            <div class="page-heading">
+                TradeSphere Global: Access UK and EU Tariff Codes, and VAT Information
+            </div>
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full">
                     {% block content %}
+                    <p>Welcome to the TradeSphere Dashboard. Explore the features using the menu on the left.</p>
                     {% endblock %}
                 </div>
             </div>
@@ -190,19 +207,31 @@
             const chatbotUI = document.getElementById("chatbot-ui");
 
             chatbotToggle.addEventListener("click", () => {
-                // Toggle visibility and animate chatbot window
                 const isOpen = chatbotUI.style.transform === "translateX(0%)";
                 chatbotUI.style.transform = isOpen ? "translateX(100%)" : "translateX(0%)";
                 chatbotUI.style.display = isOpen ? "none" : "block";
             });
         });
     </script>
-
-    <footer class="govuk-footer" role="contentinfo">
-        <div class="govuk-width-container">
-            <hr class="govuk-footer__section-break">
+<footer class="govuk-footer" role="contentinfo" style="background-color: #2a2a2a; color: white; padding: 20px 0;">
+    <div class="govuk-width-container" style="display: flex; justify-content: space-between; align-items: center;">
+        <!-- Left side: Text Content -->
+        <div style="font-size: 14px;">
+            <p style="margin: 0;">TradeSphere Global - RKLS Groups Pvt.Ltd.</p>
+            <p style="margin: 0;">All rights reserved &copy; 2025</p>
         </div>
-    </footer>
+        <!-- Right side: Logo with styling for smaller size -->
+        <div style="background-color: black; padding: 5px;">
+            <img src="/static/assets/images/rklss.png" alt="Company Logo" style="height: 40px; width: auto;">
+        </div>
+    </div>
+    <!-- Horizontal Line for separation -->
+    <div class="govuk-width-container">
+        <hr class="govuk-footer__section-break" style="border-top: 1px solid #444; margin: 10px 0;">
+    </div>
+</footer>
+
+
 
     {% block extra_js %}{% endblock %}
 </body>
