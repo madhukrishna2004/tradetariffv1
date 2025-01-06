@@ -214,9 +214,10 @@ def chat():
         
         # OpenAI API call for the chatbot response
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "system", "content": "You are a helpful assistant."},
-                      {"role": "user", "content": user_message}],
+            model="gpt-4",
+            messages=[{"role": "user", "content": user_message}],
+            max_tokens=200,
+            temperature=0.6,
         )
         
         # Get the response from OpenAI
