@@ -1,8 +1,8 @@
 [
     {
-        "final_product": "tablet",
-        "commodity": "84714100",
+        "final_product": "laptops",
+        "commodity": "84713000",
         "origin": "CTH except from non-originating materials of heading 84.73;\nor\nMaxNOM 50 % (EXW).",
-        "description": "Data-processing machines, automatic, comprising in the same housing at least a central processing unit, and one input unit and one output unit, whether or not combined (excl. portable weighing <= 10 kg and excl. those presented in the form of systems and peripheral units)"
+        "description": "Data-processing machines, automatic, portable, weighing <= 10 kg, consisting of at least a central processing unit, a keyboard and a display (excl. peripheral units)"
     }
 ]

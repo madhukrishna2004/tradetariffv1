@@ -3,6 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const fetchHsCodeButton = document.getElementById('fetch-hs-code');
     if (fetchHsCodeButton) {
         fetchHsCodeButton.addEventListener('click', () => {
+            // Show temporary info message
+            alert('After clicking the Fetch HS Code button, TradesphereChat AI will automatically suggest the most suitable HS Code. If the correct code is not retrieved, click the button again. Once the additional details are no longer needed, please remove them from the entry below (HS CODE).');
+
             const productName = document.getElementById('final-product').value.trim();
             if (!productName) {
                 alert('Please enter a product name.');
@@ -25,9 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (hsCodeInput) {
                             hsCodeInput.value = data.hs_code;
                             finalProduct = productName;
-
                         }
-                        
                     }
                 })
                 .catch((error) => console.error('Error fetching HS Code:', error));

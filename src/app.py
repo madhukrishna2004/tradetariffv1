@@ -22,7 +22,7 @@ from datetime import datetime
 from fpdf import FPDF
 from io import BytesIO
 from flask import Flask, request, jsonify, send_file
-
+from datetime import timedelta
 logger = logging.getLogger(__name__)
 import json
 # Load environment variables from .env file
@@ -38,7 +38,7 @@ app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = 'b0609b9b73170e0d13c4ce616560cc8a316c14e93e4f54ab'
 # Enable template auto-reload to refresh templates during development
 app.config['TEMPLATES_AUTO_RELOAD'] = True
-
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=15)
 # Disable caching for static files during development
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Disable static file caching
 
@@ -148,7 +148,7 @@ def home():
         return redirect("/login")
     return redirect("/tariff")
 
-
+ 
 
 @app.route("/accessibility", strict_slashes=False)
 def accessibility():
