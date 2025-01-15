@@ -46,3 +46,9 @@ zope.interface==7.2
 python-dotenv
 python-dotenv
 cryptography
+pandas
+pandas
+matplotlib
+requests
+fpdf
+ujson  # Optional, if needed
