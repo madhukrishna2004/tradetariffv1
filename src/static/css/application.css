@@ -1486,12 +1486,14 @@ tr .highlight {
     background-color: #cae2f0;
 }
 
-
+.hs-cell__subdivision {
+    background-color: #c9e8e5;
+}
 
 .govuk-table__cell--modal {
     display: none;
     position: fixed;
-    background: white;
+    background: rgb(12, 12, 12);
     border: solid black 1px;
     left: 50%;
     top: 50%;
@@ -1501,8 +1503,10 @@ tr .highlight {
     margin-top: -126px; /* Assume a rough height of ~260px + margins + borders divided by 2. */
 }
 
-.govuk-table__cell:target .govuk-table__cell--modal, .govuk-table__cell--modal.nohover {
+.govuk-table__cell:target .govuk-table__cell--modal,
+.govuk-table__cell--modal.nohover {
     display: unset;
+    color: #625710 !important; /* Force black color */
 }
 
 .govuk-table__cell--modal.with-buttons {

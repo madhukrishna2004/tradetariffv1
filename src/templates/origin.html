@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/origin.css') }}">
+    <script src="{{ url_for('static', filename='js/origin.js') }}" defer></script>
+    <title>HS Code and Commodity Details</title>
+</head>
+<body>
+    
+    
+    <!-- Fetch HS Code Section -->
+    <div>
+        <h2>Enter Final Product</h2>
+        <input type="text" id="final-product" placeholder="Enter product name" required>
+        <button id="fetch-hs-code">Fetch HS Code</button>
+        <i class="info-icon"></i>
+        <span id="info-message"></span>
+        
+
+    </div>
+    <div id="fetch-status-message"></div>
+
+    <!-- HS Code Info Section -->
+    <div id="hs-code-section">
+        <label for="hs-code">HS Code:</label>
+        <input type="text" id="hs-code" name="hs_code" placeholder="Enter HS Code" required>
+        <button id="fetch-info">Fetch Info</button>
+    </div>
+
+    <!-- Commodity Info Section -->
+    <div id="commodity-info">
+        <h3>Commodity Details:</h3>
+        <table id="commodity-table">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>HS Code</th>
+                    <th>Description</th>
+                    <th>Rule of Origin</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button id="save-selected">Save Selected</button>
+    </div>
+
+    <div>
+        <h4>Need help finding Commodity Code?</h4>
+        <p>Use <strong>TradesphereChat AI</strong> in the corner for further assistance.</p>
+    </div>
+
+    <script>
+        // Handle file upload and processing
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+
+    try {
+        const response = await fetch('/process-file', { method: 'POST', body: formData });
+        if (!response.ok) {
+            throw new Error(`Error: ${response.statusText}`);
+        }
+
+        const data = await response.blob();
+        if (data.type === 'application/json') {
+            const jsonData = await data.json();
+            if (jsonData.error) {
+                alert(jsonData.error);
+            }
+        } else {
+            const downloadButton = document.getElementById('download-report');
+            if (downloadButton) {  // Ensure button exists
+                downloadButton.href = URL.createObjectURL(data);
+                downloadButton.style.display = 'block';
+
+                downloadButton.addEventListener('click', () => {
+                    URL.revokeObjectURL(downloadButton.href);
+                });
+            } else {
+                alert('Download button not found');
+            }
+        }
+    } catch (error) {
+        console.error('File upload error:', error);
+        alert('Failed to process the file. Please try again.');
+    }
+});
+
+        // HS Code fetching and info retrieval scripts
+        document.getElementById('fetch-hs-code').addEventListener('click', () => {
+            const productName = document.getElementById('final-product').value;
+            fetch('/fetch-hs-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_name: productName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    document.getElementById('hs-code').value = data.hs_code;
+                }
+            })
+            .catch(error => console.error('Error fetching HS Code:', error));
+        });
+
+        document.getElementById('fetch-info').addEventListener('click', () => {
+            const hsCode = document.getElementById('hs-code').value;
+            fetch(`/hs-code-info/${hsCode}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        const tableBody = document.getElementById('commodity-table').getElementsByTagName('tbody')[0];
+                        tableBody.innerHTML = '';
+                        data.matched_commodities.forEach(row => {
+                            let newRow = tableBody.insertRow();
+                            newRow.innerHTML = `
+                                <td><input type="checkbox" data-hs="${row.hs_code}"></td>
+                                <td>${row.hs_code}</td>
+                                <td>${row.description}</td>
+                                <td>${row.rule_of_origin}</td>
+                            `;
+                        });
+                    }
+                })
+                .catch(error => console.error('Error fetching HS Code info:', error));
+        });
+
+        document.getElementById('save-selected').addEventListener('click', () => {
+            const selectedHSCodes = Array.from(document.querySelectorAll('#commodity-table input:checked')).map(input => input.dataset.hs);
+            if (selectedHSCodes.length) {
+                console.log('Selected HS Codes:', selectedHSCodes);
+                alert('Selected HS Codes saved successfully!');
+            } else {
+                alert('No HS Codes selected.');
+            }
+        });
+    </script>
+
+    <!-- File Upload Section -->
+    <div>
+        <h2>Upload File</h2>
+        <p>Make sure the file is in the preferred format. 
+            <a href="/static/template_bill.xlsx" download>[Download Template]</a>
+        </p>
+    
+        <form id="upload-form" action="/process-file" method="POST" enctype="multipart/form-data">
+            <label for="template-upload">Choose your "Bill Of Material" file:</label>
+            <input type="file" id="template-upload" name="file" accept=".xlsx" required>
+            <button type="submit">Process and Download</button>
+           
+        </form>
+        
+
+    </div>
+    
+</body>
+</html>

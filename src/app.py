@@ -12,11 +12,19 @@ from whitenoise import WhiteNoise
 import openai
 from dotenv import load_dotenv
 from cryptography.fernet import Fernet
-
 from src import decorators, utils
+from flask import Flask, request, redirect, session, render_template, flash
+import openai
+import os
+import pandas as pd
+import requests
+from datetime import datetime
+from fpdf import FPDF
+from io import BytesIO
+from flask import Flask, request, jsonify, send_file
 
 logger = logging.getLogger(__name__)
-
+import json
 # Load environment variables from .env file
 load_dotenv()
 
@@ -27,7 +35,7 @@ if os.getenv("SENTRY_KEY") and os.getenv("SENTRY_PROJECT") and os.getenv("SENTRY
     )
 
 app = flask.Flask(__name__)
-
+app.config['SECRET_KEY'] = 'b0609b9b73170e0d13c4ce616560cc8a316c14e93e4f54ab'
 # Enable template auto-reload to refresh templates during development
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
@@ -106,10 +114,40 @@ thread_pool = ThreadPoolExecutor()
 # Generate cache-busting version string
 VERSION = f"?v={int(os.path.getmtime(__file__))}"  # Based on the file modification time
 
+GLOBAL_TARIFF_FILE = 'global-uk-tariff.xlsx'
+
+EXCHANGE_RATE_API_URL = "https://api.exchangerate-api.com/v4/latest/"
+BASE_CURRENCY = "GBP"
+
+# Example credentials for validation
+users = {
+    "tradesphere@admin": "password",
+    "tradesphere@user1": "user1"
+}
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        # Validate credentials
+        if username in users and users[username] == password:
+            session["user"] = username  # Store username in the session
+            return redirect("/tariff")  # Redirect to /tariff after login
+        else:
+            return render_template("login.html", error="Invalid username or password!")
+
+    # Render the login page for GET requests
+    return render_template("login.html")
 
 @app.route("/")
 def home():
-    return flask.redirect("/tariff")
+    # Redirect to login page if not logged in
+    if "user" not in session:
+        return redirect("/login")
+    return redirect("/tariff")
+
 
 
 @app.route("/accessibility", strict_slashes=False)
@@ -121,8 +159,15 @@ def accessibility():
 @decorators.cache_without_request_args(
     q=utils.DEFAULT_FILTER, p=utils.DEFAULT_PAGE, n=utils.DEFAULT_SAMPLE_SIZE
 )
+
+#@app.route("/tariff")
 @decorators.compress_response
 def tariff():
+    # Ensure user is logged in
+    if "user" not in session:
+        return redirect("/login")
+
+    # Existing tariff logic
     data, total = utils.get_data_from_request()
     page = utils.get_positive_int_request_arg("p", utils.DEFAULT_PAGE)
     sample_size = utils.get_positive_int_request_arg("n", utils.DEFAULT_SAMPLE_SIZE)
@@ -139,14 +184,16 @@ def tariff():
         sample_size=sample_size,
         start_index=(sample_size * (page - 1)) + 1 if len(data) != 0 else 0,
         stop_index=sample_size * page if sample_size * page < total else total,
-        version=VERSION,
+        version="1.0",  # Replace with the actual version variable if needed
     )
+
 
 
 @app.route("/api/global-uk-tariff.csv")
 @decorators.cache_without_request_args(
     q=utils.DEFAULT_FILTER, p=utils.DEFAULT_PAGE, n=utils.DEFAULT_SAMPLE_SIZE
 )
+
 @decorators.compress_response
 def tariff_csv():
     filter_arg = request.args.get(utils.FILTER_ARG)
@@ -197,11 +244,26 @@ def dcat_metadata():
         flask.render_template("metadata.xml"), mimetype="application/rdf+xml",
     )
 
+@app.route("/logout")
+def logout():
+    session.pop("user", None)  # Remove user from session
+    return redirect("/login")
 
 @app.route("/chatbot.html")
 def chatbot():
     return flask.render_template("chatbot.html", version=VERSION)
 
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
+
+@app.route('/pricings')
+def pricings():
+    return render_template('pricings.html')
+
+@app.route('/origin')
+def origin():
+    return render_template('origin.html')
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -270,6 +332,413 @@ def google_analytics(response: Response):
         logger.exception("Google Analytics failed")
         pass
     return response
+
+@app.route('/save-selected-data', methods=['POST'])
+def save_selected_data():
+    try:
+        # Get data from the request
+        data = request.json
+        final_product = data.get('final_product')  # Extract final_product
+        selected_data = data.get('selected_data', [])  # Extract selected_data list, default to empty list
+
+        if not selected_data:
+            return {"success": False, "error": "No data received."}
+
+        processed_data = []
+        for item in selected_data:
+            try:
+                # Process each item and include the final product
+                processed_data.append({
+                    "final_product": final_product,
+                    "commodity": item['hs_code'],
+                    "origin": item['rule_of_origin'],
+                    "description": item.get('description', '')
+                })
+            except KeyError as e:
+                return {"success": False, "error": f"Missing key {e} in item: {item}"}
+
+        if not processed_data:
+            return {"success": False, "error": "No valid processed data."}
+
+        # Define JSON file path
+        json_file_path = os.path.join(os.getcwd(), 'processed_data.json')
+        
+        # Write JSON data to a file
+        with open(json_file_path, 'w') as json_file:
+            json.dump(processed_data, json_file, indent=4)
+
+        # Define Excel file path
+        xlsx_file_path = os.path.join(os.getcwd(), 'processed_data.xlsx')
+
+        # Clear the existing Excel file
+        if os.path.exists(xlsx_file_path):
+            os.remove(xlsx_file_path)
+
+        # Writing to Excel
+        import pandas as pd
+
+        df = pd.DataFrame(processed_data)
+        df.to_excel(xlsx_file_path, index=False)
+
+        # Return success response with file paths
+        return {
+            "success": True,
+            "processed_data": processed_data,
+            "json_file_path": json_file_path,
+            "xlsx_file_path": xlsx_file_path
+        }
+
+    except Exception as e:
+        # Handle any unexpected errors
+        return {"success": False, "error": str(e)}
+# Function to fetch exchange rates
+def get_exchange_rates(base_currency):
+    response = requests.get(f"{EXCHANGE_RATE_API_URL}{base_currency}")
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise ValueError("Failed to fetch exchange rates.")
+
+# Function to process the uploaded Excel file
+def process_excel(file):
+    df = pd.read_excel(file)
+
+    # Standardize column names
+    df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
+
+    # Check if all required columns are present
+    required_columns = ['item_number', 'description', 'value', 'currency', 'country_of_origin', 'commodity_code']
+    if not all(col in df.columns for col in required_columns):
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        raise KeyError(f"Missing required column(s): {', '.join(missing_columns)}")
+
+    # Fetch exchange rates
+    rates = get_exchange_rates(BASE_CURRENCY)['rates']
+
+    # Convert values to GBP
+    df['value_gbp'] = df.apply(
+        lambda row: row['value'] / rates.get(row['currency'], 1) if row['currency'] in rates else None,
+        axis=1
+    )
+
+    # Drop rows with missing conversion
+    df = df.dropna(subset=['value_gbp'])
+
+    # Calculate total value in GBP
+    total_value = df['value_gbp'].sum()
+
+    # Calculate country contribution percentages
+    contributions = (
+        df.groupby('country_of_origin')['value_gbp']
+        .sum()
+        .apply(lambda x: (x / total_value) * 100)
+        .to_dict()
+    )
+
+    return df, total_value, contributions, rates
+
+import os 
+import pandas as pd
+from fpdf import FPDF
+import matplotlib.pyplot as plt
+
+# Force Matplotlib to use a non-GUI backend
+os.environ['MPLBACKEND'] = 'Agg'
+
+def generate_beautiful_pdf(data, total, contributions, rates, excel_file='processed_data.xlsx'):
+    print("Generating PDF report...")
+
+    # Ensure the output directory existssrc\static src\static
+    pdf_output_file = 'src/pdf_report/Enhanced_Summary_Report.pdf'
+    os.makedirs(os.path.dirname(pdf_output_file), exist_ok=True)
+
+    # Verify required columns
+    required_columns = ['item_number', 'description', 'value_gbp', 'country_of_origin', 'commodity_code', 'currency']
+    for column in required_columns:
+        if column not in data.columns:
+            raise KeyError(f"Missing column: {column}")
+
+    pdf = FPDF('P', 'mm', 'A4')
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+
+    # Reading dynamic headings from Excel
+    try:
+        excel_data = pd.read_excel(excel_file, header=None)  # Read without specifying the header
+        headers = excel_data.iloc[0]  # First row as headers
+        values = excel_data.iloc[1]  # Second row as values
+
+        # Mapping dynamic headings to corresponding values
+        final_product = values[headers[headers == 'final_product'].index[0]]
+        commodity = values[headers[headers == 'commodity'].index[0]]
+        origin = values[headers[headers == 'origin'].index[0]]
+
+    except (KeyError, IndexError) as e:
+        # Fallback values in case headings or values are missing
+        final_product = 'Final Product'
+        commodity = 'Commodity'
+        origin = 'Origin'
+
+    # Add watermark
+    pdf.set_text_color(220, 220, 220)  # Light gray for watermark
+    pdf.set_font("Arial", 'B', 50)
+    pdf.set_xy(30, 130)  # Position watermark
+    pdf.cell(0, 20, "Tradesphere Global", ln=True, align='C')
+    pdf.set_text_color(0, 0, 0)  # Reset text color to black
+
+    # Title and header
+    pdf.set_xy(10, 10)
+    pdf.set_font("Arial", 'B', 18)
+    pdf.cell(0, 15, txt="Summary Report", ln=True, align='C')
+    pdf.ln(10)
+
+    # Table Header
+    pdf.set_fill_color(200, 200, 200)  # Header color
+    pdf.set_font("Arial", 'B', 12)
+    col_widths = [20, 55, 25, 40, 40]
+    headers = ["Item", "Description", "Value (GBP)", "Country of Origin", "Commodity"]
+
+    for i, header in enumerate(headers):
+        pdf.cell(col_widths[i], 12, txt=header, border=1, align='C', fill=True)
+    pdf.ln()
+
+    # Table Rows
+    pdf.set_font("Arial", size=10)
+    pdf.set_fill_color(240, 240, 240)
+    fill = False
+
+    for _, row in data.iterrows():
+        fill = not fill
+        pdf.cell(col_widths[0], 10, txt=str(row['item_number']), border=1, align='C', fill=fill)
+        pdf.cell(col_widths[1], 10, txt=row['description'], border=1, align='L', fill=fill)
+        pdf.cell(col_widths[2], 10, txt=f"{row['value_gbp']:.2f}", border=1, align='R', fill=fill)
+        pdf.cell(col_widths[3], 10, txt=row['country_of_origin'], border=1, align='C', fill=fill)
+        pdf.cell(col_widths[4], 10, txt=str(row['commodity_code']), border=1, align='C', fill=fill)
+        pdf.ln()
+
+    # Add Summary Section
+    pdf.ln(10)
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(0, 10, txt="Assembled Place=UK", ln=True)
+    pdf.cell(0, 10, txt="Final Product Details:", ln=True)
+    pdf.set_font("Arial", size=10)
+    pdf.cell(0, 8, txt=f"Final Product={final_product}", ln=True)
+    pdf.cell(0, 8, txt=f"Commodity={commodity}", ln=True)
+    pdf.cell(0, 8, txt=f"Principle of Origin={origin}", ln=True)
+    pdf.ln(10)
+
+    # Rule of Origin Section
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 10, txt="Specific Rule of Origin", ln=True)
+    pdf.set_font("Arial", size=10)
+    pdf.multi_cell(0, 8, txt=f"{commodity} = {origin}")
+    pdf.ln(10)
+
+    # Conditional Text
+    if 'CTH' in origin:
+        pdf.multi_cell(0, 8, txt=(
+            "According to CTH: CTH means production from non-originating materials of any heading, "
+            "except that of the product; this means that any non-originating material used in the "
+            "production of the product must be classified under a heading (4-digit level of the Harmonised System) "
+            "other than that of the product (i.e. a change in heading). Since the commodity codes in the bill of materials "
+            "are not equal to the first four digits of the final product's commodity code, this product can be considered "
+            "as UK origin (assembled in the UK)."
+        ))
+    elif 'CTSH' in origin:
+        pdf.multi_cell(0, 8, txt=(
+            "CTSH means production from non-originating materials of any subheading, except that of the product; "
+            "this means that any non-originating material used in the production of the product must be classified under "
+            "a subheading (6-digit level of the Harmonised System) other than that of the product (i.e. a change in subheading)."
+
+        ))
+
+    # Note Section
+    pdf.ln(10)
+    pdf.set_text_color(255, 0, 0)  # Red for notes
+    pdf.set_font("Arial", 'B', 10)
+    pdf.multi_cell(0, 8, txt=(
+        "Note: Please note that this calculation assumes that all items within the EU/UK "
+        "have valid preference origin statements from the suppliers."
+    ))
+
+    # MaxNOM Rule
+    pdf.set_text_color(0, 0, 0)  # Reset text color
+    pdf.ln(10)
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 10, txt="Alternatively, According to MaxNOM Rule:", ln=True)
+    pdf.set_font("Arial", size=10)
+    pdf.cell(0, 10, txt=f"Total Value: {total:.2f} GBP", ln=True)
+    pdf.cell(0, 10, txt=f"(Calculated using today's exchange rates to convert\n"
+                        "non-local currencies into GBP, the currency of the assembled country)", ln=True)
+    pdf.ln(5)
+
+    # Contribution Breakdown
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(0, 10, txt="Contribution Breakdown", ln=True)
+    pdf.ln(5)
+    for country, percentage in contributions.items():
+        pdf.cell(0, 8, txt=f"{country}: {percentage:.2f}%", ln=True)
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 10, txt="Exchange Rates Used:", ln=True)
+    pdf.set_font("Arial", size=10)
+
+    relevant_currencies = data['currency'].unique()
+    for currency in relevant_currencies:
+        rate = rates.get(currency)
+        if rate:
+            pdf.cell(0, 8, txt=f"{rate:.2f} {currency} = 1 GBP", ln=True)
+    pdf.ln(10)
+    pdf.set_font("Arial", 'B', 11)
+    pdf.multi_cell(0, 8, txt=(f"As based on the findings, the MaxNOM percentage is less than 50%. "
+                              f"Hence, this product can be considered as UK origin."))
+
+    pdf.ln(10)
+    pdf.set_text_color(0, 0, 255)  # Blue for clickable link
+    pdf.set_font("Arial", 'B', 10)
+    pdf.cell(0, 10, txt="Additionally, you can apply for a binding origin decision at HMRC:", ln=True)
+    pdf.set_font("Arial", size=10)
+    pdf.cell(0, 10, txt="https://www.gov.uk/guidance/apply-for-a-binding-origin-information-decision", ln=True)
+    # Pie Chart for Contributions
+    pdf.add_page()
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(0, 10, txt="Pie Chart of Contributions", ln=True)
+    pdf.ln(5)
+
+    uk_eu_percentage = contributions.get('UK', 0) + contributions.get('EU', 0)
+    rest_percentage = sum(percent for country, percent in contributions.items() if country not in ['UK', 'EU'])
+    labels = ['Rest of the Countries', 'UK & EU']
+    sizes = [rest_percentage, uk_eu_percentage]
+    colors = ['#FF9999', '#66B2FF']
+
+    plt.figure(figsize=(6, 6))
+    plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=140, colors=colors, wedgeprops=dict(edgecolor='black'))
+    plt.axis('equal')
+    plt.title('Contribution Breakdown', fontsize=14)
+    pie_chart_path = 'pdf_report/pie_chart.png'
+    plt.savefig(pie_chart_path)
+    plt.close()
+
+    pdf.image(pie_chart_path, x=10, y=60, w=180)
+
+    # Add Final Note
+ 
+
+
+    # Save PDF
+    pdf.output(pdf_output_file)
+    print(f"PDF report generated: {pdf_output_file}")
+    return pdf_output_file
+
+
+@app.route('/process-file', methods=['POST'])
+def process_file():
+    print("Received a file upload request.")
+    if 'file' not in request.files:
+        print("No file part.")
+        return jsonify({'error': 'No file part'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        print("No selected file.")
+        return jsonify({'error': 'No selected file'}), 400
+
+    if file:
+        try:
+            print(f"Processing file: {file.filename}")
+            df, total_value, contributions, rates = process_excel(file)
+            pdf_output_file = generate_beautiful_pdf(df, total_value, contributions, rates)
+
+            # Return the ID or path to allow downloading later
+            report_id = os.path.basename(pdf_output_file)
+            print(f"PDF generated: {pdf_output_file}")
+            return jsonify({'message': 'File processed successfully.', 'download_url': f'/download-report/{report_id}'}), 200
+
+        except KeyError as e:
+            missing_columns = ', '.join(e.args)
+            print(f"KeyError: Missing columns: {missing_columns}")
+            return jsonify({'error': f"Missing required columns: {missing_columns}"}), 400
+        except ValueError as e:
+            print(f"ValueError: {str(e)}")
+            return jsonify({'error': f"Value error: {str(e)}"}), 400
+        except FileNotFoundError:
+            print(f"FileNotFoundError: The file does not exist or is not accessible.")
+            return jsonify({'error': 'File not found'}), 404
+        except PermissionError:
+            print(f"PermissionError: Insufficient permissions.")
+            return jsonify({'error': 'Permission error'}), 403
+
+    print("Unexpected error occurred.")
+    return jsonify({'error': 'Unexpected error'}), 500
+
+# Endpoint to serve the generated PDF
+@app.route('/download-report/<path:report_id>', methods=['GET'])
+def download_report(report_id):
+    pdf_dir = 'pdf_report'
+    pdf_file_path = os.path.join(pdf_dir, report_id)
+
+    if os.path.exists(pdf_file_path):
+        print(f"Serving file: {pdf_file_path}")
+        return send_file(pdf_file_path, as_attachment=True, download_name=report_id, mimetype='application/pdf')
+    else:
+        print(f"File not found: {pdf_file_path}")
+        return jsonify({'error': 'File not found'}), 404
+
+
+@app.route('/fetch-hs-code', methods=['POST'])
+def fetch_hs_code():
+    data = request.json
+    product_name = data.get('product_name')
+    if not product_name:
+        return jsonify({'error': 'Product name is required'})
+
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "system", "content": "Extract numeric HS Code from product description."},
+                  {"role": "user", "content": f"Product: {product_name}"}]
+    )
+    hs_code = response['choices'][0]['message']['content']
+    return jsonify({'hs_code': hs_code})
+
+def get_commodity_details(commodity_code):
+    df = pd.read_excel(GLOBAL_TARIFF_FILE)
+    if 'commodity' not in df.columns:
+        return None
+
+    df['commodity'] = df['commodity'].astype(str).str.strip()
+    df['description'] = df['description'].astype(str).str.strip()
+    df['Product-specific rule of origin'] = df['Product-specific rule of origin'].astype(str).str.strip()
+
+    matched = df[df['commodity'].str.startswith(str(commodity_code).strip())]
+
+    if not matched.empty:
+        return matched.to_dict(orient='records')
+
+    return None
+
+@app.route('/hs-code-info/<string:hs_code>', methods=['GET'])
+def get_hs_code_info(hs_code):
+    try:
+        # Retrieve commodity details based on hs_code
+        matched_commodities = get_commodity_details(hs_code)
+
+        if not matched_commodities:
+            return jsonify({"error": "No matching commodities found for HS Code."})
+
+        # Fetch origin and other details
+        data = []
+        for commodity in matched_commodities:
+            data.append({
+                "hs_code": commodity.get('commodity'),
+                "description": commodity.get('description'),
+                "rule_of_origin": commodity.get('Product-specific rule of origin'),
+                #"country_of_origin": commodity.get('country_of_origin')  # Assuming country_of_origin is the principal origin
+            })
+
+        return jsonify({"matched_commodities": data})
+
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
 
 
 if __name__ == "__main__":

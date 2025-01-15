@@ -1453,7 +1453,7 @@
 }
 
 .govuk-button:active, .govuk-button:hover, .govuk-button:link, .govuk-button:visited {
-    color: #fff;
+    color: #100f0f;
     text-decoration: none
 }
 
