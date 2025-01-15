@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (fetchHsCodeButton) {
         fetchHsCodeButton.addEventListener('click', () => {
             // Show temporary info message
-            alert('After clicking the Fetch HS Code button, TradesphereChat AI will automatically suggest the most suitable HS Code. If the correct code is not retrieved, click the button again. Once the additional details are no longer needed, please remove them from the entry below (HS CODE).');
+            alert('After clicking the Fetch HS Code button, TradesphereChat AI will automatically suggest the most suitable HS Code. If the correct code is not retrieved, click the button again. You can also select the exact product from the below Commodity Details, which will display after some part of the given entry. Once the additional details are no longer needed, please remove them from the entry below (HS CODE).');
 
             const productName = document.getElementById('final-product').value.trim();
             if (!productName) {
