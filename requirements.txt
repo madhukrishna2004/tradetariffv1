@@ -52,3 +52,4 @@ matplotlib
 requests
 fpdf
 ujson  # Optional, if needed
+openpyxl
