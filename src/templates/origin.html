@@ -158,6 +158,41 @@
         
 
     </div>
+    <!-- Chatbot Integration -->
+    <div id="chatbot-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+        <button id="chatbot-toggle" 
+            aria-label="Open Chatbot" 
+            style="background-color: #3d3e3f; color: rgb(0, 0, 0); border: none; padding: 15px; border-radius: 50%; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); cursor: pointer;">
+            💬
+        </button>
+    </div>
     
+    <div id="chatbot-ui" 
+        style="display: none; position: fixed; bottom: 20px; right: 20px; width: 400px; height: 600px; background: rgb(16, 16, 16); border: 1px solid #292828; border-radius: 10px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); overflow: hidden; transform: translateX(100%); transition: transform 0.5s ease-in-out;">
+        <iframe 
+            src="/chatbot.html" 
+            title="Chatbot Assistant" 
+            style="width: 100%; height: 100%; border: none;">
+        </iframe>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        const chatbotToggle = document.getElementById("chatbot-toggle");
+        const chatbotUI = document.getElementById("chatbot-ui");
+
+        chatbotToggle.addEventListener("click", () => {
+            const isOpen = chatbotUI.style.display === "block";
+            if (isOpen) {
+                chatbotUI.style.transform = "translateX(100%)";
+                chatbotUI.style.display = "none";
+            } else {
+                chatbotUI.style.transform = "translateX(0%)";
+                chatbotUI.style.display = "block";
+            }
+        });
+    });
+
+    </script>
 </body>
 </html>

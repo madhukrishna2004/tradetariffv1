@@ -212,3 +212,9 @@ button:hover, table tr:hover {
         transform: rotate(360deg);
     }
 }
+#chatbot-ui {
+    display: none;
+    transform: translateX(100%);
+    transition: transform 0.5s ease-in-out;
+}
+
