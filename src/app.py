@@ -598,15 +598,37 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     pdf.cell(0, 10, txt="Additionally, you can apply for a binding origin decision at HMRC:", ln=True)
     pdf.set_font("Arial", size=10)
     pdf.cell(0, 10, txt="https://www.gov.uk/guidance/apply-for-a-binding-origin-information-decision", ln=True)
+
+    pdf.set_font("Arial", 'B', 10)
+    pdf.cell(0, 10, txt="Apply for an Advance Tariff Ruling:", ln=True)
+    pdf.set_text_color(0, 0, 255)  # Blue for clickable link
+    pdf.set_font("Arial", size=10)
+
+    # Adding a clickable link
+    url = "https://www.gov.uk/guidance/apply-for-an-advance-tariff-ruling#apply-for-an-advance-tariff-ruling"
+    pdf.cell(0, 10, txt="Go to Website", ln=True, link=url)
+
     # Pie Chart for Contributions
     pdf.add_page()
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(0, 10, txt="Pie Chart of Contributions", ln=True)
     pdf.ln(5)
 
-    uk_eu_percentage = contributions.get('UK', 0) + contributions.get('EU', 0)
-    rest_percentage = sum(percent for country, percent in contributions.items() if country not in ['UK', 'EU'])
-    labels = ['Rest of the Countries', 'UK & EU']
+    eu_countries = [
+        "Austria", "Belgium", "Bulgaria", "Croatia", "Republic of Cyprus", "Czech Republic",
+        "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland",
+        "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland",
+        "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden"
+    ]
+    uk_countries = ["England", "Scotland", "Wales", "Northern Ireland", "UK"]
+
+    # Combine EU and UK contributions
+    uk_eu_percentage = sum(percent for country, percent in contributions.items() if country in eu_countries or country in uk_countries)
+    rest_percentage = sum(
+        percent for country, percent in contributions.items()
+        if country not in eu_countries and country not in uk_countries
+    )
+    labels = ['Other Countries', 'UK & EU']
     sizes = [rest_percentage, uk_eu_percentage]
     colors = ['#FF9999', '#66B2FF']
 

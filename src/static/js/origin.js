@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fetchInfoButton = document.getElementById('fetch-info');
     if (fetchInfoButton) {
         fetchInfoButton.addEventListener('click', () => {
+            alert('Fetching information, please wait... This may take some time.');
             const hsCode = document.getElementById('hs-code').value.trim();
             if (!hsCode) {
                 alert('Please enter an HS Code.');
@@ -75,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveSelectedButton = document.getElementById('save-selected');
     if (saveSelectedButton) {
         saveSelectedButton.addEventListener('click', () => {
+            alert('Saving Details, please wait...');
             const selectedData = Array.from(
                 document.querySelectorAll('#commodity-table input:checked')
             ).map((input) => {
@@ -125,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
 if (uploadForm) {
     uploadForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        alert('The processed file will be available for download shortly');
         const formData = new FormData(e.target);
 
         try {
