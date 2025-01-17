@@ -587,12 +587,54 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
         rate = rates.get(currency)
         if rate:
             pdf.cell(0, 8, txt=f"{rate:.2f} {currency} = 1 GBP", ln=True)
-    pdf.ln(10)
-    pdf.set_font("Arial", 'B', 11)
-    pdf.multi_cell(0, 8, txt=(f"As based on the findings, the MaxNOM percentage is less than 50%. "
-                              f"Hence, this product can be considered as UK origin."))
+    eu_countries = [
+        "Austria", "Belgium", "Bulgaria", "Croatia", "Republic of Cyprus", "Czech Republic",
+        "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland",
+        "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland",
+        "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden"
+    ]
+    uk_countries = ["England", "Scotland", "Wales", "Northern Ireland", "UK", "United Kingdom", "Great Britain"]
+    
+    uk_eu_percentage = sum(percent for country, percent in contributions.items() if country in eu_countries or country in uk_countries)
+    rest_percentage = sum(
+        percent for country, percent in contributions.items()
+        if country not in eu_countries and country not in uk_countries
+    )
+    # Filter out countries from EU and UK lists
+    filtered_contributions = {
+        country: value for country, value in contributions.items()
+        if country not in eu_countries and country not in uk_countries
+    }
 
+    # Determine the highest contributed country (outside EU and UK)
+    if filtered_contributions:
+        highest_contributed_country = max(filtered_contributions, key=filtered_contributions.get)
+    else:
+        highest_contributed_country = "Unknown"  # Fallback if all countries are EU/UK
+
+    # Example rest_percentage (MaxNom)
+      # Replace with actual calculated value
+    max_nom_percentage = rest_percentage
+
+    # Add vertical spacing
     pdf.ln(10)
+
+    # Check the MaxNOM percentage and set the message accordingly
+    if max_nom_percentage < 50:
+        pdf.set_font("Arial", 'B', 11)
+        pdf.multi_cell(0, 8, txt=(
+            "The MaxNOM percentage is below 50%.\n"
+            "As a result, the product qualifies as UK origin."
+        ))
+    else:
+        pdf.set_font("Arial", 'B', 11)
+        pdf.multi_cell(0, 8, txt=(
+            f"Based on the findings, the MaxNOM percentage which is greater than the required 50% "
+            f"to qualify under UK origin. This is now considered as {highest_contributed_country} origin "
+            f"as the significant value and key added value is originating from {highest_contributed_country}. "
+            f"Hence, this product is considered as {highest_contributed_country} origin under this MaxNOM Rule."
+        ))
+        
     pdf.set_text_color(0, 0, 255)  # Blue for clickable link
     pdf.set_font("Arial", 'B', 10)
     pdf.cell(0, 10, txt="Additionally, you can apply for a binding origin decision at HMRC:", ln=True)
@@ -620,7 +662,7 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
         "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland",
         "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden"
     ]
-    uk_countries = ["England", "Scotland", "Wales", "Northern Ireland", "UK"]
+    uk_countries = ["England", "Scotland", "Wales", "Northern Ireland", "UK","United Kingdom","Great Britain"]
 
     # Combine EU and UK contributions
     uk_eu_percentage = sum(percent for country, percent in contributions.items() if country in eu_countries or country in uk_countries)
