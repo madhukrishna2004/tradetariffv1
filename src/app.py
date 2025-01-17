@@ -486,7 +486,7 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     pdf.cell(0, 20, "Tradesphere Global", ln=True, align='C')
     pdf.set_text_color(0, 0, 0)  # Reset text color to black
 
-    # Title and header
+    # Title and headerd
     pdf.set_xy(10, 10)
     pdf.set_font("Arial", 'B', 18)
     pdf.cell(0, 15, txt="Summary Report", ln=True, align='C')
@@ -623,16 +623,14 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     if max_nom_percentage < 50:
         pdf.set_font("Arial", 'B', 11)
         pdf.multi_cell(0, 8, txt=(
-            "The MaxNOM percentage is below 50%.\n"
-            "As a result, the product qualifies as UK origin."
+            "Based on the findings,the MaxNOM percentage is below 50%.\n"
+            "As a result the product is of UK Origin and eligible under EU-UK Preference trade agreement for Zero or reduced Duty while importing."
         ))
     else:
         pdf.set_font("Arial", 'B', 11)
         pdf.multi_cell(0, 8, txt=(
-            f"Based on the findings, the MaxNOM percentage which is greater than the required 50% "
-            f"to qualify under UK origin. This is now considered as {highest_contributed_country} origin "
-            f"as the significant value and key added value is originating from {highest_contributed_country}. "
-            f"Hence, this product is considered as {highest_contributed_country} origin under this MaxNOM Rule."
+            "Based on the findings, the MaxNOM percentage which is greater than the required 50%.\n"
+            "As a result the product can not be considered UK or EU Origin and is not eligible under EU-UK Preference trade agreement for Zero or reduced Duty while importing."
         ))
         
     pdf.set_text_color(0, 0, 255)  # Blue for clickable link
