@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (fetchHsCodeButton) {
         fetchHsCodeButton.addEventListener('click', () => {
             // Show temporary info message
-            //alert('Please manually enter the HS Code for the product in the provided field.');
+            alert('After clicking the Fetch HS Code button, TradesphereChat AI will automatically suggest the most suitable HS Code. If the correct code is not retrieved, click the button again. You can also select the exact product from the below Commodity Details, which will display after some part of the given entry. Once the additional details are no longer needed, please remove them from the entry below (HS CODE).');
 
             const productName = document.getElementById('final-product').value.trim();
             if (!productName) {
@@ -12,17 +12,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const hsCodeInput = document.getElementById('hs-code');
-            if (!hsCodeInput || !hsCodeInput.value.trim()) {
-                //alert('Please enter the HS Code.');
-                return;
-            }
-
-            const enteredHsCode = hsCodeInput.value.trim();
-            if (enteredHsCode) {
-                finalProduct = productName; // Store the product name for further use
-                //alert(`HS Code "${enteredHsCode}" saved for product "${productName}".`);
-            }
+            fetch('/fetch-hs-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ product_name: productName }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        const hsCodeInput = document.getElementById('hs-code');
+                        if (hsCodeInput) {
+                            hsCodeInput.value = data.hs_code;
+                            finalProduct = productName;
+                        }
+                    }
+                })
+                .catch((error) => console.error('Error fetching HS Code:', error));
         });
     }
 
