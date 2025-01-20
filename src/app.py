@@ -2,7 +2,7 @@ import logging
 import math
 import os
 from concurrent.futures.thread import ThreadPoolExecutor
-
+import re
 from elasticapm.contrib.flask import ElasticAPM
 import flask
 from flask import request, Response, jsonify, render_template
@@ -23,6 +23,7 @@ from fpdf import FPDF
 from io import BytesIO
 from flask import Flask, request, jsonify, send_file
 from datetime import timedelta
+from datetime import datetime
 logger = logging.getLogger(__name__)
 import json
 # Load environment variables from .env file
@@ -551,6 +552,14 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
             "a subheading (6-digit level of the Harmonised System) other than that of the product (i.e. a change in subheading)."
 
         ))
+    elif 'CC' in origin:
+        pdf.multi_cell(0, 8, txt=(
+            "CC means production from non-originating materials of any Chapter, except that of the"
+            "product; this means that any non-originating material used in the production of the product"
+            "alignmust be classified under a Chapter (2-digit level of the Harmonised System) other than that of"
+            "the product (i.e. a change in Chapter);"
+
+        ))    
 
     # Note Section
     pdf.ln(10)
@@ -565,7 +574,7 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     pdf.set_text_color(0, 0, 0)  # Reset text color
     pdf.ln(10)
     pdf.set_font("Arial", 'B', 12)
-    pdf.cell(0, 10, txt="Alternatively, According to MaxNOM Rule:", ln=True)
+    pdf.cell(0, 10, txt=f"Alternatively, according to: {origin}", ln=True)
     pdf.set_font("Arial", size=10)
     pdf.cell(0, 10, txt=f"Total Value: {total:.2f} GBP", ln=True)
     pdf.cell(0, 10, txt=f"(Calculated using today's exchange rates to convert\n"
@@ -587,6 +596,9 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
         rate = rates.get(currency)
         if rate:
             pdf.cell(0, 8, txt=f"{rate:.2f} {currency} = 1 GBP", ln=True)
+
+
+            
     eu_countries = [
         "Austria", "Belgium", "Bulgaria", "Croatia", "Republic of Cyprus", "Czech Republic",
         "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland",
@@ -594,44 +606,107 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
         "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden"
     ]
     uk_countries = ["England", "Scotland", "Wales", "Northern Ireland", "UK", "United Kingdom", "Great Britain"]
-    
+
     uk_eu_percentage = sum(percent for country, percent in contributions.items() if country in eu_countries or country in uk_countries)
     rest_percentage = sum(
         percent for country, percent in contributions.items()
         if country not in eu_countries and country not in uk_countries
     )
-    # Filter out countries from EU and UK lists
+    
     filtered_contributions = {
         country: value for country, value in contributions.items()
         if country not in eu_countries and country not in uk_countries
     }
+    
+    highest_contributed_country = max(filtered_contributions, key=filtered_contributions.get, default="Unknown")
 
-    # Determine the highest contributed country (outside EU and UK)
-    if filtered_contributions:
-        highest_contributed_country = max(filtered_contributions, key=filtered_contributions.get)
-    else:
-        highest_contributed_country = "Unknown"  # Fallback if all countries are EU/UK
-
-    # Example rest_percentage (MaxNom)
-      # Replace with actual calculated value
-    max_nom_percentage = rest_percentage
+    max_nom_percentage = rest_percentage  # Adjust as needed
 
     # Add vertical spacing
     pdf.ln(10)
 
-    # Check the MaxNOM percentage and set the message accordingly
-    if max_nom_percentage < 50:
-        pdf.set_font("Arial", 'B', 11)
-        pdf.multi_cell(0, 8, txt=(
-            "Based on the findings,the MaxNOM percentage is below 50%.\n"
-            "As a result the product is of UK Origin and eligible under EU-UK Preference trade agreement for Zero or reduced Duty while importing."
-        ))
+    # Check `origin` conditions
+    if "wholly obtained" in origin.lower():
+        message = (
+            f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+            "As a result, the product is of UK Origin and eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+        )
+    elif "MaxNOM 50% (EXW)" in origin:
+        threshold = 50
+        if max_nom_percentage < threshold:
+            message = (
+                f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+                "As a result, the product is of UK Origin and eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+            )
+        else:
+            message = (
+                f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+                "As a result, the product cannot be considered UK or EU Origin and is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+            )
+    elif "MaxNOM 70% (EXW)" in origin:
+        threshold = 70
+        if max_nom_percentage < threshold:
+            message = (
+                f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+                "As a result, the product is of UK Origin and eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+            )
+        else:
+            message = (
+                f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+                "As a result, the product cannot be considered UK or EU Origin and is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+            )
+    elif "except from non-originating materials of headings" in origin:
+        match = re.search(r"except from non-originating materials of headings (\d+\.\d+)", origin)
+        if match:
+            heading = match.group(1).replace('.', '')  # Removing dots
+            if heading in commodity:
+                message = (
+                    f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+                    "As a result, the product is of UK Origin and eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+                )
+            else:
+                message = (
+                    f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+                    "As a result, the product cannot be considered UK or EU Origin and is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+                )
+    elif "the value of non-originating materials" in origin:
+        match = re.search(r"(\d+)%.*headings (\d+) and (\d+)", origin)
+        if match:
+            specified_percentage = int(match.group(1))
+            heading1, heading2 = match.group(2), match.group(3)
+            
+            value_heading1 = commodity.get(heading1, 0)
+            value_heading2 = commodity.get(heading2, 0)
+            
+            if value_heading1 <= specified_percentage and value_heading2 <= specified_percentage:
+                message = (
+                    f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+                    "As a result, the product is of UK Origin and eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+                )
+            else:
+                message = (
+                    f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+                    "As a result, the product cannot be considered UK or EU Origin and is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+                )
+        else:
+            message = "Invalid origin condition specified."
     else:
-        pdf.set_font("Arial", 'B', 11)
-        pdf.multi_cell(0, 8, txt=(
-            "Based on the findings, the MaxNOM percentage which is greater than the required 50%.\n"
-            "As a result the product can not be considered UK or EU Origin and is not eligible under EU-UK Preference trade agreement for Zero or reduced Duty while importing."
-        ))
+        # Generic fallback
+        if max_nom_percentage < 50:
+            message = (
+                f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+                "As a result, the product is of UK Origin and eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+            )
+        else:
+            message = (
+                f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+                "As a result, the product cannot be considered UK or EU Origin and is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+            )
+
+    pdf.set_font("Arial", 'B', 11)
+    pdf.multi_cell(0, 8, txt=message)
+
+    
         
     pdf.set_text_color(0, 0, 255)  # Blue for clickable link
     pdf.set_font("Arial", 'B', 10)
@@ -647,7 +722,12 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     # Adding a clickable link
     url = "https://www.gov.uk/guidance/apply-for-an-advance-tariff-ruling#apply-for-an-advance-tariff-ruling"
     pdf.cell(0, 10, txt="Go to Website", ln=True, link=url)
-
+    
+    pdf.set_text_color(0, 0, 0)
+    current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    pdf.set_font("Arial", 'I', 10)
+    pdf.cell(0, 10, txt=f"Report generated on: {current_datetime}", ln=True)
+    
     # Pie Chart for Contributions
     pdf.add_page()
     pdf.set_font("Arial", 'B', 14)
@@ -683,7 +763,7 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     pdf.image(pie_chart_path, x=10, y=60, w=180)
 
     # Add Final Note
- 
+    
 
 
     # Save PDF

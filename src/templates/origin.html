@@ -6,9 +6,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/origin.css') }}">
     <script src="{{ url_for('static', filename='js/origin.js') }}" defer></script>
     <title>HS Code and Commodity Details</title>
+
+    
 </head>
 <body>
-    
     
     <!-- Fetch HS Code Section -->
     <div>
@@ -17,10 +18,14 @@
         <button id="fetch-hs-code">Fetch HS Code</button>
         <i class="info-icon"></i>
         <span id="info-message"></span>
-        
-
     </div>
     <div id="fetch-status-message"></div>
+
+    <!-- Animated Indicator Section -->
+    <div id="animated-indicator">
+        <span class="spinner"></span>
+        <span id="animated-message"></span>
+    </div>
 
     <!-- HS Code Info Section -->
     <div id="hs-code-section">
@@ -153,11 +158,9 @@
             <label for="template-upload">Choose your "Bill Of Material" file:</label>
             <input type="file" id="template-upload" name="file" accept=".xlsx" required>
             <button type="submit">Process and Download</button>
-           
         </form>
-        
-
     </div>
+
     <!-- Chatbot Integration -->
     <div id="chatbot-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
         <button id="chatbot-toggle" 
