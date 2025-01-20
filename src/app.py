@@ -541,9 +541,7 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
             "According to CTH: CTH means production from non-originating materials of any heading, "
             "except that of the product; this means that any non-originating material used in the "
             "production of the product must be classified under a heading (4-digit level of the Harmonised System) "
-            "other than that of the product (i.e. a change in heading). Since the commodity codes in the bill of materials "
-            "are not equal to the first four digits of the final product's commodity code, this product can be considered "
-            "as UK origin (assembled in the UK)."
+            "other than that of the product (i.e. a change in heading)."
         ))
     elif 'CTSH' in origin:
         pdf.multi_cell(0, 8, txt=(
@@ -629,31 +627,31 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     if "wholly obtained" in origin.lower():
         message = (
             f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
-            "As a result, the product is of UK Origin and eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+            "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
         )
     elif "MaxNOM 50% (EXW)" in origin:
         threshold = 50
         if max_nom_percentage < threshold:
             message = (
                 f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
-                "As a result, the product is of UK Origin and eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+                "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
             )
         else:
             message = (
                 f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
-                "As a result, the product cannot be considered UK or EU Origin and is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+                "The product is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
             )
     elif "MaxNOM 70% (EXW)" in origin:
         threshold = 70
         if max_nom_percentage < threshold:
             message = (
                 f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
-                "As a result, the product is of UK Origin and eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+                "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
             )
         else:
             message = (
                 f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
-                "As a result, the product cannot be considered UK or EU Origin and is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+                "The product is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
             )
     elif "except from non-originating materials of headings" in origin:
         match = re.search(r"except from non-originating materials of headings (\d+\.\d+)", origin)
@@ -662,12 +660,12 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
             if heading in commodity:
                 message = (
                     f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
-                    "As a result, the product is of UK Origin and eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+                    "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
                 )
             else:
                 message = (
                     f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
-                    "As a result, the product cannot be considered UK or EU Origin and is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+                    "The product is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
                 )
     elif "the value of non-originating materials" in origin:
         match = re.search(r"(\d+)%.*headings (\d+) and (\d+)", origin)
@@ -681,12 +679,12 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
             if value_heading1 <= specified_percentage and value_heading2 <= specified_percentage:
                 message = (
                     f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
-                    "As a result, the product is of UK Origin and eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+                    "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
                 )
             else:
                 message = (
                     f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
-                    "As a result, the product cannot be considered UK or EU Origin and is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+                    "The product is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
                 )
         else:
             message = "Invalid origin condition specified."
@@ -695,12 +693,12 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
         if max_nom_percentage < 50:
             message = (
                 f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
-                "As a result, the product is of UK Origin and eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+                "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
             )
         else:
             message = (
                 f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
-                "As a result, the product cannot be considered UK or EU Origin and is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+                "The product is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
             )
 
     pdf.set_font("Arial", 'B', 11)
