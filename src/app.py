@@ -266,6 +266,10 @@ def pricings():
 def origin():
     return render_template('origin.html')
 
+@app.route('/supplieraccess')
+def supplieraccess():
+    return render_template('supplieraccess.html')
+
 @app.route("/chat", methods=["POST"])
 def chat():
     try:
@@ -445,7 +449,13 @@ import matplotlib.pyplot as plt
 
 # Force Matplotlib to use a non-GUI backend
 os.environ['MPLBACKEND'] = 'Agg'
-
+def add_watermark(pdf):
+    """Adds a watermark to the current page."""
+    pdf.set_text_color(220, 220, 220)  # Light gray for watermark
+    pdf.set_font("Arial", 'B', 50)
+    pdf.set_xy(30, 130)  # Position watermark at the center
+    pdf.cell(0, 20, "Tradesphere Global", ln=True, align='C')
+    pdf.set_text_color(0, 0, 0)  # Reset text color to black
 def generate_beautiful_pdf(data, total, contributions, rates, excel_file='processed_data.xlsx'):
     print("Generating PDF report...")
 
@@ -461,6 +471,7 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
 
     pdf = FPDF('P', 'mm', 'A4')
     pdf.add_page()
+    add_watermark(pdf) 
     pdf.set_auto_page_break(auto=True, margin=15)
 
     # Reading dynamic headings from Excel
@@ -480,12 +491,7 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
         commodity = 'Commodity'
         origin = 'Origin'
 
-    # Add watermark
-    pdf.set_text_color(220, 220, 220)  # Light gray for watermark
-    pdf.set_font("Arial", 'B', 50)
-    pdf.set_xy(30, 130)  # Position watermark
-    pdf.cell(0, 20, "Tradesphere Global", ln=True, align='C')
-    pdf.set_text_color(0, 0, 0)  # Reset text color to black
+
 
     # Title and headerd
     pdf.set_xy(10, 10)
@@ -520,12 +526,12 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     # Add Summary Section
     pdf.ln(10)
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(0, 10, txt="Assembled Place=UK", ln=True)
+    pdf.cell(0, 10, txt="Assembled Place = UK", ln=True)
     pdf.cell(0, 10, txt="Final Product Details:", ln=True)
     pdf.set_font("Arial", size=10)
-    pdf.cell(0, 8, txt=f"Final Product={final_product}", ln=True)
-    pdf.cell(0, 8, txt=f"Commodity={commodity}", ln=True)
-    pdf.cell(0, 8, txt=f"Principle of Origin={origin}", ln=True)
+    pdf.cell(0, 8, txt=f"Final Product = {final_product}", ln=True)
+    pdf.cell(0, 8, txt=f"Commodity = {commodity}", ln=True)
+    pdf.cell(0, 8, txt=f"Principle of Origin = {origin}", ln=True)
     pdf.ln(10)
 
     # Rule of Origin Section
@@ -541,15 +547,19 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
             "According to CTH: CTH means production from non-originating materials of any heading, "
             "except that of the product; this means that any non-originating material used in the "
             "production of the product must be classified under a heading (4-digit level of the Harmonised System) "
-            "other than that of the product (i.e. a change in heading)."
+            "other than that of the product (i.e. a change in heading).Since the commodity codes in"
+            "the bill of materials are not equal to the first four digits of the final product's commodity code," 
+            "this product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
         ))
     elif 'CTSH' in origin:
         pdf.multi_cell(0, 8, txt=(
             "CTSH means production from non-originating materials of any subheading, except that of the product; "
             "this means that any non-originating material used in the production of the product must be classified under "
             "a subheading (6-digit level of the Harmonised System) other than that of the product (i.e. a change in subheading)."
-
+            "the bill of materials are not equal to the first six digits of the final product's commodity code," 
+            "this product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
         ))
+
     elif 'CC' in origin:
         pdf.multi_cell(0, 8, txt=(
             "CC means production from non-originating materials of any Chapter, except that of the"
@@ -559,20 +569,16 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
 
         ))    
 
-    # Note Section
-    pdf.ln(10)
-    pdf.set_text_color(255, 0, 0)  # Red for notes
-    pdf.set_font("Arial", 'B', 10)
-    pdf.multi_cell(0, 8, txt=(
-        "Note: Please note that this calculation assumes that all items within the EU/UK "
-        "have valid preference origin statements from the suppliers."
-    ))
+    
 
     # MaxNOM Rule
-    pdf.set_text_color(0, 0, 0)  # Reset text color
-    pdf.ln(10)
-    pdf.set_font("Arial", 'B', 12)
-    pdf.cell(0, 10, txt=f"Alternatively, according to: {origin}", ln=True)
+    # Reset text color
+    pdf.set_text_color(0, 0, 0) 
+    if "MaxNOM" in origin:
+        pdf.ln(10)
+        pdf.set_font("Arial", size=12)
+        pdf.cell(0, 10, txt="Alternatively, according to MaxNOM Rule:", ln=True)
+
     pdf.set_font("Arial", size=10)
     pdf.cell(0, 10, txt=f"Total Value: {total:.2f} GBP", ln=True)
     pdf.cell(0, 10, txt=f"(Calculated using today's exchange rates to convert\n"
@@ -580,15 +586,17 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     pdf.ln(5)
 
     # Contribution Breakdown
-    pdf.set_font("Arial", 'B', 14)
+    pdf.set_font("Arial", size=12)
     pdf.cell(0, 10, txt="Contribution Breakdown", ln=True)
-    pdf.ln(5)
+    #pdf.ln(5)
+    pdf.set_font("Arial", size=10)
     for country, percentage in contributions.items():
         pdf.cell(0, 8, txt=f"{country}: {percentage:.2f}%", ln=True)
-    pdf.set_font("Arial", 'B', 12)
+    pdf.ln(5)  
+
+    pdf.set_font("Arial", size=12)
     pdf.cell(0, 10, txt="Exchange Rates Used:", ln=True)
     pdf.set_font("Arial", size=10)
-
     relevant_currencies = data['currency'].unique()
     for currency in relevant_currencies:
         rate = rates.get(currency)
@@ -626,108 +634,111 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     # Check `origin` conditions
     if "wholly obtained" in origin.lower():
         message = (
-            f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+            f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
             "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
         )
-    elif "MaxNOM 50% (EXW)" in origin:
-        threshold = 50
-        if max_nom_percentage < threshold:
-            message = (
-                f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
-                "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
-            )
-        else:
-            message = (
-                f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
-                "The product is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
-            )
-    elif "MaxNOM 70% (EXW)" in origin:
-        threshold = 70
-        if max_nom_percentage < threshold:
-            message = (
-                f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
-                "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
-            )
-        else:
-            message = (
-                f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
-                "The product is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
-            )
-    elif "except from non-originating materials of headings" in origin:
-        match = re.search(r"except from non-originating materials of headings (\d+\.\d+)", origin)
+
+    elif "MaxNOM" in origin:
+        # Extract the dynamic threshold for MaxNOM
+        match = re.search(r"MaxNOM (\d+)\s?%", origin)
         if match:
-            heading = match.group(1).replace('.', '')  # Removing dots
-            if heading in commodity:
+            threshold = int(match.group(1))
+            if max_nom_percentage < threshold:
                 message = (
-                    f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+                    f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
                     "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
                 )
             else:
                 message = (
-                    f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+                    f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
                     "The product is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
                 )
-    elif "the value of non-originating materials" in origin:
-        match = re.search(r"(\d+)%.*headings (\d+) and (\d+)", origin)
+        else:
+            message = "Invalid MaxNOM condition specified."
+
+    elif "except from non-originating materials of headings" in origin:
+        # Extract the range from the origin string
+        match = re.search(r"headings (\d+)\.(\d+) to (\d+)\.(\d+)", origin)
         if match:
-            specified_percentage = int(match.group(1))
-            heading1, heading2 = match.group(2), match.group(3)
-            
-            value_heading1 = commodity.get(heading1, 0)
-            value_heading2 = commodity.get(heading2, 0)
-            
-            if value_heading1 <= specified_percentage and value_heading2 <= specified_percentage:
+            # Normalize start and end of the range (e.g., 72.08 -> 7208)
+            start_range = int(match.group(1) + match.group(2))
+            end_range = int(match.group(3) + match.group(4))
+
+            # Check each heading in the commodity list
+            all_eligible = True  # Assume eligible unless proven otherwise
+            for heading in commodity:
+                # Extract the leading part of the heading (e.g., 72096060 -> 7209)
+                normalized_heading = int(heading[:4])  # Use only the first 4 digits
+                if start_range <= normalized_heading <= end_range:
+                    all_eligible = False  # Found an ineligible heading
+                    break
+
+            # Determine the message based on eligibility
+            if all_eligible:
                 message = (
-                    f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+                    f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
                     "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
                 )
             else:
                 message = (
-                    f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+                    f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
+                    "The product is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+                )
+        else:
+            message = "Invalid heading condition specified."
+
+
+    elif "the value of non-originating materials" in origin:
+        # Extract percentage and headings from origin
+        match = re.search(r"(\d+)%.*headings ([\d.]+)(?: and ([\d.]+))?", origin)
+        if match:
+            specified_percentage = int(match.group(1))  # Extract percentage threshold
+            headings = [match.group(2).replace('.', '')]  # Normalize heading1
+            if match.group(3):
+                headings.append(match.group(3).replace('.', ''))  # Normalize heading2 if present
+
+            compliance = True
+            for heading in headings:
+                # Check if the heading exists in the commodity dictionary
+                if heading in commodity and commodity[heading] <= specified_percentage:
+                    continue
+                compliance = False
+                break
+
+            if compliance:
+                message = (
+                    f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
+                    "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
+                )
+            else:
+                message = (
+                    f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
                     "The product is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
                 )
         else:
             message = "Invalid origin condition specified."
+
     else:
-        # Generic fallback
+        # Generic fallback for unspecified conditions
         if max_nom_percentage < 50:
             message = (
-                f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+                f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
                 "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
             )
         else:
             message = (
-                f"Based on the findings, according to product-specific rule of origin of the final product:{origin}.\n"
+                f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
                 "The product is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
             )
 
-    pdf.set_font("Arial", 'B', 11)
+
+
+    pdf.set_font("Arial", 'I', 11)
     pdf.multi_cell(0, 8, txt=message)
 
-    
-        
-    pdf.set_text_color(0, 0, 255)  # Blue for clickable link
-    pdf.set_font("Arial", 'B', 10)
-    pdf.cell(0, 10, txt="Additionally, you can apply for a binding origin decision at HMRC:", ln=True)
-    pdf.set_font("Arial", size=10)
-    pdf.cell(0, 10, txt="https://www.gov.uk/guidance/apply-for-a-binding-origin-information-decision", ln=True)
-
-    pdf.set_font("Arial", 'B', 10)
-    pdf.cell(0, 10, txt="Apply for an Advance Tariff Ruling:", ln=True)
-    pdf.set_text_color(0, 0, 255)  # Blue for clickable link
-    pdf.set_font("Arial", size=10)
-
-    # Adding a clickable link
-    url = "https://www.gov.uk/guidance/apply-for-an-advance-tariff-ruling#apply-for-an-advance-tariff-ruling"
-    pdf.cell(0, 10, txt="Go to Website", ln=True, link=url)
-    
-    pdf.set_text_color(0, 0, 0)
-    current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    pdf.set_font("Arial", 'I', 10)
-    pdf.cell(0, 10, txt=f"Report generated on: {current_datetime}", ln=True)
-    
     # Pie Chart for Contributions
     pdf.add_page()
+    add_watermark(pdf) 
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(0, 10, txt="Pie Chart of Contributions", ln=True)
     pdf.ln(5)
@@ -761,7 +772,35 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     pdf.image(pie_chart_path, x=10, y=60, w=180)
 
     # Add Final Note
+    pdf.add_page()
+    add_watermark(pdf) 
+    pdf.ln(10)
+    pdf.set_text_color(255, 0, 0)  # Red for notes
+    pdf.set_font("Arial", 'B', 10)
+    pdf.multi_cell(0, 8, txt=(
+        "Note: Please note that this calculation assumes that all items within the EU/UK "
+        "have valid preference origin statements from the suppliers."
+    ))
+       
+    pdf.set_text_color(0, 0, 255)  # Blue for clickable link
+    pdf.set_font("Arial", 'B', 10)
+    pdf.cell(0, 10, txt="Additionally, you can apply for a binding origin decision at HMRC:", ln=True)
+    pdf.set_font("Arial", size=10)
+    pdf.cell(0, 10, txt="https://www.gov.uk/guidance/apply-for-a-binding-origin-information-decision", ln=True)
+
+    pdf.set_font("Arial", 'B', 10)
+    pdf.cell(0, 10, txt="Apply for an Advance Tariff Ruling:", ln=True)
+    pdf.set_text_color(0, 0, 255)  # Blue for clickable link
+    pdf.set_font("Arial", size=10)
+
+    # Adding a clickable link
+    url = "https://www.gov.uk/guidance/apply-for-an-advance-tariff-ruling#apply-for-an-advance-tariff-ruling"
+    pdf.cell(0, 10, txt="Go to Website", ln=True, link=url)
     
+    pdf.set_text_color(0, 0, 0)
+    current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    pdf.set_font("Arial", 'I', 10)
+    pdf.cell(0, 10, txt=f"Report generated on: {current_datetime}", ln=True)
 
 
     # Save PDF
