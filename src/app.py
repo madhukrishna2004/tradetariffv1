@@ -526,7 +526,7 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     # Add Summary Section
     pdf.ln(10)
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(0, 10, txt="Assembled Place = UK", ln=True)
+    #pdf.cell(0, 10, txt="Assembled Place = UK", ln=True)
     pdf.cell(0, 10, txt="Final Product Details:", ln=True)
     pdf.set_font("Arial", size=10)
     pdf.cell(0, 8, txt=f"Final Product = {final_product}", ln=True)
@@ -567,7 +567,8 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
             "alignmust be classified under a Chapter (2-digit level of the Harmonised System) other than that of"
             "the product (i.e. a change in Chapter);"
 
-        ))    
+        )) 
+       
 
     
 
