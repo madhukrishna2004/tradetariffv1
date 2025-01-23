@@ -123,7 +123,7 @@ BASE_CURRENCY = "GBP"
 # Example credentials for validation
 users = {
     "tradesphere@admin": "password",
-    "tradesphere@user1": "user"
+    "tradesphere@user2": "user2"
 }
 
 @app.route("/login", methods=["GET", "POST"])
