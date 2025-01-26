@@ -1341,69 +1341,120 @@ button.next {
         </div>
     </section>
 
-    <!-- Pricing Plans Section -->
-    <div id="pricing">
-        <h2>Choose the Plan That Fits You Best</h2>
-        <div class="pricing-plans">
-            <!-- Beginner Plan -->
-            <div class="pricing-card">
-                <h3>Beginner Plan</h3>
-                <p class="price">$25/month</p>
-                <ul class="features">
-                    <li>4 Country of Origin Calculations</li>
-                    <li>Unlimited Expired Commodity Code Data</li>
-                    <li>Unlimited Live Commodity Codes</li>
-                    <li>10 AI Input Questions</li>
-                    <li>1 Login Access</li>
-                </ul>
-                <a href="#contact" class="btn">Get Started</a>
-            </div>
-            
-            <!-- Small Business Plan -->
-            <div class="pricing-card">
-                <h3>Small Business Plan</h3>
-                <p class="price">$50/month</p>
-                <ul class="features">
-                    <li>10 Country of Origin Calculations</li>
-                    <li>Unlimited Expired Commodity Code Data</li>
-                    <li>Unlimited Live Commodity Codes</li>
-                    <li>40 AI Input Questions</li>
-                    <li>2 Login Access</li>
-                </ul>
-                <a href="#contact" class="btn">Get Started</a>
-            </div>
-    
-            <!-- Enterprise Plan -->
-            <div class="pricing-card">
-                <h3>Enterprise Plan</h3>
-                <p class="price">$150/month</p>
-                <ul class="features">
-                    <li>Unlimited Country of Origin Calculations</li>
-                    <li>Unlimited Expired Commodity Code Data</li>
-                    <li>Unlimited Live Commodity Codes</li>
-                    <li>Unlimited AI Input Questions</li>
-                    <li>5 Login Access</li>
-                </ul>
-                <a href="#contact" class="btn">Get Started</a>
-            </div>
-    
-            <!-- Enterprise & Suppliers Access -->
-            <div class="pricing-card">
-                <h3>Enterprise & Suppliers Access</h3>
-                <p class="price">$200/month</p>
-                <ul class="features">
-                    <li>Unlimited Country of Origin Calculations</li>
-                    <li>Unlimited Expired Commodity Code Data</li>
-                    <li>Unlimited Live Commodity Codes</li>
-                    <li>Unlimited AI Input Questions</li>
-                    <li>5 Login Access</li>
-                    <li>Request Supplier Declaration</li>
-                </ul>
-                <a href="#contact" class="btn">Get Started</a>
-            </div>
-        </div>
+ <!-- Styling for Buttons -->
+<style>
+    .buy-now-button {
+      text-align: center;
+      border: none;
+      border-radius: 0.25rem;
+      min-width: 11.625rem;
+      padding: 0 2rem;
+      height: 2.625rem;
+      font-weight: bold;
+      background-color: #FFD140;
+      color: #000000;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: 1rem;
+      line-height: 1.25rem;
+      cursor: pointer;
+    }
+  
+    .buy-now-form {
+      display: inline-grid;
+      justify-items: center;
+      align-content: start;
+      gap: 0.5rem;
+    }
+  
+    .paypal-logo {
+      height: 0.875rem;
+      vertical-align: middle;
+    }
+  </style>
+  
+  <!-- Pricing Plans Section -->
+  <div id="pricing" style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 1rem; margin: 2rem 0;">
+    <!-- Beginner Plan -->
+    <div class="pricing-card" style="flex: 1; min-width: 300px; max-width: 350px; border: 1px solid #ddd; padding: 1rem; border-radius: 8px; text-align: center;">
+      <h3>Beginner Plan</h3>
+      <p class="price">$25/month</p>
+      <ul class="features" style="list-style: none; padding: 0;">
+        <li>4 Country of Origin Calculations</li>
+        <li>Unlimited Expired Commodity Code Data</li>
+        <li>Unlimited Live Commodity Codes</li>
+        <li>10 AI Input Questions</li>
+        <li>1 Login Access</li>
+      </ul>
+      <form action="https://www.paypal.com/ncp/payment/EJMC4RDDWF7CC" method="post" target="_blank" class="buy-now-form">
+        <button class="buy-now-button" type="submit">Choose Plan</button>
+        <img src="https://www.paypalobjects.com/images/Debit_Credit_APM.svg" alt="cards" />
+        <section>
+          Powered by 
+          <img src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg" alt="paypal" class="paypal-logo" />
+        </section>
+      </form>
     </div>
-    
+  
+    <!-- Small Business Plan -->
+    <div class="pricing-card" style="flex: 1; min-width: 300px; max-width: 350px; border: 1px solid #ddd; padding: 1rem; border-radius: 8px; text-align: center;">
+      <h3>Small Business Plan</h3>
+      <p class="price">$50/month</p>
+      <ul class="features" style="list-style: none; padding: 0;">
+        <li>10 Country of Origin Calculations</li>
+        <li>Unlimited Expired Commodity Code Data</li>
+        <li>Unlimited Live Commodity Codes</li>
+        <li>40 AI Input Questions</li>
+        <li>2 Login Access</li>
+      </ul>
+      <form action="https://www.paypal.com/ncp/payment/YKE9YXKQRPENG" method="post" target="_blank" class="buy-now-form">
+        <button class="buy-now-button" type="submit">Choose Plan</button>
+        <img src="https://www.paypalobjects.com/images/Debit_Credit_APM.svg" alt="cards" />
+        <section>
+          Powered by 
+          <img src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg" alt="paypal" class="paypal-logo" />
+        </section>
+      </form>
+    </div>
+  
+    <!-- Enterprise Plan -->
+    <div class="pricing-card" style="flex: 1; min-width: 300px; max-width: 350px; border: 1px solid #ddd; padding: 1rem; border-radius: 8px; text-align: center;">
+      <h3>Enterprise Plan</h3>
+      <p class="price">$150/month</p>
+      <ul class="features" style="list-style: none; padding: 0;">
+        <li>Unlimited Country of Origin Calculations</li>
+        <li>Unlimited Expired Commodity Code Data</li>
+        <li>Unlimited Live Commodity Codes</li>
+        <li>Unlimited AI Input Questions</li>
+        <li>5 Login Access</li>
+      </ul>
+      <form action="https://www.paypal.com/ncp/payment/3F2SWSNEU3DAC" method="post" target="_blank" class="buy-now-form">
+        <button class="buy-now-button" type="submit">Choose Plan</button>
+        <img src="https://www.paypalobjects.com/images/Debit_Credit_APM.svg" alt="cards" />
+        <section>
+          Powered by 
+          <img src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg" alt="paypal" class="paypal-logo" />
+        </section>
+      </form>
+    </div>
+  
+    <!-- Enterprise & Suppliers Access -->
+    <div class="pricing-card" style="flex: 1; min-width: 300px; max-width: 350px; border: 1px solid #ddd; padding: 1rem; border-radius: 8px; text-align: center;">
+      <h3>Enterprise & Suppliers Access</h3>
+      <p class="price">$200/month</p>
+      <ul class="features" style="list-style: none; padding: 0;">
+        <li>Unlimited Country of Origin Calculations</li>
+        <li>Unlimited Expired Commodity Code Data</li>
+        <li>Unlimited Live Commodity Codes</li>
+        <li>Unlimited AI Input Questions</li>
+        <li>5 Login Access</li>
+        <li>Request Supplier Declaration</li>
+      </ul>
+      <a href="#contact" class="buy-now-button">Get Started</a>
+    </div>
+  </div>
+  
+
+
     <section id="login">
         <div class="login-container">
             <h2>Login to Your Account</h2>
