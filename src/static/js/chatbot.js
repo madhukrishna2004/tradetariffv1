@@ -8,6 +8,9 @@ document.getElementById("chatbot-send").addEventListener("click", function() {
     // Clear input field
     document.getElementById("chatbot-input").value = "";
 
+    // Display loading dots while waiting for the response
+    document.getElementById("loading-indicator").style.display = 'inline-block';
+
     // Send message to the backend
     fetch('/chat', {
         method: 'POST',
@@ -18,6 +21,9 @@ document.getElementById("chatbot-send").addEventListener("click", function() {
     })
     .then(response => response.json())
     .then(data => {
+        // Hide the loading dots once the response is received
+        document.getElementById("loading-indicator").style.display = 'none';
+
         if (data.response) {
             // Display the bot's reply
             displayMessage(data.response, "bot");
@@ -27,7 +33,8 @@ document.getElementById("chatbot-send").addEventListener("click", function() {
         }
     })
     .catch(error => {
-        // In case of network or other errors, display a generic error message
+        // In case of network or other errors, hide the loading dots and display a generic error message
+        document.getElementById("loading-indicator").style.display = 'none';
         console.error('Error:', error);
         displayMessage("Oops! Something went wrong. Please try again.", "bot");
     });

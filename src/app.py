@@ -352,59 +352,54 @@ def save_selected_data():
     try:
         # Get data from the request
         data = request.json
-        final_product = data.get('final_product')  # Extract final_product
-        selected_data = data.get('selected_data', [])  # Extract selected_data list, default to empty list
+        final_product = data.get('final_product')  # Final product name
+        selected_data = data.get('selected_data', [])  # Selected data list
 
-        if not selected_data:
-            return {"success": False, "error": "No data received."}
+        # Basic validation: Check if the required fields are present
+        if not final_product:
+            return {"success": False, "error": "Final product name is required."}
 
-        processed_data = []
-        for item in selected_data:
-            try:
-                # Process each item and include the final product
-                processed_data.append({
-                    "final_product": final_product,
-                    "commodity": item['hs_code'],
-                    "origin": item['rule_of_origin'],
-                    "description": item.get('description', '')
-                })
-            except KeyError as e:
-                return {"success": False, "error": f"Missing key {e} in item: {item}"}
+        if not selected_data or not isinstance(selected_data, list):
+            return {"success": False, "error": "No valid selected data provided."}
 
-        if not processed_data:
-            return {"success": False, "error": "No valid processed data."}
+        # Prepare data for saving
+        processed_data = [
+            {
+                "final_product": final_product,
+                "commodity": item.get('hs_code', 'Unknown'),
+                "origin": item.get('rule_of_origin', 'Unknown'),
+                "description": item.get('description', 'Unknown')
+            }
+            for item in selected_data
+        ]
 
-        # Define JSON file path
+        # File paths for saving
         json_file_path = os.path.join(os.getcwd(), 'processed_data.json')
-        
-        # Write JSON data to a file
+        xlsx_file_path = os.path.join(os.getcwd(), 'processed_data.xlsx')
+
+        # Save JSON data
         with open(json_file_path, 'w') as json_file:
             json.dump(processed_data, json_file, indent=4)
 
-        # Define Excel file path
-        xlsx_file_path = os.path.join(os.getcwd(), 'processed_data.xlsx')
-
-        # Clear the existing Excel file
-        if os.path.exists(xlsx_file_path):
-            os.remove(xlsx_file_path)
-
-        # Writing to Excel
+        # Save Excel data
         import pandas as pd
-
         df = pd.DataFrame(processed_data)
         df.to_excel(xlsx_file_path, index=False)
 
-        # Return success response with file paths
+        # Respond with success and file paths
         return {
             "success": True,
+            "message": "Data saved successfully.",
             "processed_data": processed_data,
             "json_file_path": json_file_path,
             "xlsx_file_path": xlsx_file_path
         }
 
     except Exception as e:
-        # Handle any unexpected errors
-        return {"success": False, "error": str(e)}
+        # Catch and report any unexpected errors
+        return {"success": False, "error": f"An unexpected error occurred: {str(e)}"}
+
+
 # Function to fetch exchange rates
 def get_exchange_rates(base_currency):
     response = requests.get(f"{EXCHANGE_RATE_API_URL}{base_currency}")

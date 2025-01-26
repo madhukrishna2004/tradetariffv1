@@ -1,8 +1,8 @@
 [
     {
-        "final_product": "laptop",
-        "commodity": "84713000",
-        "origin": "CTH except from non-originating materials of heading 84.73;\nor\nMaxNOM 50 % (EXW).",
-        "description": "Data-processing machines, automatic, portable, weighing <= 10 kg, consisting of at least a central processing unit, a keyboard and a display (excl. peripheral units)"
+        "final_product": "computers",
+        "commodity": "84331110",
+        "origin": "CTH;\nor\nMaxNOM 50 % (EXW).",
+        "description": "Electric motor mowers for lawns, parks or sports grounds, with the cutting device rotating in a horizontal plane"
     }
 ]
