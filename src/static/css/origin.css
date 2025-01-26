@@ -1,47 +1,61 @@
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #1A1A1A; /* Darker background for a more intense look */
-    color: #F0F0F0; /* Slightly lighter text for better contrast */
-    padding: 20px;
-    line-height: 1.6;
+    background-color: #F5F8FA; /* Fresh and positive background color */
+    color: #333333; /* Neutral dark text for readability */
+    padding: 0;
     margin: 0;
+    line-height: 1.8;
+    text-align: center; /* Center all text by default */
 }
 
 /* Headings */
 h2, h3, h4 {
-    color: #FFD700; /* Gold for a bold and striking header look */
-    margin-bottom: 15px;
+    color: #1D3557; /* Deep blue for headings */
+    margin-bottom: 10px;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
+/* Form Container */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    margin: 0 auto;
+    max-width: 450px;
+    background: #FFFFFF; /* White background for form contrast */
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
 /* Inputs and Buttons */
 input, button {
-    padding: 12px;
-    margin: 5px;
-    border-radius: 8px;
-    border: 1px solid #555;
-    font-size: 1rem;
-    width: 100%;
-    max-width: 400px;
+    padding: 10px; /* Reduced padding for compact size */
+    margin: 8px 0; /* Vertical spacing for consistency */
+    border-radius: 6px;
+    border: 1px solid #CCCCCC;
+    font-size: 0.95rem; /* Slightly smaller font size */
+    width: 85%; /* Center-aligned and responsive */
     box-sizing: border-box;
     transition: all 0.3s ease-in-out;
 }
 
 input {
-    background-color: #2C2C2C;
-    color: #F0F0F0;
+    background-color: #F0F4F8; /* Light grey for input background */
+    color: #333333;
 }
 
 input:focus {
-    border-color: #FFD700; /* Glowing border for focus */
-    box-shadow: 0 0 8px #FFD700;
+    border-color: #1D3557; /* Deep blue border on focus */
+    box-shadow: 0 0 6px #1D3557;
     outline: none;
 }
 
 button {
-    background-color: #333;
-    color: #FFD700;
+    background-color: #457B9D; /* Positive blue for buttons */
+    color: #FFFFFF;
     font-weight: bold;
     text-transform: uppercase;
     cursor: pointer;
@@ -50,68 +64,124 @@ button {
 }
 
 button:hover {
-    background-color: #FFD700; /* Gold hover effect */
-    color: #1A1A1A; /* Dark text on gold background */
+    background-color: #1D3557; /* Darker blue on hover */
+    color: #FFFFFF;
 }
 
 button:focus {
-    outline: 2px solid #FFD700;
+    outline: 2px solid #1D3557;
     outline-offset: 2px;
 }
 
 button:active {
-    background-color: #FFA500; /* Orange for pressed state */
+    background-color: #A8DADC; /* Softer greenish-blue for pressed state */
+}
+
+/* Spinner Design */
+.spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin-top: -20px;  /* Adjust for exact centering */
+    margin-left: -20px; /* Adjust for exact centering */
+    z-index: 1000; /* Ensure it's on top */
+}
+
+.spinner div {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: #1D3557; /* Deep blue spinner blocks */
+    animation: rotate 1s linear infinite;
+}
+
+.spinner div:nth-child(1) {
+    animation-delay: 0s;
+    top: 0;
+    left: 0;
+}
+
+.spinner div:nth-child(2) {
+    animation-delay: 0.3s;
+    top: 0;
+    right: 0;
+}
+
+.spinner div:nth-child(3) {
+    animation-delay: 0.6s;
+    bottom: 0;
+    right: 0;
+}
+
+.spinner div:nth-child(4) {
+    animation-delay: 0.9s;
+    bottom: 0;
+    left: 0;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(90deg);
+    }
 }
 
 /* Table Styles */
 table {
-    width: 100%;
+    width: 90%;
     border-collapse: collapse;
-    margin-top: 10px;
-    background-color: #1A1A1A; /* Darker background for a sleek look */
+    margin: 20px auto; /* Center the table */
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 table th, table td {
-    border: 1px solid #333;
-    padding: 12px;
+    border: 1px solid #E5E5E5;
+    padding: 10px; /* Reduced padding for compact design */
     text-align: left;
+    font-size: 0.9rem;
 }
 
 table th {
-    background-color: #444;
-    color: #FFD700; /* Gold for header text */
+    background-color: #1D3557; /* Deep blue for table headers */
+    color: #FFFFFF;
     text-transform: uppercase;
     font-weight: bold;
 }
 
 table tr:nth-child(even) {
-    background-color: #2C2C2C;
+    background-color: #F8FAFC; /* Light background for even rows */
 }
 
 table tr:nth-child(odd) {
-    background-color: #3C3C3C;
+    background-color: #FFFFFF; /* White background for odd rows */
 }
 
 table tr:hover {
-    background-color: #FFD700;
-    color: #1A1A1A; /* Dark text on hover */
+    background-color: #A8DADC; /* Highlight row on hover */
+    color: #1D3557; /* Text color on hover */
 }
 
-/* Checkbox Centering */
-#results-body input[type="checkbox"] {
-    margin: 0 auto;
-    display: block;
+/* Animations for Buttons and Table Rows */
+button:hover, table tr:hover {
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Responsive Design */
 @media (max-width: 600px) {
-    input, button {
+    .form-container {
+        width: 95%;
         padding: 10px;
-        font-size: 0.9rem;
     }
-    
-    table th, table td {
-        padding: 10px;
+
+    input, button {
+        font-size: 0.85rem; /* Further reduce font size for smaller screens */
     }
     
     table {
@@ -119,102 +189,8 @@ table tr:hover {
         overflow-x: auto;
         white-space: nowrap;
     }
-}
 
-/* Form Container */
-.form-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-}
-
-.form-container button {
-    margin-top: 15px;
-}
-
-/* Card Design */
-.card {
-    background-color: #2C2C2C;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
-}
-
-.card h4 {
-    color: #FFD700;
-    text-transform: uppercase;
-}
-
-/* Smooth Scrollbar for Better UX */
-body {
-    scrollbar-width: thin;
-    scrollbar-color: #FFD700 #2C2C2C;
-}
-
-body::-webkit-scrollbar {
-    width: 8px;
-}
-
-body::-webkit-scrollbar-track {
-    background: #2C2C2C;
-}
-
-body::-webkit-scrollbar-thumb {
-    background-color: #FFD700;
-    border-radius: 8px;
-}
-
-/* Animations */
-button:hover, table tr:hover {
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* Styling for the informational icon */
-.info-icon {
-    font-size: 16px;
-    margin-left: 8px;
-    color: #c9240e; /* Blue color for icon */
-    cursor: pointer;
-    transition: color 0.3s ease;
-}
-
-.info-icon:hover {
-    color: #ca4e06; /* Darker blue on hover */
-}
-
-/* Styling for the message span */
-#info-message {
-    margin-left: 8px;
-    color: #bbbbbb; /* Light grey text for message */
-    font-size: 14px;
-    opacity: 0.8; /* Subtle opacity for dark theme */
-    transition: opacity 0.3s ease;
-}
-#fetch-status-message {
-    display: none; /* Initially hidden */
-    font-size: 14px;
-    color: green; /* Success message color */
-    margin-top: 10px;
-}
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
+    table th, table td {
+        padding: 8px; /* Compact padding for smaller screens */
     }
 }
-#chatbot-ui {
-    display: none;
-    transform: translateX(100%);
-    transition: transform 0.5s ease-in-out;
-}
-

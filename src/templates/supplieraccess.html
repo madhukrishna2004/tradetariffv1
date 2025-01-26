@@ -8,8 +8,8 @@
     body {
       margin: 0;
       padding: 0;
-      background: linear-gradient(to bottom, #0a0a0a, #1c1c1c);
-      color: white;
+      background: linear-gradient(to bottom, #A8DADC, #457B9D); /* Soft and fresh gradient */
+      color: #333;
       font-family: 'Arial', sans-serif;
       display: flex;
       justify-content: center;
@@ -20,38 +20,42 @@
 
     .popup-container {
       position: relative;
-      width: 50%;
+      width: 90%;
       max-width: 600px;
       min-height: 300px;
-      background: linear-gradient(to bottom right, #111, #333);
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.7);
+      background: #FFFFFF; /* White background for a clean and fresh look */
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
       border-radius: 15px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 30px;
       text-align: center;
       animation: slideDown 0.8s ease-in-out;
+      box-sizing: border-box;
     }
 
     .popup-container h1 {
-      font-size: 28px;
-      color: #ffcc00;
-      text-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
+      font-size: 32px;
+      color: #1D3557; /* Deep blue for positive and professional vibe */
       margin-bottom: 20px;
+      text-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Light shadow for contrast */
+      font-weight: bold;
     }
 
     .popup-container p {
       font-size: 18px;
-      color: #ddd;
+      color: #555; /* Dark gray text for good readability */
       line-height: 1.5;
+      margin-bottom: 20px;
     }
 
     .popup-container img {
-      width: 100px;
+      width: 120px; /* Increased size for more impact */
       margin-top: 20px;
-      filter: drop-shadow(0px 4px 4px rgba(255, 255, 255, 0.3));
+      filter: drop-shadow(0px 4px 6px rgba(255, 255, 255, 0.3)); /* Subtle drop-shadow */
+      animation: bounce 1s ease-in-out infinite; /* Added bounce animation */
     }
 
     @keyframes slideDown {
@@ -64,17 +68,24 @@
         opacity: 1;
       }
     }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
   </style>
 </head>
 <body>
   <div class="popup-container">
     <h1>Feature Under Development</h1>
     <p>
-      This functionality is currently being developed to enhance your experience. 
-      Please check back soon for updates!
+      We are working hard to bring this new feature to you. Stay tuned for updates!
     </p>
     <img src="https://cdn-icons-png.flaticon.com/512/2972/2972378.png" alt="Trade Illustration">
   </div>
-  
 </body>
 </html>

@@ -126,20 +126,6 @@ users = {
     "tradesphere@user2": "user2"
 }
 
-app = Flask(__name__)
-app.secret_key = 'your_secret_key'
-
-# Set session lifetime to 5 minutes
-app.permanent_session_lifetime = timedelta(minutes=5)
-
-@app.before_request
-def before_request():
-    # If the user is logged in, reset the session's expiration time
-    if 'user' in session:
-        session.permanent = True  # Make the session permanent so it respects the lifetime setting
-    else:
-        session.permanent = False
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -163,14 +149,19 @@ def home():
         return redirect("/login")
     return redirect("/tariff")
 
+ 
+
 @app.route("/accessibility", strict_slashes=False)
 def accessibility():
     return flask.render_template("accessibility.html", version=VERSION)
+
 
 @app.route("/tariff")
 @decorators.cache_without_request_args(
     q=utils.DEFAULT_FILTER, p=utils.DEFAULT_PAGE, n=utils.DEFAULT_SAMPLE_SIZE
 )
+
+#@app.route("/tariff")
 @decorators.compress_response
 def tariff():
     # Ensure user is logged in
@@ -413,17 +404,15 @@ def get_exchange_rates(base_currency):
     else:
         raise ValueError("Failed to fetch exchange rates.")
 
+# Function to process the uploaded Excel file
 def process_excel(file):
-    import pandas as pd
-
-    # Read the Excel file into a DataFrame
     df = pd.read_excel(file)
 
     # Standardize column names
     df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
     # Check if all required columns are present
-    required_columns = ['item_number', 'description', 'value', 'currency', 'country_of_origin', 'commodity_code', 'weight']
+    required_columns = ['item_number', 'description', 'value', 'currency', 'country_of_origin', 'commodity_code']
     if not all(col in df.columns for col in required_columns):
         missing_columns = [col for col in required_columns if col not in df.columns]
         raise KeyError(f"Missing required column(s): {', '.join(missing_columns)}")
@@ -451,12 +440,7 @@ def process_excel(file):
         .to_dict()
     )
 
-    # Add weight-based calculations
-    total_weight = df['weight'].sum()
-    df['weight_contribution_percentage'] = (df['weight'] / total_weight) * 100
-
     return df, total_value, contributions, rates
-
 
 import os 
 import pandas as pd
@@ -472,23 +456,22 @@ def add_watermark(pdf):
     pdf.set_xy(30, 130)  # Position watermark at the center
     pdf.cell(0, 20, "Tradesphere Global", ln=True, align='C')
     pdf.set_text_color(0, 0, 0)  # Reset text color to black
-    
 def generate_beautiful_pdf(data, total, contributions, rates, excel_file='processed_data.xlsx'):
     print("Generating PDF report...")
 
-    # Ensure the output directory exists
+    # Ensure the output directory existssrc\static src\static
     pdf_output_file = 'src/pdf_report/Enhanced_Summary_Report.pdf'
     os.makedirs(os.path.dirname(pdf_output_file), exist_ok=True)
 
     # Verify required columns
-    required_columns = ['item_number', 'description', 'value_gbp', 'country_of_origin', 'commodity_code', 'currency', 'weight', 'weight_contribution_percentage']
+    required_columns = ['item_number', 'description', 'value_gbp', 'country_of_origin', 'commodity_code', 'currency']
     for column in required_columns:
         if column not in data.columns:
             raise KeyError(f"Missing column: {column}")
 
     pdf = FPDF('P', 'mm', 'A4')
     pdf.add_page()
-    add_watermark(pdf)
+    add_watermark(pdf) 
     pdf.set_auto_page_break(auto=True, margin=15)
 
     # Reading dynamic headings from Excel
@@ -508,7 +491,9 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
         commodity = 'Commodity'
         origin = 'Origin'
 
-    # Title and header
+
+
+    # Title and headerd
     pdf.set_xy(10, 10)
     pdf.set_font("Arial", 'B', 18)
     pdf.cell(0, 15, txt="Summary Report", ln=True, align='C')
@@ -517,8 +502,8 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     # Table Header
     pdf.set_fill_color(200, 200, 200)  # Header color
     pdf.set_font("Arial", 'B', 12)
-    col_widths = [20, 50, 25, 40, 40, 20, 30]  # Add space for the new column
-    headers = ["Item", "Description", "Value (GBP)", "Country of Origin", "Commodity", "Weight"]
+    col_widths = [20, 55, 25, 40, 40]
+    headers = ["Item", "Description", "Value (GBP)", "Country of Origin", "Commodity"]
 
     for i, header in enumerate(headers):
         pdf.cell(col_widths[i], 12, txt=header, border=1, align='C', fill=True)
@@ -536,8 +521,6 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
         pdf.cell(col_widths[2], 10, txt=f"{row['value_gbp']:.2f}", border=1, align='R', fill=fill)
         pdf.cell(col_widths[3], 10, txt=row['country_of_origin'], border=1, align='C', fill=fill)
         pdf.cell(col_widths[4], 10, txt=str(row['commodity_code']), border=1, align='C', fill=fill)
-        pdf.cell(col_widths[5], 10, txt=f"{row['weight']:.2f} kg", border=1, align='R', fill=fill)
-        #pdf.cell(col_widths[6], 10, txt=f"{row['weight_contribution_percentage']:.2f}%", border=1, align='R', fill=fill)
         pdf.ln()
 
     # Add Summary Section
@@ -586,27 +569,16 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
 
         )) 
        
+
     
 
-
-
     # MaxNOM Rule
-    pdf.set_text_color(0, 0, 0)
-
-# Check for CTH rule (excluding non-originating active cathode materials)
-    if "cathode" in origin:
-        pdf.ln(10)
-        pdf.set_font("Arial", size=9)
-        pdf.cell(0, 10, txt="*Please make sure there is no active cathode material in the Bill of Materials to qualify for CTH rule.", ln=True)
-
-    # Check for MaxNOM rule
+    # Reset text color
+    pdf.set_text_color(0, 0, 0) 
     if "MaxNOM" in origin:
         pdf.ln(10)
         pdf.set_font("Arial", size=12)
         pdf.cell(0, 10, txt="Alternatively, according to MaxNOM Rule:", ln=True)
-
-
-
 
     pdf.set_font("Arial", size=10)
     pdf.cell(0, 10, txt=f"Total Value: {total:.2f} GBP", ln=True)
@@ -632,7 +604,6 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
         if rate:
             pdf.cell(0, 8, txt=f"{rate:.2f} {currency} = 1 GBP", ln=True)
 
-    
 
             
     eu_countries = [
@@ -842,7 +813,6 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
 @app.route('/process-file', methods=['POST'])
 def process_file():
     print("Received a file upload request.")
-    
     if 'file' not in request.files:
         print("No file part.")
         return jsonify({'error': 'No file part'}), 400
@@ -855,11 +825,7 @@ def process_file():
     if file:
         try:
             print(f"Processing file: {file.filename}")
-            
-            # Process the Excel file and capture the return values
             df, total_value, contributions, rates = process_excel(file)
-            
-            # Generate the PDF with the processed data
             pdf_output_file = generate_beautiful_pdf(df, total_value, contributions, rates)
 
             # Return the ID or path to allow downloading later
@@ -883,7 +849,6 @@ def process_file():
 
     print("Unexpected error occurred.")
     return jsonify({'error': 'Unexpected error'}), 500
-
 
 # Endpoint to serve the generated PDF
 @app.route('/download-report/<path:report_id>', methods=['GET'])

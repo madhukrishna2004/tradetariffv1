@@ -246,11 +246,6 @@
             <li class="menu-item">
                 <a href="/supplieraccess" class="subheading">Request Supplier Declaration</a>
             </li>
-            <li class="menu-item">
-                <a href="/pricings" class="subheading">Pricings</a>
-            </li>
-            
-
             
         </ul>    
  
@@ -275,28 +270,80 @@
     </div>
 
     <!-- Modal (Popup) -->
-    <div class="modal" id="commodity-modal">
-        <div class="modal-content">
-            <div class="modal-header">Expired Commodity Details</div>
-            <button class="modal-close" onclick="closeModal()">Close</button>
-            <table class="commodity-table">
-                <thead>
-                    <tr>
-                        <th>Sl. No.</th>
-                        <th>Commodity</th>
-                        <th>Description</th>
-                        <th>Expired On</th>
-                    </tr>
-                </thead>
-                <tbody id="commodity-table-body">
-                    
-                    <tr>
-                        <td class="empty" colspan="4">No expired commodities</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+<div class="modal" id="commodity-modal">
+  <div class="modal-content">
+      <div class="modal-header">Expired Commodity Details</div>
+      <button class="modal-close" onclick="closeModal()">Close</button>
+      <table class="commodity-table">
+          <thead>
+              <tr>
+                  <th>Sl. No.</th>
+                  <th>Commodity</th>
+                  <th>Description</th>
+                  <th>Expired On</th>
+              </tr>
+          </thead>
+          <tbody id="commodity-table-body">
+              <tr>
+                  <td class="empty" colspan="4">No expired commodities</td>
+              </tr>
+          </tbody>
+      </table>
+  </div>
+</div>
+
+<script>
+// Data for expired commodities
+const commodities = [
+  { slNo: 1, commodity: "7210701010", description: "Hot-rolled steel, flat product", expiredOn: "May 15, 2024" },
+  { slNo: 2, commodity: "7210701090", description: "Another type of hot-rolled steel, flat product", expiredOn: "May 15, 2024" },
+  { slNo: 3, commodity: "7210708019", description: "Hot-rolled steel with specific features", expiredOn: "May 15, 2024" },
+  { slNo: 4, commodity: "7210708099", description: "Another variant of hot-rolled steel", expiredOn: "May 15, 2024" },
+  { slNo: 5, commodity: "7210903010", description: "Cold-rolled steel, flat product", expiredOn: "May 15, 2024" },
+  { slNo: 6, commodity: "7210903090", description: "Another cold-rolled steel, flat product", expiredOn: "May 15, 2024" },
+  { slNo: 7, commodity: "7210908010", description: "Cold-rolled steel with specific features", expiredOn: "May 15, 2024" },
+  { slNo: 8, commodity: "7212408009", description: "Flat alloy steel product", expiredOn: "May 15, 2024" },
+  { slNo: 9, commodity: "7212408029", description: "Another alloy steel flat product", expiredOn: "May 15, 2024" },
+  { slNo: 10, commodity: "7212408091", description: "Flat alloy steel with specific features", expiredOn: "May 15, 2024" },
+  { slNo: 11, commodity: "7212408099", description: "Another variant of flat alloy steel", expiredOn: "May 15, 2024" },
+  { slNo: 12, commodity: "7212600011", description: "Alloy steel bars or rods", expiredOn: "May 15, 2024" },
+  { slNo: 13, commodity: "7212600019", description: "Another type of alloy steel bars or rods", expiredOn: "May 15, 2024" },
+  { slNo: 14, commodity: "7212600091", description: "Alloy steel bars for specific uses", expiredOn: "May 15, 2024" },
+  { slNo: 15, commodity: "7212600093", description: "Another alloy steel bar for specific applications", expiredOn: "May 15, 2024" },
+  { slNo: 16, commodity: "7212600099", description: "Yet another alloy steel bar for specialized uses", expiredOn: "May 15, 2024" },
+];
+
+// Populate the table body dynamically
+function populateTable() {
+  const tableBody = document.getElementById("commodity-table-body");
+
+  // Clear existing rows
+  tableBody.innerHTML = "";
+
+  // Check if there are commodities
+  if (commodities.length === 0) {
+      const emptyRow = `<tr><td class="empty" colspan="4">No expired commodities</td></tr>`;
+      tableBody.innerHTML = emptyRow;
+      return;
+  }
+
+  // Add rows for each commodity
+  commodities.forEach(commodity => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+          <td>${commodity.slNo}</td>
+          <td>${commodity.commodity}</td>
+          <td>${commodity.description}</td>
+          <td>${commodity.expiredOn}</td>
+      `;
+      tableBody.appendChild(row);
+  });
+}
+
+// Call the function to populate the table when the page loads
+document.addEventListener("DOMContentLoaded", populateTable);
+</script>
+
 
     <!-- Chatbot Integration -->
     <div id="chatbot-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">

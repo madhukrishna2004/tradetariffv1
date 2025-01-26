@@ -1,8 +1,8 @@
 [
     {
-        "final_product": "lawn mower",
-        "commodity": "85192010",
-        "origin": "CTH except from non-originating materials of heading 85.22;\nor\nMaxNOM 50 % (EXW).",
-        "description": "Coin-operated or disc-operated record-players"
+        "final_product": "laptop",
+        "commodity": "84713000",
+        "origin": "CTH except from non-originating materials of heading 84.73;\nor\nMaxNOM 50 % (EXW).",
+        "description": "Data-processing machines, automatic, portable, weighing <= 10 kg, consisting of at least a central processing unit, a keyboard and a display (excl. peripheral units)"
     }
 ]

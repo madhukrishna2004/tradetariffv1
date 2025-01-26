@@ -1,147 +1,1085 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#0b0c0c">
-    <title>TradeSphere Dashboard - Futuristic Landing Page</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        /* Body and Background */
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Roboto', sans-serif;
-            color: #F5F5F5;
-            background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
-            overflow-x: hidden;
-        }
-        
-        /* Background Particles */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('https://cdn.pixabay.com/photo/2018/08/14/13/23/universe-3608030_1280.jpg') no-repeat center center / cover;
-            z-index: -1;
-            opacity: 0.15;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tradesphere Global - Landing Page</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <nav class="navbar">
+            <div class="logo">
+                <h1>Tradesphere Global</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#contact">Contact Us</a></li>
+                
+            </ul>
+            
+            <div class="cta-buttons">
+                <a href="#login" class="btn login-container">Login</a>
+            </div>
+        </nav>
+    </header>
+    <!-- Hero Section -->
+    <section id="hero">
+        <div class="hero-content">
+            <h1>Unlock the Full Potential of Tradesphere Global</h1>
+            <p>Efficient solutions for businesses navigating global trade regulations.</p>
+            <div class="cta-buttons">
+                <a href="#contact" class="btn demo-btn">Request a Demo</a>
+                <a href="#services" class="btn services-btn">Our Services</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="logo.png" alt="Tradesphere Global">
+        </div>
+    </section>
 
-        /* Intro Section */
-        .intro-section {
-            padding: 60px;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(8px);
-            border-radius: 20px;
-            margin: 40px auto;
-            width: 80%;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            animation: fadeIn 2s ease-in-out;
-        }
+    <!-- Image Gallery Section -->
+<!-- Gallery Section -->
+<section id="gallery-section">
+    <div class="gallery-container">
+        <div class="slideshow">
+            <div class="slide active">
+                <img src="/static/assets/images/img1.webp" alt="Image 1">
+            </div>
+            <div class="slide">
+                <img src="/static/assets/images/img2.webp" alt="Image 2">
+            </div>
+            <div class="slide">
+                <img src="/static/assets/images/img3.webp" alt="Image 3">
+            </div>
+            
+        </div>
+        <!-- Navigation Arrows -->
+        <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
+        <button class="next" onclick="changeSlide(1)">&#10095;</button>
+        <!-- Dots Navigation -->
+        <div class="dots">
+            <span class="dot" onclick="currentSlide(1)"></span>
+            <span class="dot" onclick="currentSlide(2)"></span>
+            <span class="dot" onclick="currentSlide(3)"></span>
+           
+        </div>
+    </div>
+</section>
+<!-- JavaScript for Slideshow -->
+<!-- JavaScript for Slideshow -->
+<script>
+    (function () {
+        let slideIndex = 1;
+        showSlides(slideIndex);
 
-        .intro-section h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
-            color: #FFD700;
-            text-shadow: 0 0 20px #FFD700;
-        }
+        // Change slide by increment
+        window.changeSlide = function (n) {
+            showSlides((slideIndex += n));
+        };
 
-        .intro-section p {
-            font-size: 1.2rem;
-            margin: 20px 0;
-            line-height: 1.8;
-            color: #E0E0E0;
-        }
+        // Jump to specific slide
+        window.currentSlide = function (n) {
+            showSlides((slideIndex = n));
+        };
 
-        .intro-section ul {
-            list-style-type: none;
-            padding: 0;
-            color: #FFD700;
-        }
+        // Main function to display slides
+        function showSlides(n) {
+            const slides = document.querySelectorAll(".slide");
+            const dots = document.querySelectorAll(".dot");
 
-        .intro-section ul li {
-            margin: 10px 0;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-        }
+            if (n > slides.length) slideIndex = 1;
+            if (n < 1) slideIndex = slides.length;
 
-        .intro-section ul li::before {
-            content: "\f00c";
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 900;
-            margin-right: 10px;
-            color: #FFD700;
-        }
+            slides.forEach((slide) => (slide.style.opacity = "0"));
+            dots.forEach((dot) => dot.classList.remove("active"));
 
-        /* Login Section */
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            slides[slideIndex - 1].style.opacity = "1";
+            dots[slideIndex - 1].classList.add("active");
         }
+    })();
+</script>
 
-        .login-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            max-width: 400px;
-            animation: slideUp 1.5s ease-in-out;
-        }
+<style>
+    /* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        .login-card h2 {
-            text-align: center;
-            font-size: 1.8rem;
-            color: #FFD700;
-            margin-bottom: 20px;
-        }
+/* Heading Section */
+#heading-container {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #f4f4f9;
+}
 
-        input[type="text"],
-        input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            border: 1px solid #555;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #FFF;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
+#heading-container h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
 
-        input[type="text"]:focus,
-        input[type="password"]:focus {
-            border-color: #FFD700;
-            box-shadow: 0 0 10px #FFD700;
-            outline: none;
-        }
+#heading-container p {
+    font-size: 1.2rem;
+    color: #666;
+}
 
-        .login-btn {
-            background: linear-gradient(90deg, #FFD700, #FF8C00);
-            border: none;
-            color: #121212;
-            font-size: 1.1rem;
-            padding: 12px 20px;
-            border-radius: 8px;
-            width: 100%;
-            cursor: pointer;
-            transition: background 0.5s, transform 0.3s;
-        }
+/* Gallery Section */
+#gallery-section {
+    position: relative;
+    width: 80%; /* Reduced width for gallery */
+    max-width: 1000px; /* Max width to limit gallery size */
+    margin: 30px auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    height: 400px; /* Reduced height for the gallery */
+}
 
-        .login-btn:hover {
-            background: linear-gradient(90deg, #FF8C00, #FFD700);
-            transform: translateY(-5px);
-        }
+.gallery-container {
+    position: relative;
+    width: 100%;
+    height: 100%; /* Ensures the container takes full height */
+    overflow: hidden;
+}
 
-        .forgot-password {
+/* Slideshow Styling */
+.slideshow {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    height: 100%; /* Ensures slides take full height of container */
+}
+
+.slide {
+    min-width: 100%;
+    height: 100%; /* Ensures slides are full height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Image Styling */
+.slide img {
+    width: 100%;
+    height: auto;
+    object-fit: contain; /* Ensures images are shown without cropping */
+}
+
+/* Navigation Arrows */
+button.prev, button.next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 50%;
+    z-index: 10;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+}
+
+button.prev:hover, button.next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+button.prev {
+    left: 10px;
+}
+
+button.next {
+    right: 10px;
+}
+
+/* Dots Navigation */
+.dots {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.dots .dot {
+    width: 12px;
+    height: 12px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dots .dot.active {
+    background-color: #333;
+}
+
+.dots .dot:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    button.prev, button.next {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    .dots .dot {
+        width: 10px;
+        height: 10px;
+    }
+}
+/* Resetting some default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Body */
+body {
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Header Styles */
+#header {
+    background-color: #1e3c72;
+    padding: 20px 0;
+    color: #fff;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 50px;
+}
+
+.navbar .logo h1 {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.navbar .nav-links {
+    list-style-type: none;
+    display: flex;
+    gap: 20px;
+}
+
+.navbar .nav-links li {
+    display: inline;
+}
+
+.navbar .nav-links a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+.navbar .nav-links a:hover {
+    color: #00bcd4;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 20px;
+}
+
+.cta-buttons .btn {
+    background-color: #00bcd4;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.cta-buttons .btn:hover {
+    background-color: #007c80;
+    transform: translateY(-5px);
+}
+
+/* Hero Section */
+#hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1e3c72;
+    color: white;
+    padding: 50px 100px;
+    height: 400px;
+}
+
+#hero .hero-content h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+#hero .hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.hero-image img {
+    width: 300px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+/* Slideshow */
+#hero .hero-image {
+    width: 50%;
+    overflow: hidden;
+    position: relative;
+}
+
+#hero .hero-image img {
+    position: absolute;
+    width: 100%;
+    animation: slide 9s infinite;
+}
+
+@keyframes slide {
+    0% { opacity: 1; transform: translateX(0); }
+    33.33% { opacity: 0; transform: translateX(-100%); }
+    66.66% { opacity: 0; transform: translateX(100%); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+
+/* Features Section */
+#features {
+    background-color: #f1f1f1;
+    padding: 50px 100px;
+    text-align: center;
+}
+
+#features h2 {
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+    font-weight: bold;
+}
+
+.features-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.feature-card {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    width: 23%;
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+}
+
+.feature-card h3 {
+    margin-top: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.feature-card p {
+    font-size: 1rem;
+    margin-top: 10px;
+    color: #555;
+}
+
+/* Services Section */
+#services {
+    padding: 50px 100px;
+    background-color: #fff;
+}
+
+#services h2 {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 40px;
+    font-weight: bold;
+}
+
+.services-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.service-card {
+    background-color: #f1f1f1;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    width: 30%;
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+}
+
+.service-card h3 {
+    margin-top: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.service-card p {
+    font-size: 1rem;
+    margin-top: 10px;
+    color: #555;
+}
+
+/* Pricing Section */
+#pricing {
+    padding: 50px 100px;
+    background-color: #f1f1f1;
+    text-align: center;
+}
+
+#pricing h2 {
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+    font-weight: bold;
+}
+
+.pricing-plans {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.pricing-card {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    width: 22%;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.pricing-card:hover {
+    transform: translateY(-10px);
+}
+
+.pricing-card h3 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.pricing-card p {
+    font-size: 1rem;
+    color: #555;
+}
+
+.pricing-card .btn {
+    margin-top: 20px;
+    background-color: #00bcd4;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.pricing-card .btn:hover {
+    background-color: #007c80;
+    transform: translateY(-5px);
+}
+
+/* Contact Section */
+#contact {
+    padding: 50px 100px;
+    background-color: #fff;
+    text-align: center;
+}
+
+#contact h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.contact-form-container {
+    background-color: #f1f1f1;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.contact-form-container .form-group {
+    margin-bottom: 20px;
+}
+
+.contact-form-container input, .contact-form-container textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.contact-form-container button {
+    background-color: #00bcd4;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.contact-form-container button:hover {
+    background-color: #007c80;
+    transform: translateY(-5px);
+}
+
+/* Footer */
+#footer {
+    background-color: #1e3c72;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+#footer p {
+    margin-bottom: 10px;
+}
+
+#footer .footer-links {
+    list-style-type: none;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+#footer .footer-links a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+#footer .footer-links a:hover {
+    color: #00bcd4;
+}
+/* Reset some default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Body */
+body {
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Pricing Section */
+#pricing {
+    padding: 50px 100px;
+    background-color: #f1f1f1;
+    text-align: center;
+}
+
+#pricing h2 {
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+    font-weight: bold;
+    color: #333;
+}
+
+.pricing-plans {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.pricing-card {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    width: 250px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.pricing-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.pricing-card h3 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.pricing-card p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.pricing-card .price {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #1e3c72;
+    margin-bottom: 20px;
+}
+
+.pricing-card .features {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.pricing-card .features li {
+    margin: 10px 0;
+    font-size: 1rem;
+}
+
+.pricing-card .btn {
+    background-color: #00bcd4;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.pricing-card .btn:hover {
+    background-color: #007c80;
+    transform: translateY(-5px);
+}
+
+/* Login Section */
+#login {
+    padding: 50px 100px;
+    background-color: #fff;
+    text-align: center;
+}
+
+#login h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.login-container {
+    background-color: #f1f1f1;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.login-container .form-group {
+    margin-bottom: 20px;
+}
+
+.login-container input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.login-container button {
+    background-color: #00bcd4;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    width: 100%;
+}
+
+.login-container button:hover {
+    background-color: #007c80;
+    transform: translateY(-5px);
+}
+/* Pricing Section */
+#pricing {
+    background-color: #f9f9f9;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+#pricing h2 {
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 40px;
+}
+
+.pricing-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.pricing-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 250px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pricing-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.pricing-card h3 {
+    font-size: 24px;
+    color: #0073e6;
+    margin-bottom: 20px;
+}
+
+.pricing-card .price {
+    font-size: 30px;
+    color: #0073e6;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.pricing-card ul {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.pricing-card ul li {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.pricing-card .btn {
+    background-color: #0073e6;
+    color: #ffffff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+.pricing-card .btn:hover {
+    background-color: #005bb5;
+}
+
+/* About Us Section */
+#about-us {
+    background-color: #f1f8ff;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+#about-us h2 {
+    font-size: 36px;
+    color: #0073e6;
+    margin-bottom: 20px;
+}
+
+#about-us p {
+    font-size: 18px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+#about-us .btn.about-btn {
+    background-color: #0073e6;
+    color: #ffffff;
+    padding: 12px 30px;
+    font-size: 16px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+#about-us .btn.about-btn:hover {
+    background-color: #005bb5;
+}
+/* General Reset for Consistency */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Heading Section */
+#heading-container {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #f4f4f9;
+}
+
+#heading-container h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+#heading-container p {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+/* Image Section */
+#image-section {
+    width: 100%;
+    padding: 20px 0;
+    background-color: #fff;
+}
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Add spacing between images */
+    overflow: hidden;
+    flex-wrap: wrap; /* Wrap for smaller screens */
+}
+
+.image-slide {
+    flex: 1 1 calc(33.333% - 20px); /* 3 images per row */
+    max-width: calc(33.333% - 20px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.image-slide img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+/* Hover Effects */
+.image-slide:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .image-slide {
+        flex: 1 1 calc(50% - 20px); /* 2 images per row on tablets */
+        max-width: calc(50% - 20px);
+    }
+}
+
+@media (max-width: 480px) {
+    .image-slide {
+        flex: 1 1 100%; /* 1 image per row on mobile */
+        max-width: 100%;
+    }
+}
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Heading Section */
+#heading-container {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #f4f4f9;
+}
+
+#heading-container h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+#heading-container p {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+/* Gallery Section */
+#gallery-section {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 30px auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.gallery-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.slideshow {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.slide {
+    min-width: 100%;
+    transition: opacity 0.5s ease-in-out;
+    opacity: 0;
+}
+
+.slide.active {
+    opacity: 1;
+}
+
+.slide img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* Navigation Arrows */
+button.prev, button.next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 50%;
+    z-index: 10;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+}
+
+button.prev:hover, button.next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+button.prev {
+    left: 10px;
+}
+
+button.next {
+    right: 10px;
+}
+
+/* Dots Navigation */
+.dots {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.dots .dot {
+    width: 12px;
+    height: 12px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dots .dot.active {
+    background-color: #333;
+}
+
+.dots .dot:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    button.prev, button.next {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    .dots .dot {
+        width: 10px;
+        height: 10px;
+    }
+}
+/* Logo Section Styling */
+#logo-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 0; /* Increase padding to give more space around the logo */
+    background-color: #f4f4f9; /* Background color of the logo section */
+    margin-bottom: 50px; /* Space between logo and login section */
+    transition: transform 0.5s ease-in-out;
+}
+
+#logo-section img {
+    max-width: 400px; /* Increased size */
+    max-height: 300px; /* Increased size */
+    object-fit: contain;
+    border-radius: 15px; /* Optional for rounded corners */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Adds a stronger shadow for a more prominent look */
+    transform: scale(1);
+}
+
+#logo-section img:hover {
+    transform: scale(1.1); /* Slightly larger zoom effect on hover */
+}
+.forgot-password {
             color: #FFD700;
             text-decoration: none;
             display: block;
@@ -173,7 +1111,7 @@
             color: #fff;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 5px 15px rgba(145, 173, 171, 0.5);
             width: 80%;
             max-width: 400px;
             text-align: center;
@@ -197,12 +1135,12 @@
         }
 
         .popup-content input:focus {
-            border-color: #FFD700;
+            border-color: #0d9470;
             outline: none;
         }
 
         .popup-content button {
-            background: linear-gradient(90deg, #FFD700, #FF8C00);
+            background: linear-gradient(90deg, #0d798d, #1e6d8d);
             border: none;
             color: #121212;
             font-size: 1rem;
@@ -213,7 +1151,7 @@
         }
 
         .popup-content button:hover {
-            background: linear-gradient(90deg, #FF8C00, #FFD700);
+            background: linear-gradient(90deg, #047692, #327b94);
             transform: translateY(-5px);
         }
 
@@ -223,7 +1161,7 @@
             right: 10px;
             cursor: pointer;
             font-size: 1.5rem;
-            color: #FFD700;
+            color: #10546f;
         }
 
         /* Animations */
@@ -252,7 +1190,7 @@
         .forgot-password {
         display: block;
         margin-top: 10px;
-        color: #FFD700;
+        color: #128fac;
         text-decoration: none;
         font-size: 14px;
     }
@@ -268,7 +1206,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(5, 5, 5, 0.982);
+        background: rgba(201, 209, 212, 0.982);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -286,11 +1224,11 @@
     }
 
     .popup-content {
-        background: #2b2f3a;
-        color: #fff;
+        background: #dadbdf;
+        color: #282626;
         padding: 30px;
         border-radius: 10px;
-        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
+        box-shadow: 0px 4px 20px rgba(246, 243, 243, 0.4);
         text-align: center;
         max-width: 400px;
         width: 80%;
@@ -316,7 +1254,7 @@
     }
 
     .email-link {
-        color: #FFD700;
+        color: #237ea8;
         text-decoration: none;
         font-weight: bold;
     }
@@ -327,7 +1265,7 @@
 
     .close-btn {
         padding: 10px 20px;
-        background: #FFD700;
+        background: #1da9a2;
         color: #000;
         border: none;
         border-radius: 5px;
@@ -336,54 +1274,165 @@
     }
 
     .close-btn:hover {
-        background: #e6c700;
+        background: #157e7e;
     }
 
-    </style>
-</head>
-<body>
-    <!-- Intro Section -->
-    <div class="intro-section">
-        <h1>Welcome to Tradesphere Global</h1>
-        <p>AI-Powered UK and EU Trade Tariff Portal</p>
-        <p>
-            At Tradesphere Global, we understand that managing tariffs can be complex and time-consuming. Our platform is designed to simplify this process, providing businesses with the tools they need to stay compliant with ever-changing regulations. We offer a comprehensive suite of features that cater to the needs of businesses engaged in international trade, ensuring that you can navigate the complexities of tariffs with ease. Our commitment to accuracy and reliability sets us apart in the industry, making us a trusted partner in your trade journey. We strive to empower our users with the knowledge and resources necessary to thrive in the global market.
-        </p>
-        <p>
-            Our AI-powered tools allow you to easily search for commodities, access HS code information, and find the origin of products directly from your bill of materials. With our comprehensive database, you can navigate the complexities of international trade with confidence.
-        </p>
+</style>
 
-        <p>
-            Our user-friendly interface allows you to easily navigate through various tariff codes and updates, ensuring that you can find the information you need quickly and efficiently. With intuitive design and easy access to critical data, you can focus on your core business activities without getting bogged down by administrative tasks. The layout is designed to resemble traditional tariff portals, making it familiar and accessible for all users, regardless of their experience level. This design philosophy ensures that you can maximize your productivity while minimizing the learning curve associated with new software.
-        </p>
-        <p>
-            With real-time updates on tariff changes, you can make informed decisions that impact your business operations. Our platform ensures that you are always aware of the latest developments in trade agreements, allowing you to adapt your strategies accordingly. This feature is crucial for businesses that need to stay ahead in a rapidly changing trade environment, minimizing risks associated with outdated information and ensuring compliance with the latest regulations.
-        </p>
-        <ul>
-            <li>Access to HS code information</li>
-            <li>Search for commodities</li>
-            <li>Find the origin of products from the bill of materials</li>
-            <li>Access to supplier declarations</li>
-            <li>Stay updated on trade agreements with the EU and UK</li>
-            <li>Avoid customs issues with timely information</li>
-        </ul>
-        <img src="/static/assets/images/logo.png" alt="Login Logo" style="float: right; cursor: pointer; width: 500px;">
+<section id="logo-section">
+    <img src="/static/assets/images/logo.png" alt="Company Logo">
+</section>
+    <!-- About Us Section -->
+    <section id="about-us">
+        <div class="about-us-container">
+            <h2>About Tradesphere Global</h2>
+            <p>AI-Powered UK and EU Trade Tariff Portal</p>
+            <p>At Tradesphere Global, we understand that managing tariffs can be complex and time-consuming. Our platform is designed to simplify this process, providing businesses with the tools they need to stay compliant with ever-changing regulations. We offer a comprehensive suite of features that cater to the needs of businesses engaged in international trade, ensuring that you can navigate the complexities of tariffs with ease. Our commitment to accuracy and reliability sets us apart in the industry, making us a trusted partner in your trade journey. We strive to empower our users with the knowledge and resources necessary to thrive in the global market.</p>
+            <p> Our AI-powered tools allow you to easily search for commodities, access HS code information, and find the origin of products directly from your bill of materials. With our comprehensive database, you can navigate the complexities of international trade with confidence.</p>
+            <p> Our user-friendly interface allows you to easily navigate through various tariff codes and updates, ensuring that you can find the information you need quickly and efficiently. With intuitive design and easy access to critical data, you can focus on your core business activities without getting bogged down by administrative tasks. The layout is designed to resemble traditional tariff portals, making it familiar and accessible for all users, regardless of their experience level. This design philosophy ensures that you can maximize your productivity while minimizing the learning curve associated with new software.</p></p>
+            <p>With real-time updates on tariff changes, you can make informed decisions that impact your business operations. Our platform ensures that you are always aware of the latest developments in trade agreements, allowing you to adapt your strategies accordingly. This feature is crucial for businesses that need to stay ahead in a rapidly changing trade environment, minimizing risks associated with outdated information and ensuring compliance with the latest regulations.</p>
+        </div>
+    </section>
+    <!-- Features at a Glance -->
+    <section id="features">
+        <h2>Our Core Features</h2>
+
+        <div class="features-container">
+            <div class="feature-card">
+                <i class="fas fa-search feature-icon"></i>
+                <h3>HS Code Lookup</h3>
+                <p>Search and identify HS codes for your commodities, ensuring accurate tariff calculations.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-calendar-alt feature-icon"></i>
+                <h3>Expired Commodity Details</h3>
+                <p>Get detailed insights into expired commodities and make informed decisions on imports/exports.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-check-circle feature-icon"></i>
+                <h3>EU-UK Trade Agreement Eligibility</h3>
+                <p>Check your product's eligibility for EU-UK preferential trade agreements with ease.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-file-alt feature-icon"></i>
+                <h3>Request Supplier Declaration</h3>
+                <p>Quickly request supplier declarations to ensure compliance with tariff rules and regulations.</p>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services">
+        <h2>Our Services</h2>
+        <div class="services-container">
+            <div class="service-card">
+                <h3>Custom Tariff Solutions</h3>
+                <p>Tailored tariff solutions for businesses of all sizes, helping you navigate complex regulations.</p>
+            </div>
+            <div class="service-card">
+                <h3>Consulting & Support</h3>
+                <p>Expert consultation services to help you stay compliant and optimize your international trade operations.</p>
+            </div>
+            <div class="service-card">
+                <h3>Data Analysis & Reporting</h3>
+                <p>Comprehensive data analysis for trade compliance and reporting, delivered on time, every time.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Plans Section -->
+    <div id="pricing">
+        <h2>Choose the Plan That Fits You Best</h2>
+        <div class="pricing-plans">
+            <!-- Beginner Plan -->
+            <div class="pricing-card">
+                <h3>Beginner Plan</h3>
+                <p class="price">$25/month</p>
+                <ul class="features">
+                    <li>4 Country of Origin Calculations</li>
+                    <li>Unlimited Expired Commodity Code Data</li>
+                    <li>Unlimited Live Commodity Codes</li>
+                    <li>10 AI Input Questions</li>
+                    <li>1 Login Access</li>
+                </ul>
+                <a href="#contact" class="btn">Get Started</a>
+            </div>
+            
+            <!-- Small Business Plan -->
+            <div class="pricing-card">
+                <h3>Small Business Plan</h3>
+                <p class="price">$50/month</p>
+                <ul class="features">
+                    <li>10 Country of Origin Calculations</li>
+                    <li>Unlimited Expired Commodity Code Data</li>
+                    <li>Unlimited Live Commodity Codes</li>
+                    <li>40 AI Input Questions</li>
+                    <li>2 Login Access</li>
+                </ul>
+                <a href="#contact" class="btn">Get Started</a>
+            </div>
+    
+            <!-- Enterprise Plan -->
+            <div class="pricing-card">
+                <h3>Enterprise Plan</h3>
+                <p class="price">$150/month</p>
+                <ul class="features">
+                    <li>Unlimited Country of Origin Calculations</li>
+                    <li>Unlimited Expired Commodity Code Data</li>
+                    <li>Unlimited Live Commodity Codes</li>
+                    <li>Unlimited AI Input Questions</li>
+                    <li>5 Login Access</li>
+                </ul>
+                <a href="#contact" class="btn">Get Started</a>
+            </div>
+    
+            <!-- Enterprise & Suppliers Access -->
+            <div class="pricing-card">
+                <h3>Enterprise & Suppliers Access</h3>
+                <p class="price">$200/month</p>
+                <ul class="features">
+                    <li>Unlimited Country of Origin Calculations</li>
+                    <li>Unlimited Expired Commodity Code Data</li>
+                    <li>Unlimited Live Commodity Codes</li>
+                    <li>Unlimited AI Input Questions</li>
+                    <li>5 Login Access</li>
+                    <li>Request Supplier Declaration</li>
+                </ul>
+                <a href="#contact" class="btn">Get Started</a>
+            </div>
+        </div>
     </div>
+    
+    <section id="login">
+        <div class="login-container">
+            <h2>Login to Your Account</h2>
+            <form action="/login" method="POST">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="email" id="username" name="username" placeholder="Enter your username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn login-btn">Login</button>
+                </div>
+                <a href="javascript:void(0);" class="forgot-password" onclick="showPopup()">Forgot Password?</a>
+            </form>
+    
+            <!-- Error Message Display -->
+            {% if error %}
+            <div class="error-message">
+                <p>{{ error }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+    
 
- <!-- Login Section -->
-<div class="login-container">
-    <div class="login-card">
-        <h2>Login to Your Account</h2>
-        <form action="/login" method="POST">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit" class="login-btn">Login</button>
-        </form>
-        <a href="javascript:void(0);" class="forgot-password" onclick="showPopup()">Forgot Password?</a>
-    </div>
-</div>
-
-<!-- Stylish Pop-up Container for Forgot Password -->
+    <!-- Stylish Pop-up Container for Forgot Password -->
 <div class="popup-container" id="forgotPasswordPopup" style="display: none;">
     <div class="popup-content">
         <h3>Forgot Password?</h3>
@@ -410,7 +1459,56 @@
     }
 </script>
 
+    
+
+   <!-- Contact Section -->
+<section id="contact">
+    <h2>Get in Touch</h2>
+    <p>We would love to hear from you. Whether you have a question about our services or need assistance with your trade tariffs, our team is here to help.</p>
+    <div class="contact-form-container">
+        <!-- Embedded Google Form -->
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSftO1R2LxrxNDeeiSe_-HBfFPUKCeQygBGBUj6T1IWICG03rQ/viewform?embedded=true" 
+                width="640" 
+                height="642" 
+                frameborder="0" 
+                marginheight="0" 
+                marginwidth="0">Loading…</iframe>
+    </div>
+</section>
 
 
+    <footer class="govuk-footer" role="contentinfo" style="background-color: #2a2a2a; color: white; padding: 20px 0;">
+        <div class="govuk-width-container" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 14px;">
+                <p style="margin: 0;">TradeSphere Global</p>
+                <p style="margin: 0;">All rights reserved &copy; 2025</p>
+            </div>
+            <div style="background-color: rgb(3, 3, 3); padding: 5px;">
+                <img src="/static/assets/images/rklss.png" alt="Company Logo" style="height: 40px; width: auto;">
+            </div>
+        </div>
+        <div class="govuk-width-container">
+            <hr class="govuk-footer__section-break" style="border-top: 1px solid #444; margin: 10px 0;">
+        </div>
+    </footer>
+
+    <script>
+        // Slideshow functionality
+        let slideIndex = 0;
+        showSlides();
+
+        function showSlides() {
+            let slides = document.getElementsByClassName("slide");
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+            slideIndex++;
+            if (slideIndex > slides.length) {
+                slideIndex = 1;
+            }
+            slides[slideIndex - 1].style.display = "block";
+            setTimeout(showSlides, 3000); // Change image every 3 seconds
+        }
+    </script>
 </body>
 </html>
