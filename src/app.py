@@ -123,7 +123,20 @@ BASE_CURRENCY = "GBP"
 # Example credentials for validation
 users = {
     "tradesphere@admin": "password",
-    "tradesphere@user2": "user2"
+    "tradesphere@user2": "user2",
+    #
+    "tradesphere@user3": "user3",
+    "tradesphere@user4": "user4",
+    "tradesphere@user5": "user5",
+    "tradesphere@user6": "user6",
+    "tradesphere@user7": "user7",
+    #
+    "tradesphere@user81": "user8",
+    "tradesphere@user91": "user9",
+    "tradesphere@user101": "user10",
+    "tradesphere@user111": "user11",
+    "tradesphere@user121": "user12",
+    "tradesphere@user131": "user13"
 }
 
 app = Flask(__name__)
