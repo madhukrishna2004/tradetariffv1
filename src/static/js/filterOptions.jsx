@@ -21,7 +21,7 @@ const FilterOptions = (props) => {
                        aria-controls="alltable"
                        onChange={props.handleFilterChange}/>
                 <button type="submit">
-                    <img src={searchImage} alt="search"/>
+                    <img src={searchImage} alt="TradeSphere Global Logo - AI for Trade Compliance""search"/>
                 </button>
             </div>
         </div>
