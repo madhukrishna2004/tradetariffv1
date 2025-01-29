@@ -5,7 +5,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 import re
 from elasticapm.contrib.flask import ElasticAPM
 import flask
-from flask import request, Response, jsonify, render_template
+from flask import request, Response, jsonify, render_template, send_from_directory
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 from whitenoise import WhiteNoise
@@ -359,7 +359,9 @@ def google_analytics(response: Response):
         logger.exception("Google Analytics failed")
         pass
     return response
-
+@app.route('/sitemap.xml')
+def sitemap():
+    return send_from_directory('static', 'sitemap.xml')
 @app.route('/save-selected-data', methods=['POST'])
 def save_selected_data():
     try:
