@@ -80,7 +80,7 @@ def test_healthcheck(client: FlaskClient):
 
 def test_noindex(client: FlaskClient):
     response = client.get("/")
-    assert response.headers["X-Robots-Tag"] == "noindex, nofollow"
+    assert response.headers["X-Robots-Tag"] == "index, nofollow"
 
 
 @pytest.mark.parametrize(

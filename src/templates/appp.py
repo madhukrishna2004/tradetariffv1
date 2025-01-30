@@ -304,7 +304,7 @@ def set_cache_control_headers(response: Response):
     response.headers["Expires"] = "0"
 
     # Prevent search engines from indexing the site
-    response.headers["X-Robots-Tag"] = "noindex, nofollow"
+    response.headers["X-Robots-Tag"] = "index, nofollow"
     return response
 
 
