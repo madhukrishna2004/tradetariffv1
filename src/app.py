@@ -328,7 +328,13 @@ def set_cache_control_headers(response: Response):
     # Prevent search engines from indexing the site
     response.headers["X-Robots-Tag"] = "index, nofollow"
     return response
-
+    
+# Redirect www to non-www
+@app.before_request
+def before_request():
+    if request.host.startswith('www.'):
+        # Redirect to non-www version with HTTPS
+        return redirect(f"https://{request.host[4:]}{request.path}", code=301)
 
 @app.after_request
 def google_analytics(response: Response):
