@@ -472,8 +472,6 @@ def process_excel(file):
     df['weight_contribution_percentage'] = (df['weight'] / total_weight) * 100
 
     return df, total_value, contributions, rates
-
-
 import os 
 import pandas as pd
 from fpdf import FPDF
@@ -489,13 +487,15 @@ def add_watermark(pdf):
     pdf.cell(0, 20, "Tradesphere Global", ln=True, align='C')
     pdf.set_text_color(0, 0, 0)  # Reset text color to black
     
-def generate_beautiful_pdf(data, total, contributions, rates, excel_file='processed_data.xlsx'):
+def generate_beautiful_pdf(data, total, contributions, rates, excel_file='processed_data.xlsx', filename_prefix='Enhanced_Summary_Report'):
     print("Generating PDF report...")
 
     # Ensure the output directory exists
-    pdf_output_file = 'src/pdf_report/Enhanced_Summary_Report.pdf'
-    os.makedirs(os.path.dirname(pdf_output_file), exist_ok=True)
+    output_dir = 'src/pdf_report'
+    os.makedirs(output_dir, exist_ok=True)
 
+    # Create a unique filename for the PDF
+    pdf_output_file = os.path.join(output_dir, f"{filename_prefix}.pdf")
     # Verify required columns
     required_columns = ['item_number', 'description', 'value_gbp', 'country_of_origin', 'commodity_code', 'currency', 'weight', 'weight_contribution_percentage']
     for column in required_columns:
@@ -562,7 +562,7 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     #pdf.cell(0, 10, txt="Assembled Place = UK", ln=True)
     pdf.cell(0, 10, txt="Final Product Details:", ln=True)
     pdf.set_font("Arial", size=10)
-    pdf.cell(0, 8, txt=f"Final Product = {final_product}", ln=True)
+    pdf.cell(0, 8, txt=f"Final Product = {final_product}", ln=True) 
     pdf.cell(0, 8, txt=f"Commodity = {commodity}", ln=True)
     pdf.cell(0, 8, txt=f"Principle of Origin = {origin}", ln=True)
     pdf.ln(10)
@@ -854,66 +854,91 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     print(f"PDF report generated: {pdf_output_file}")
     return pdf_output_file
 
+import zipfile
+from werkzeug.utils import secure_filename
+import tempfile
 
 @app.route('/process-file', methods=['POST'])
 def process_file():
     print("Received a file upload request.")
-    
-    if 'file' not in request.files:
+
+    if 'files' not in request.files:
         print("No file part.")
         return jsonify({'error': 'No file part'}), 400
 
-    file = request.files['file']
-    if file.filename == '':
-        print("No selected file.")
-        return jsonify({'error': 'No selected file'}), 400
+    files = request.files.getlist('files')
+    if not files or all(file.filename == '' for file in files):
+        print("No selected files.")
+        return jsonify({'error': 'No selected files'}), 400
 
-    if file:
-        try:
-            print(f"Processing file: {file.filename}")
-            
-            # Process the Excel file and capture the return values
-            df, total_value, contributions, rates = process_excel(file)
-            
-            # Generate the PDF with the processed data
-            pdf_output_file = generate_beautiful_pdf(df, total_value, contributions, rates)
+    processed_files = []
+    errors = []
 
-            # Return the ID or path to allow downloading later
-            report_id = os.path.basename(pdf_output_file)
-            print(f"PDF generated: {pdf_output_file}")
-            return jsonify({'message': 'File processed successfully.', 'download_url': f'/download-report/{report_id}'}), 200
+    for file in files:
+        if file:
+            try:
+                print(f"Processing file: {file.filename}")
 
-        except KeyError as e:
-            missing_columns = ', '.join(e.args)
-            print(f"KeyError: Missing columns: {missing_columns}")
-            return jsonify({'error': f"Missing required columns: {missing_columns}"}), 400
-        except ValueError as e:
-            print(f"ValueError: {str(e)}")
-            return jsonify({'error': f"Value error: {str(e)}"}), 400
-        except FileNotFoundError:
-            print(f"FileNotFoundError: The file does not exist or is not accessible.")
-            return jsonify({'error': 'File not found'}), 404
-        except PermissionError:
-            print(f"PermissionError: Insufficient permissions.")
-            return jsonify({'error': 'Permission error'}), 403
+                # Process the Excel file
+                df, total_value, contributions, rates = process_excel(file)
 
-    print("Unexpected error occurred.")
-    return jsonify({'error': 'Unexpected error'}), 500
+                # Generate the PDF with the processed data
+                pdf_output_file = generate_beautiful_pdf(
+                    df, total_value, contributions, rates,
+                    filename_prefix=f"Enhanced_Summary_Report_{secure_filename(file.filename)}"
+                )
 
+                # Ensure the file is not already in the list
+                if pdf_output_file not in processed_files:
+                    processed_files.append(pdf_output_file)
+                    print(f"PDF generated: {pdf_output_file}")
 
-# Endpoint to serve the generated PDF
-@app.route('/download-report/<path:report_id>', methods=['GET'])
-def download_report(report_id):
-    pdf_dir = 'pdf_report'
-    pdf_file_path = os.path.join(pdf_dir, report_id)
+            except KeyError as e:
+                error_msg = f"File {file.filename}: Missing required columns: {str(e)}"
+                print(f"KeyError: {error_msg}")
+                errors.append(error_msg)
+            except ValueError as e:
+                error_msg = f"File {file.filename}: Value error: {str(e)}"
+                print(f"ValueError: {error_msg}")
+                errors.append(error_msg)
+            except Exception as e:
+                error_msg = f"File {file.filename}: Unexpected error: {str(e)}"
+                print(f"Unexpected error: {error_msg}")
+                errors.append(error_msg)
 
-    if os.path.exists(pdf_file_path):
-        print(f"Serving file: {pdf_file_path}")
-        return send_file(pdf_file_path, as_attachment=True, download_name=report_id, mimetype='application/pdf')
-    else:
-        print(f"File not found: {pdf_file_path}")
+    if errors:
+        return jsonify({'error': 'Errors occurred during processing.', 'details': errors}), 400
+
+    if not processed_files:
+        return jsonify({'error': 'No files were processed successfully.'}), 400
+
+    # Create a temporary zip file
+    with tempfile.NamedTemporaryFile(suffix='.zip', delete=False) as temp_zip:
+        zip_path = temp_zip.name
+        print(f"Creating temporary zip file at: {zip_path}")
+
+        with zipfile.ZipFile(zip_path, 'w') as zipf:
+            for pdf_file in processed_files:
+                # Ensure unique filenames in the zip archive
+                zip_filename = os.path.basename(pdf_file)
+                zipf.write(pdf_file, zip_filename)
+
+    # Return the zip file's URL for download
+    zip_filename = os.path.basename(zip_path)
+    return jsonify({
+        'message': 'Files processed successfully.',
+        'download_url': f'/download-report/{zip_filename}'
+    }), 200
+@app.route('/download-report/<filename>', methods=['GET'])
+def download_report(filename):
+    # Serve the generated zip file for download
+    temp_dir = tempfile.gettempdir()
+    file_path = os.path.join(temp_dir, filename)
+
+    if not os.path.exists(file_path):
         return jsonify({'error': 'File not found'}), 404
 
+    return send_file(file_path, as_attachment=True)
 
 @app.route('/fetch-hs-code', methods=['POST'])
 def fetch_hs_code():
@@ -987,7 +1012,13 @@ def get_hs_code_info(hs_code):
     except Exception as e:
         return jsonify({"error": str(e)})
 
+@app.route('/terms-of-service')
+def terms():
+    return render_template('terms_of_service.html')
 
+@app.route('/privacy-policy')
+def privacy():
+    return render_template('privacy_policy.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -207,52 +207,78 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handle file upload
     const uploadForm = document.getElementById('upload-form');
-    if (uploadForm) {
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            spinner.style.display = 'block';
-            const content = document.getElementById('content');
-            if (content) {
-                content.style.display = 'none';
+if (uploadForm) {
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const spinner = document.getElementById('spinner-loader');
+        const content = document.getElementById('content');
+
+        // Show spinner and hide content
+        if (spinner) spinner.style.display = 'block';
+        if (content) content.style.display = 'none';
+
+        alert('The processed files will be available for download shortly');
+        const formData = new FormData(e.target);
+
+        // Append all selected files to FormData
+        const fileInput = document.getElementById('template-upload');
+        if (fileInput.files.length > 0) {
+            for (let file of fileInput.files) {
+                formData.append('files', file); // Use 'files' as the key for multiple files
+            }
+        }
+
+        try {
+            const response = await fetch('/process-file', { method: 'POST', body: formData });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Error: ${response.statusText}`);
             }
 
-            alert('The processed file will be available for download shortly');
-            const formData = new FormData(e.target);
+            const result = await response.json();
 
-            try {
-                const response = await fetch('/process-file', { method: 'POST', body: formData });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || `Error: ${response.statusText}`);
+            // Handle the download URL
+            if (result.download_url) {
+                const downloadResponse = await fetch(result.download_url);
+                if (!downloadResponse.ok) {
+                    throw new Error('Failed to download the file.');
                 }
 
-                const result = await response.json();
+                // Convert the response to a Blob
+                const blob = await downloadResponse.blob();
 
-                if (result.download_url) {
-                    const downloadLink = document.createElement('a');
-                    downloadLink.href = result.download_url;
-                    downloadLink.download = 'Enhanced_Summary_Report.pdf';
-                    document.body.appendChild(downloadLink);
-                    downloadLink.click();
-                    document.body.removeChild(downloadLink);
-                    alert('File downloaded successfully!');
-                } else if (result.message) {
-                    alert(result.message);
-                } else {
-                    throw new Error('Unexpected server response.');
-                }
-            } catch (error) {
-                console.error('File upload error:', error);
-                alert('Failed to process the file. Please check your connection and try again.');
-            } finally {
-                spinner.style.display = 'none';
-                if (content) {
-                    content.style.display = 'block';
-                }
+                // Create a temporary link to trigger the download
+                const downloadLink = document.createElement('a');
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.download = result.filename || 'Processed_Files.zip'; // Default filename
+                document.body.appendChild(downloadLink);
+
+                // Trigger the download
+                downloadLink.click();
+
+                // Clean up the temporary link
+                document.body.removeChild(downloadLink);
+                URL.revokeObjectURL(downloadLink.href);
+
+                //alert('Files downloaded successfully!');
+            } else if (result.message) {
+                alert(result.message);
+            } else {
+                throw new Error('Unexpected server response.');
             }
-        });
-    }
+        } catch (error) {
+            console.error('File upload error:', error);
+            alert('Failed to process the files. Please check your connection and try again.');
+        } finally {
+            // Hide spinner and show content after the download is complete
+            if (spinner) spinner.style.display = 'none';
+            if (content) content.style.display = 'block';
+        }
+    });
+}
+
+
+ 
 });
