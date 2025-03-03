@@ -57,4 +57,5 @@ fpdf
 ujson  # Optional, if needed
 openpyxl
 pyttsx3
-speech_recognition
+SpeechRecognition==3.14.1  # Or the installed version
+
