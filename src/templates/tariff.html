@@ -4,14 +4,14 @@
 
 {% block content %}
 
-<div class="govuk-body" style="color: white;">
+<div class="govuk-body" style="color: rgb(44, 44, 44);">
     Leverage this tool to identify the appropriate commodity code for goods being imported to or exported from the UK.  
     This service also enables you to:
     <ul>
         <li>Determine applicable customs duties or VAT</li>
         <li>Explore tariff suspensions or reductions</li>
     </ul>
-    <p style="color: white;">To accurately classify your goods and obtain a commodity code, ensure you have detailed information about the product, such as:</p>
+    <p style="color: rgb(44, 44, 44)e;">To accurately classify your goods and obtain a commodity code, ensure you have detailed information about the product, such as:</p>
     <ul>
         <li>The product category and type</li>
         <li>Its intended purpose or usage</li>
@@ -19,7 +19,7 @@
         <li>The manufacturing process involved</li>
         <li>Its packaging and presentation</li>
     </ul>
-    <p style="color: white;">In most cases, rates in the UKGT have been set at the 8-digit commodity code level. If you have a 10-digit commodity code, use the first 8 digits to search for your product.</p>
+    <p style="color: rgb(44, 44, 44);">In most cases, rates in the UKGT have been set at the 8-digit commodity code level. If you have a 10-digit commodity code, use the first 8 digits to search for your product.</p>
 </div>
 
 
@@ -33,7 +33,7 @@
                         </div>
                     </div>
                     <div class="data-options__length">
-                        <label style="color: white;">
+                        <label style="color: rgb(44, 44, 44);">
                             Show 
                             <select name="n" aria-controls="alltable" class="govuk-select">
                                 {% for size in [10, 25, 50, 100] %}
@@ -46,7 +46,7 @@
                 </form>
                 <br>
                 <br>
-                <div class="govuk-body" style="color: white;">
+                <div class="govuk-body" style="color: rgb(44, 44, 44);">
                     <a href="https://www.gov.uk/guidance/using-the-trade-tariff-tool-to-find-a-commodity-code" class="govuk-link govuk-link--no-visited-state" style="color: white;">Learn more</a>.
                 </div>
                 <table class="table table-hover govuk-table sticky dataTable no-footer" id="alltable" role="grid">
@@ -69,10 +69,10 @@
                                     <span class="hs-cell__subheading">{{ item.commodity[6:8] }}</span>
                                     
                                 </td>
-                                <td class="govuk-table__cell" style="color: white;">{{ item.description }}</td>
-                                <td class="govuk-table__cell" style="color: white;">{{ item.cet_duty_rate }}</td>
-                                <td class="govuk-table__cell" style="color: white;">{{ item.ukgt_duty_rate }}</td>
-                                <td class="govuk-table__cell r" style="color: white;">{{ item.product_specific_rule_of_origin }}</td>
+                                <td class="govuk-table__cell" style="color: rgba(45, 45, 45, 0.753);">{{ item.description }}</td>
+                                <td class="govuk-table__cell" style="color: rgba(45, 45, 45, 0.753);">{{ item.cet_duty_rate }}</td>
+                                <td class="govuk-table__cell" style="color: rgba(45, 45, 45, 0.753);">{{ item.ukgt_duty_rate }}</td>
+                                <td class="govuk-table__cell r" style="color: rgba(45, 45, 45, 0.753);">{{ item.product_specific_rule_of_origin }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -80,7 +80,7 @@
 
                 <div class="pagination">
                     <div class="pagination__info" role="status" aria-live="polite">
-                        <span class="govuk-body" style="color: white;">Showing {{ start_index }} to {{ stop_index }} of {{ total }} commodities</span>
+                        <span class="govuk-body" style="color: rgb(44, 44, 44);">Showing {{ start_index }} to {{ stop_index }} of {{ total }} commodities</span>
                     </div>
                     <div class="pagination__links">
                         {% if page > 1 %}
@@ -92,7 +92,7 @@
                             {% elif page_option is number %}
                                 <a href="{{ url_for('tariff', p=page_option, n=sample_size, q=filter) }}" class="pagination__links--button number" style="color: white;">{{ page_option }}</a>
                             {% else %}
-                                <span class="pagination__links--button ellipsis" style="color: white;">{{ page_option }}</span>
+                                <span class="pagination__links--button ellipsis" style="color: rgb(44, 44, 44);">{{ page_option }}</span>
                             {% endif %}
                         {% endfor %}
                         {% if page < max_page %}
@@ -104,7 +104,7 @@
         </noscript>
     </div>
     <br>
-    <a href="" class="govuk-link govuk-link--no-visited-state" style="color: white;"></a>
+    <a href="" class="govuk-link govuk-link--no-visited-state" style="color: rgb(44, 44, 44);"></a>
 {% endblock %}
 
 {% block extra_js %}

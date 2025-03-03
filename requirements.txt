@@ -56,3 +56,6 @@ requests
 fpdf
 ujson  # Optional, if needed
 openpyxl
+pyttsx3
+pickle
+speech_recognition

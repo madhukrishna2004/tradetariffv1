@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>TradeSphere Global - HS Code Lookup, UK Preference Origin Calculation, EU-UK Tariff Compliance Software</title>
+    <meta name="description" content="TradeSphere Global provides AI-driven software for HS code lookup, UK trade compliance, UK preference origin calculation, EU-UK trade agreement eligibility, and supplier declarations. Get solutions for global and UK import/export compliance." />
+    <meta name="keywords" content="HS code lookup, UK trade compliance, AI-powered trade solutions, UK origin calculation, trade tariff software, UK supplier declarations, import export compliance" />
+
+    <link rel="icon" href="https://trade-sphereglobal.com/favicon.ico" type="image/x-icon">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="TradeSphere Global - UK Trade Compliance, HS Code Lookup & EU-UK Tariff Calculation Software" />
+    <meta property="og:description" content="TradeSphere Global provides AI-powered solutions for UK trade compliance, HS code lookup, UK preference origin calculation, EU-UK trade agreement eligibility, and supplier declarations." />
+    <meta property="og:image" content="https://trade-sphereglobal.com/assets/tradesphere-banner.jpg" />
+    <meta property="og:url" content="https://trade-sphereglobal.com/" />
+    <meta property="og:type" content="website" />
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/munichat.css') }}">
+
+    <!-- Robots Meta Tag -->
+    <meta name="robots" content="index, follow">
+</head>
+<body>
+
+    <!-- Chatbot Window -->
+    <div class="chatbot-window" id="chatbot-window">
+        <div class="chatbot-header">
+            <h3>TradeSphere AI</h3>
+            <button id="toggle-mode" onclick="toggleDarkMode()">🌙</button>
+        </div>
+
+        <div class="chatbot-body" id="chatbot-body">
+            <div class="chatbot-message bot-message">
+                Hi there! I'm here to assist you.
+                <div class="reaction-container">
+                    <span>👍</span> <span>❤️</span>
+                </div>
+            </div>
+
+            <!-- Typing Indicator (Fixed) -->
+            <div id="loading-indicator" class="typing-indicator">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+
+        <div class="chatbot-footer">
+            <input type="text" id="chatbot-input" placeholder="Ask me anything..." onkeypress="playMessageSound()">
+            <button id="chatbot-send" class="send-btn" onclick="sendMessage()">➤</button>
+            <button id="chatbot-record" class="send-btn" onclick="startRecording()">🎤</button>
+        </div>
+    </div>
+
+    <!-- Audio for message notifications -->
+    <audio id="message-sound">
+        <source src="{{ url_for('static', filename='assets/sounds/message-blip.mp3') }}" type="audio/mpeg">
+    </audio>
+
+    <!-- JavaScript Files -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <script>
+        function playMessageSound() {
+            let sound = document.getElementById("message-sound");
+            sound.play().catch(error => console.log("Audio play failed due to browser restrictions:", error));
+        }
+
+        // Ensure audio can play after user interaction
+        document.body.addEventListener("click", () => {
+            let sound = document.getElementById("message-sound");
+            sound.play().catch(() => {});
+        }, { once: true });
+
+        function toggleDarkMode() {
+            let body = document.body;
+            let chatbotWindow = document.getElementById("chatbot-window");
+            let inputBox = document.getElementById("chatbot-input");
+            let isDark = body.classList.toggle("dark-mode");
+
+            chatbotWindow.style.background = isDark ? "var(--chat-bg-dark)" : "var(--chat-bg-light)";
+            body.style.background = isDark ? "var(--bg-dark)" : "var(--bg-light)";
+            inputBox.style.color = isDark ? "var(--text-dark)" : "var(--text-light)";
+        }
+    </script>
+
+</body>
+</html>

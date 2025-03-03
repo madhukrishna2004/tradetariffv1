@@ -26,6 +26,17 @@ from datetime import timedelta
 from datetime import datetime
 logger = logging.getLogger(__name__)
 import json
+import os
+import openai
+import pickle
+import logging
+import pyttsx3
+import speech_recognition as sr
+from flask import Flask, render_template, request, jsonify, session
+from werkzeug.utils import secure_filename
+from src.chatbot import chatbot_bp
+from src.chatbot_routes import chatbot_bp
+from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
@@ -1024,5 +1035,112 @@ def contact():
 def privacy():
     return render_template('privacy_policy.html')
 
+
+# OpenAI API Key
+part1 = "sk-proj-Jcgx4YzLqRFQq9F9MXwTfq2sk_q1HwfklOFIviaF45ockbK_K7HIUDUngcXZH6ka3jI0kxXYU1T3"
+part2 = "BlbkFJjKGwgEWutYmHyXYAzNCozAUvZVgvDT8wzlhe2sNmugk628iD4XHcmflri96tUZbi-E4J24l14A"
+encryption_key = generate_encryption_key()
+save_encryption_key(encryption_key)
+encrypt_api_key_parts(part1, part2, encryption_key)
+
+# Load the encryption key
+encryption_key = load_encryption_key()
+
+# Decrypt and combine the API key parts
+openai.api_key = decrypt_api_key_parts("encrypted_api_key_parts.txt", encryption_key)
+
+# Cache Memory Setup (Pickle)
+CACHE_FILE = 'cache.pkl'
+cache = {}
+
+# Directory setup for file uploads
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'wav', 'aiff', 'aifc', 'flac'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# Logging Configuration
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def allowed_file(filename):
+    """Check if file extension is allowed"""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def load_cache():
+    """Load cache from file if it exists"""
+    global cache
+    if os.path.exists(CACHE_FILE):
+        try:
+            with open(CACHE_FILE, 'rb') as f:
+                cache = pickle.load(f)
+            logger.info("Cache loaded successfully.")
+        except (EOFError, pickle.UnpicklingError):
+            cache = {}  # Reset cache if corrupted
+            save_cache()
+            logger.warning("Cache was corrupted. Resetting.")
+
+def save_cache():
+    """Save cache to file"""
+    global cache
+    with open(CACHE_FILE, 'wb') as f:
+        pickle.dump(cache, f)
+        f.flush()  # Ensure data is written
+    logger.info("Cache saved successfully.")
+
+@app.route('/index')
+def index():
+    return render_template('index.html')
+
+@app.route('/ask', methods=['POST'])
+def ask():
+    """Handles chatbot interaction with conversation context"""
+    global cache
+
+    user_input = request.json.get('user_input')
+    if not user_input:
+        return jsonify({"error": "Empty input received."})
+
+    session_id = session.get('session_id', 'default')  # Assign a session ID (default for now)
+
+    if session_id not in cache:
+        cache[session_id] = []  # Create conversation history for this session
+
+    conversation = cache[session_id]  # Retrieve conversation history
+
+    # Append user's input to the conversation history
+    conversation.append({"role": "user", "content": user_input})
+
+    logger.info(f"Processing conversation history for session: {session_id}")
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=conversation,  # Send full conversation history
+            max_tokens=150
+        )
+
+        if "choices" in response and len(response["choices"]) > 0:
+            answer = response["choices"][0]["message"]["content"].strip()
+        else:
+            return jsonify({"error": "Unexpected OpenAI API response format."})
+
+    except Exception as e:
+        logger.error(f"Failed to get response from OpenAI: {e}")
+        return jsonify({"error": "Failed to get response from OpenAI."})
+
+    # Append AI response to conversation history
+    conversation.append({"role": "assistant", "content": answer})
+
+    # Save updated conversation in cache
+    cache[session_id] = conversation
+    save_cache()
+
+    return jsonify({"response": answer})
+
+app.register_blueprint(chatbot_bp, url_prefix='/chatbot')
+@chatbot_bp.route('/')
+def chatbot_ui():
+    return render_template('chatbot.html') 
 if __name__ == "__main__":
     app.run(debug=True)
