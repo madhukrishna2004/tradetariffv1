@@ -1016,6 +1016,10 @@ def get_hs_code_info(hs_code):
 def terms():
     return render_template('terms_of_service.html')
 
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
 @app.route('/privacy-policy')
 def privacy():
     return render_template('privacy_policy.html')

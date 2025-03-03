@@ -1548,37 +1548,45 @@ button.next {
 </section>
 
 
-<footer class="govuk-footer" role="contentinfo" style="background-color: #2a2a2a; color: white; padding: 20px 0;">
-    <div class="govuk-width-container" style="display: flex; justify-content: space-between; align-items: center;">
+<footer class="govuk-footer" role="contentinfo" style="background-color: #2a2a2a; color: white; padding: 30px 0;">
+    <div class="govuk-width-container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; padding: 0 20px;">
+        
         <!-- Company Info -->
-        <div style="font-size: 14px;">
-            <p style="margin: 0;">TradeSphere Global</p>
-            <p style="margin: 0;">All rights reserved &copy; 2025</p>
+        <div style="font-size: 16px; flex: 1; min-width: 250px;">
+            <p style="margin: 5px 0; font-weight: bold; font-size: 18px;">TradeSphere Global</p>
+            <p style="margin: 5px 0;">Empowering AI for Trade Compliance</p>
+            <p style="margin: 5px 0;">&copy; 2025 TradeSphere Global. All rights reserved.</p>
         </div>
 
         <!-- Company Logo -->
-        <div style="background-color: rgb(3, 3, 3); padding: 5px;">
+        <div style="background-color: rgb(3, 3, 3); padding: 5px; flex: 1; text-align: center;">
             <img src="/static/assets/images/rklss.png" alt="TradeSphere Global Logo - AI for Trade Compliance" 
-                style="height: 40px; width: auto;">
+                style="height: 50px; width: auto;">
+        </div>
+
+        <!-- Important Links -->
+        <div style="text-align: right; flex: 1; min-width: 250px;">
+            <h3 style="font-size: 18px; margin-bottom: 10px;">Important Links</h3>
+            <a href="/terms-of-service" style="color: #ffcc00; text-decoration: none; font-size: 16px; display: block; font-weight: bold;">📜 Terms of Service</a>
+            <a href="/privacy-policy" style="color: #ffcc00; text-decoration: none; font-size: 16px; display: block; font-weight: bold;">🔒 Privacy Policy</a>
+            <a href="/contact" style="color: #b3b3b3; text-decoration: none; font-size: 16px; display: block; margin-top: 5px;">📧 Contact Us</a>
         </div>
     </div>
 
     <!-- Horizontal Line -->
-    <div class="govuk-width-container">
-        <hr class="govuk-footer__section-break" style="border-top: 1px solid #444; margin: 10px 0;">
+    <div class="govuk-width-container" style="margin-top: 15px;">
+        <hr class="govuk-footer__section-break" style="border-top: 1px solid #444;">
     </div>
 
-    <!-- Footer Links Section -->
-    <div class="govuk-width-container" style="text-align: center; font-size: 14px;">
-        <a href="/terms-of-service" style="color: #b3b3b3; text-decoration: none; margin: 0 15px;">Terms of Service</a>
-        |
-        <a href="/privacy-policy" style="color: #b3b3b3; text-decoration: none; margin: 0 15px;">Privacy Policy</a>
-        |
-        <a href="/contact" style="color: #b3b3b3; text-decoration: none; margin: 0 15px;">Contact</a>
-        |
-        <a href="/about" style="color: #b3b3b3; text-decoration: none; margin: 0 15px;">About Us</a>
+    <!-- Google-Friendly Privacy & Terms Notice -->
+    <div class="govuk-width-container" style="text-align: center; font-size: 16px; margin-top: 10px;">
+        <p>🔎 We value your privacy and transparency. Read our  
+            <a href="/terms-of-service" style="color: #ffcc00; text-decoration: underline;">Terms of Service</a>  
+            and <a href="/privacy-policy" style="color: #ffcc00; text-decoration: underline;">Privacy Policy</a>.
+        </p>
     </div>
 </footer>
+
 
 
     <script>

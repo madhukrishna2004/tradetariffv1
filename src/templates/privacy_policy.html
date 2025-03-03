@@ -4,194 +4,202 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy | TradeSphere Global</title>
-    <link rel="stylesheet" href="styles.css">
-
-    <!-- Google Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* General Styles */
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Merriweather', serif;
+            background: url('https://www.toptal.com/designers/subtlepatterns/patterns/old_map.png');
+            color: #333;
             margin: 0;
             padding: 0;
-            background: #f4f7fc;
-            color: #333;
             line-height: 1.8;
         }
 
+        /* Container */
         .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid #d4af37;
         }
 
-        .navbar {
-            background: #102a43;
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .navbar-brand {
-            font-size: 22px;
+        /* Hero Section */
+        .hero-text {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            color: #1c3d6e;
+            font-size: 36px;
             font-weight: bold;
-            color: #FFD700;
-            text-decoration: none;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #d4af37;
+            padding-bottom: 10px;
         }
 
-        .nav-links {
-            list-style: none;
-            display: flex;
-            padding: 0;
+        /* Section Headers */
+        h2 {
+            font-size: 22px;
+            color: #1c3d6e;
+            font-family: 'Playfair Display', serif;
+            margin-top: 30px;
+            font-weight: bold;
         }
 
-        .nav-links li {
+        p {
+            font-size: 18px;
+            color: #444;
+            text-align: justify;
+        }
+
+        p:first-letter {
+            font-size: 32px;
+            font-weight: bold;
+            color: #d4af37;
+            float: left;
+            margin-right: 8px;
+            line-height: 1;
+        }
+
+        ul {
+            font-size: 18px;
+            color: #555;
             margin-left: 20px;
         }
 
-        .nav-links a {
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 16px;
-            transition: 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: #FFD700;
-        }
-
-        .hero {
+        /* Decorative Divider */
+        .divider {
             text-align: center;
-            padding: 70px 20px;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            font-size: 20px;
+            color: #d4af37;
+            margin: 20px 0;
+        }
+
+        /* Button */
+        .btn {
+            background: #1c3d6e;
             color: white;
-            border-bottom-left-radius: 30px;
-            border-bottom-right-radius: 30px;
-        }
-
-        .hero h1 {
-            font-size: 36px;
-            margin-bottom: 10px;
-        }
-
-        .hero p {
-            font-size: 18px;
-            max-width: 600px;
-            margin: 0 auto;
-            opacity: 0.9;
-        }
-
-        .content {
-            padding: 50px 20px;
-        }
-
-        .content h2 {
-            font-size: 22px;
-            color: #102a43;
-            margin-bottom: 15px;
-            border-left: 5px solid #FFD700;
-            padding-left: 12px;
-        }
-
-        .content p, .content ul {
+            padding: 12px 25px;
             font-size: 16px;
-            color: #333;
-        }
-
-        .content ul {
-            padding-left: 20px;
-        }
-
-        .content ul li {
-            margin-bottom: 10px;
-        }
-
-        .contact-section {
-            text-align: center;
-            padding: 30px;
-            background: #16213e;
-            color: white;
-            border-radius: 10px;
-            margin-top: 30px;
-        }
-
-        .contact-section a {
-            color: #FFD700;
+            border: 2px solid #d4af37;
+            border-radius: 6px;
             font-weight: bold;
             text-decoration: none;
+            display: inline-block;
+            margin-top: 30px;
+            transition: 0.3s ease-in-out;
         }
 
-        .contact-section a:hover {
-            text-decoration: underline;
+        .btn:hover {
+            background: #d4af37;
+            color: #1c3d6e;
         }
 
+        /* Footer */
         footer {
+            background-color: #1c3d6e;
             text-align: center;
             padding: 20px;
-            background: #102a43;
-            color: #ccc;
-            font-size: 14px;
-            margin-top: 50px;
+            color: white;
+            font-size: 16px;
+            border-top: 3px solid #d4af37;
+        }
+
+        footer a {
+            color: #d4af37;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        footer a:hover {
+            color: #ffffff;
         }
     </style>
 </head>
-
 <body>
-    <nav class="navbar">
-        <div class="container">
-            <a class="navbar-brand" href="#">TradeSphere Global</a>
-            <ul class="nav-links">
-                <li><a href="/login">Home</a></li>
-                <li><a href="/terms-of-service">Terms of Service</a></li>
-            </ul>
-        </div>
-    </nav>
 
-    <header class="hero">
-        <h1>Privacy Policy</h1>
-        <p>Your data, our responsibility. We ensure the highest security standards.</p>
-    </header>
+    <!-- Hero Section -->
+    <div class="hero-text">
+        Privacy Policy
+        <p style="font-size: 18px; font-weight: normal; margin-top: 5px;">Your privacy is our priority. Read how we handle your data securely.</p>
+    </div>
 
-    <section class="content">
-        <div class="container">
-            <h2>1. Introduction</h2>
-            <p>At TradeSphere Global, protecting your privacy is fundamental. This policy explains how we collect, use, and safeguard your information.</p>
+    <!-- Main Content -->
+    <div class="container">
+        <h2>1. Introduction</h2>
+        <p>Welcome to **TradeSphere Global**. This Privacy Policy explains how we collect, use, and protect your information when using our services.</p>
 
-            <h2>2. Information We Collect</h2>
-            <ul>
-                <li><strong>Personal Data:</strong> Name, email, company details.</li>
-                <li><strong>Usage Data:</strong> Website interactions, log files.</li>
-                <li><strong>Cookies:</strong> Analytics and user experience improvements.</li>
-            </ul>
+        <div class="divider">✦ ✦ ✦</div>
 
-            <h2>3. How We Use Your Data</h2>
-            <p>We use your information to enhance our services, ensure security, and improve user experience.</p>
+        <h2>2. Information We Collect</h2>
+        <p>We only collect **essential user data** required for service functionality. This includes:</p>
+        <ul>
+            <li>OAuth authentication details (temporary access tokens, never stored).</li>
+            <li>User-provided data when using Google Forms, Gmail, or Sheets integrations.</li>
+            <li>Basic account details (name, email) for authentication purposes.</li>
+        </ul>
 
-            <h2>4. Data Sharing Policy</h2>
-            <p>We do not sell your data. It is only shared with trusted partners for security and service improvements.</p>
+        <div class="divider">✦ ✦ ✦</div>
 
-            <h2>5. Your Rights</h2>
-            <p>You have the right to access, modify, or delete your data. Contact us for requests.</p>
+        <h2>3. How We Use Your Data</h2>
+        <p>We use the collected data **only for its intended purpose** and never share or sell it. This includes:</p>
+        <ul>
+            <li>Sending **user-initiated emails** via Gmail API.</li>
+            <li>Creating and modifying Google Forms **on user request**.</li>
+            <li>Storing structured data in Google Sheets **with user authorization**.</li>
+        </ul>
 
-            <h2>6. Contact Us</h2>
-            <div class="contact-section">
-                <p>For inquiries, email us at <a href="mailto:support@tradesphere.com">support@tradesphere.com</a></p>
-            </div>
-        </div>
-    </section>
+        <div class="divider">✦ ✦ ✦</div>
 
+        <h2>4. Google API Compliance</h2>
+        <p>TradeSphere Global complies with **Google’s API Services User Data Policy** and **Limited Use Policy**:</p>
+        <ul>
+            <li><strong>OAuth tokens are never stored</strong> beyond the active session.</li>
+            <li><strong>Data is never shared</strong> with third parties.</li>
+            <li><strong>We request the minimum necessary permissions</strong> for app functionality.</li>
+        </ul>
+
+        <div class="divider">✦ ✦ ✦</div>
+
+        <h2>5. Data Security</h2>
+        <p>We implement security measures to protect your information:</p>
+        <ul>
+            <li>All communication is **encrypted** using secure protocols.</li>
+            <li>We do not store or log OAuth tokens after authentication.</li>
+            <li>User data is only processed **when explicitly requested** by the user.</li>
+        </ul>
+
+        <div class="divider">✦ ✦ ✦</div>
+
+        <h2>6. User Rights & Choices</h2>
+        <p>You have the right to:</p>
+        <ul>
+            <li>Revoke OAuth permissions at any time via **Google Account settings**.</li>
+            <li>Request deletion of any data associated with your account.</li>
+        </ul>
+
+        <div class="divider">✦ ✦ ✦</div>
+
+        <h2>7. Changes to Privacy Policy</h2>
+        <p>We may update this Privacy Policy as needed. Changes will be notified through our platform.</p>
+
+        <div class="divider">✦ ✦ ✦</div>
+
+        <h2>8. Contact Us</h2>
+        <p>For questions or data requests, contact us at <strong><a href="mailto:support@tradesphere.com" class="btn">support@tradesphere.com</a></strong></p>
+
+        <!-- Button -->
+        <a href="mailto:support@tradesphere.com" class="btn">Contact Us</a>
+    </div>
+
+    <!-- Footer -->
     <footer>
-        <p>© 2025 TradeSphere Global. All rights reserved.</p>
+        <p>&copy; 2025 TradeSphere Global. All Rights Reserved. <a href="/terms-of-service">Terms of Service</a></p>
     </footer>
+
 </body>
 </html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | SREEIS RKLS LLP</title>
+    <link rel="stylesheet" href="/static/assets/css/style.css"> <!-- Main Styles -->
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #00a8ff;
+        }
+
+        .contact-info {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .contact-info p {
+            margin: 5px 0;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid #00a8ff;
+            border-radius: 5px;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #ff9f43;
+        }
+
+        button {
+            background: #00a8ff;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #ff9f43;
+        }
+
+        .social-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            color: #00a8ff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 18px;
+        }
+
+        .footer-links {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .footer-links a {
+            color: #b3b3b3;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer-links a:hover {
+            color: #ff9f43;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Contact Us</h1>
+        <p style="text-align: center;">We're here to assist you. Get in touch with us.</p>
+
+        <div class="contact-info">
+            <p>📍 <strong>Office Address:</strong><br> Venkateswara Nagar Road, Nagabhusan, Nagabhusan Colony,<br> Kasturi Nagar, Sri Krishna Nagar, Kurnool, Kurnool 518002, India</p>
+            <p>📧 <strong>Email:</strong> <a href="mailto:tradesphereglobalqueries@gmail.com" style="color: #00a8ff; text-decoration: none;">support@rkls.com</a></p>
+            <p>📞 <strong>Phone:</strong> <a href="tel:+918074807875" style="color: #00a8ff; text-decoration: none;">+91 80748 07875</a></p>
+        </div>
+
+        <h2>Send Us a Message</h2>
+        <form action="/send-message" method="POST" class="contact-form">
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email" required>
+            <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+
+        <div class="social-links">
+            <h2>Follow Us</h2>
+            <a href="https://www.linkedin.com/company/sreeis-rkls-llp/" target="_blank">🔗 LinkedIn</a>
+            
+        </div>
+
+        <div class="footer-links">
+            <a href="/terms-of-service">Terms of Service</a> |
+            <a href="/privacy-policy">Privacy Policy</a> |
+            <a href="/">Home</a>
+        </div>
+    </div>
+
+</body>
+</html>
