@@ -1474,7 +1474,101 @@ button.next {
       <a href="#contact" class="buy-now-button">Get Started</a>
     </div>
   </div>
-  
+
+ <!-- YouTube Video Embed -->
+ <!-- Stylish Video Embed Section -->
+ <style> 
+    /* Center the video container and set width to 60% */
+    .video-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100vh; /* Full height of viewport */
+    }
+
+    .video-container {
+        width: 60%; /* 60% of the page width */
+        max-width: 800px; /* Limit maximum width for large screens */
+        position: relative;
+        padding-bottom: 33.75%; /* 16:9 aspect ratio (60% width) */
+        height: 0;
+        overflow: hidden;
+        background: #000;
+        border-radius: 15px; /* Rounded corners */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Soft shadow */
+        transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+        cursor: pointer;
+    }
+
+    .video-container:hover {
+        transform: scale(1.05); /* Slight zoom effect */
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4); /* Enhanced shadow */
+    }
+
+    /* Make the iframe responsive and fill the container */
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 10px; /* Optional rounded corners */
+    }
+
+    /* Play button styling */
+    .play-button {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 40px;
+        color: white;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 15px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .video-container:hover .play-button {
+        background: rgba(0, 0, 0, 0.8);
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    /* Hide play button when video is playing */
+    .video-container.playing .play-button {
+        display: none;
+    }
+</style>
+
+<div class="video-wrapper">
+    <div class="video-container" onclick="playVideo(this)">
+        <!-- Play Button Overlay -->
+        <div class="play-button">▶</div>
+
+        <!-- YouTube Embed Code -->
+        <iframe id="video" src="https://www.youtube.com/embed/t0tY9Agcsps?autoplay=0" title="YouTube video player" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+    </div>
+</div>
+
+<script>
+    function playVideo(container) {
+        let iframe = container.querySelector("iframe");
+        let src = iframe.src;
+        
+        // Add autoplay if not already playing
+        if (!src.includes("autoplay=1")) {
+            iframe.src = src + "&autoplay=1";
+            container.classList.add("playing"); // Hide play button
+        }
+    }
+</script>
+
 
 
     <section id="login">
