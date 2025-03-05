@@ -94,20 +94,22 @@
     </div>
 </section>
 <!-- JavaScript for Slideshow -->
-<!-- JavaScript for Slideshow -->
 <script>
     (function () {
         let slideIndex = 1;
+        let timeout;
         showSlides(slideIndex);
 
         // Change slide by increment
         window.changeSlide = function (n) {
-            showSlides((slideIndex += n));
+            clearTimeout(timeout);
+            showSlides(slideIndex += n);
         };
 
         // Jump to specific slide
         window.currentSlide = function (n) {
-            showSlides((slideIndex = n));
+            clearTimeout(timeout);
+            showSlides(slideIndex = n);
         };
 
         // Main function to display slides
@@ -123,9 +125,16 @@
 
             slides[slideIndex - 1].style.opacity = "1";
             dots[slideIndex - 1].classList.add("active");
+
+            // Change slide every **5 seconds (5000ms)**
+            timeout = setTimeout(() => {
+                showSlides(slideIndex += 1);
+            }, 10000); 
         }
     })();
 </script>
+
+
 
 <style>
     /* General Reset */
@@ -133,6 +142,9 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+.slide {
+    transition: opacity 0.5s ease-in-out;
 }
 
 /* Heading Section */
