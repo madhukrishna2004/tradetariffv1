@@ -279,13 +279,66 @@ if (uploadForm) {
 
 
     <!-- Chatbot Integration -->
-    <div id="chatbot-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
-        <button id="chatbot-toggle" 
-            aria-label="Open Chatbot" 
-            style="background-color: #9cb3ca; color: rgb(80, 140, 160); border: none; padding: 15px; border-radius: 50%; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); cursor: pointer;">
-            💬
-        </button>
-    </div>
+<div id="chatbot-container">
+    <button id="chatbot-toggle" aria-label="Open Chatbot">💬</button>
+  </div>
+  
+  <style>
+    /* Chatbot container styling */
+    #chatbot-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+  
+    /* Chatbot button styling */
+    #chatbot-toggle {
+        background-color: #9cb3ca;
+        color: rgb(80, 140, 160);
+        border: none;
+        padding: 18px;
+        border-radius: 50%;
+        font-size: 22px;
+        cursor: pointer;
+        transition: transform 0.3s ease-out, box-shadow 0.3s ease-in-out;
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
+        animation: rajamouliFloat 5s cubic-bezier(0.5, 0.05, 0.1, 1) infinite, 
+                   pulseAura 2.5s infinite alternate;
+    }
+  
+    /* Epic Heroic Floating */
+    @keyframes rajamouliFloat {
+        0% { transform: translateY(0px) rotate(0deg) scale(1); }
+        20% { transform: translateY(-12px) rotate(-3deg) scale(1.08); }
+        40% { transform: translateY(5px) rotate(2deg) scale(1); }
+        60% { transform: translateY(-8px) rotate(-1deg) scale(1.04); }
+        80% { transform: translateY(3px) rotate(1deg) scale(1.02); }
+        100% { transform: translateY(0px) rotate(0deg) scale(1); }
+    }
+  
+    /* Electrifying Aura */
+    @keyframes pulseAura {
+        0% { box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3); }
+        100% { box-shadow: 0px 15px 35px rgba(80, 140, 160, 0.8), 
+                      0px 0px 10px rgba(80, 140, 160, 0.6); }
+    }
+  
+    /* Hover: Shockwave Explosion */
+    #chatbot-toggle:hover {
+        transform: scale(1.3) rotate(6deg);
+        box-shadow: 0px 20px 50px rgba(80, 140, 160, 0.9), 
+                    0px 0px 15px rgba(255, 255, 255, 0.8);
+        animation: impactShockwave 0.4s ease-out;
+    }
+  
+    /* Hover Shockwave */
+    @keyframes impactShockwave {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.4); }
+        100% { transform: scale(1.3); }
+    }
+  </style>
 
     <div id="chatbot-ui" 
         style="display: none; position: fixed; bottom: 20px; right: 20px; width: 400px; height: 600px; background: rgb(16, 16, 16); border: 1px solid #292828; border-radius: 10px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); overflow: hidden; transform: translateX(100%); transition: transform 0.5s ease-in-out;">
@@ -324,6 +377,45 @@ if (uploadForm) {
     <span>Loading, please wait...</span>
 </div>
 
+<div id="onboarding-popup" class="onboarding-container">
+    <div id="popup-content">
+        <div class="onboarding-header">
+            <h1>Quick Start Guide</h1>
+            <p></p>
+            <span id="skip-onboarding">Skip</span> <!-- Skip button -->
+        </div>
+    <div class="onboarding-content">
+        <div class="step active-step" id="step-1">
+            <h2>Step 1: Enter Your Final Product</h2>
+            <p>Start by entering the name of your final product.</p>
+            <button class="next-step" data-next="step-2">Next</button>
+        </div>
+        <div class="step" id="step-2">
+            <h2>Step 2: Fetch HS Code</h2>
+            <p>Click Fetch HS Code to let AI determine the HS Code for your product. If incorrect, retry or enter manually.</p>
+            <button class="prev-step" data-prev="step-1">Back</button>
+            <button class="next-step" data-next="step-3">Next</button>
+        </div>
+        <div class="step" id="step-3">
+            <h2>Step 3: Fetch Information</h2>
+            <p>Click Fetch Info to display all matched products.</p>
+            <button class="prev-step" data-prev="step-2">Back</button>
+            <button class="next-step" data-next="step-4">Next</button>
+        </div>
+        <div class="step" id="step-4">
+            <h2>Step 4: Select and Save</h2>
+            <p>Select the exact product from the list and save.</p>
+            <button class="prev-step" data-prev="step-3">Back</button>
+            <button class="next-step" data-next="step-5">Next</button>
+        </div>
+        <div class="step" id="step-5">
+            <h2>Step 5: Upload Bill of Materials</h2>
+            <p>If needed, download the template, upload your Bill of Materials, click Process and download the generated reports.</p>
+            <button class="prev-step" data-prev="step-4">Back</button>
+            <button id="finish-onboarding">Finish</button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

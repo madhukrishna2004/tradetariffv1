@@ -282,3 +282,55 @@ if (uploadForm) {
 
  
 });
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const onboardingPopup = document.getElementById("onboarding-popup");
+    const popupContent = document.getElementById("popup-content");
+    const skipButton = document.getElementById("skip-onboarding");
+    const steps = document.querySelectorAll(".step");
+    const nextButtons = document.querySelectorAll(".next-step");
+    const prevButtons = document.querySelectorAll(".prev-step");
+    const finishButton = document.getElementById("finish-onboarding");
+
+    // Open onboarding automatically
+    setTimeout(() => {
+        onboardingPopup.style.display = "block";
+        document.getElementById("step-1").classList.add("active-step");
+    }, 1000);
+
+    // Close when clicking "Skip"
+    skipButton.addEventListener("click", () => {
+        onboardingPopup.style.display = "none";
+    });
+
+    // Close when clicking outside the popup content
+    window.addEventListener("click", function (event) {
+        if (event.target === onboardingPopup) {
+            onboardingPopup.style.display = "none";
+        }
+    });
+
+    // Navigation
+    nextButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+            const nextStep = document.getElementById(this.dataset.next);
+            steps.forEach(step => step.classList.remove("active-step"));
+            nextStep.classList.add("active-step");
+        });
+    });
+
+    prevButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+            const prevStep = document.getElementById(this.dataset.prev);
+            steps.forEach(step => step.classList.remove("active-step"));
+            prevStep.classList.add("active-step");
+        });
+    });
+
+    // Finish onboarding
+    finishButton.addEventListener("click", () => {
+        onboardingPopup.style.display = "none";
+    });
+});

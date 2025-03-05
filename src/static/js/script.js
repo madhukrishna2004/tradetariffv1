@@ -54,46 +54,53 @@ function sendMessage() {
     });
 }
 
-async function startRecording() {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mediaRecorder = new MediaRecorder(stream);
-    const audioChunks = [];
-    const chatBox = document.getElementById("chatbot-body");
 
-    mediaRecorder.ondataavailable = event => {
-        audioChunks.push(event.data);
-    };
+//
+document.addEventListener("DOMContentLoaded", function () {
+    const onboardingPopup = document.getElementById("onboarding-popup");
+    const popupContent = document.getElementById("popup-content"); // Add this inside the popup div
+    const steps = document.querySelectorAll(".step");
+    const nextButtons = document.querySelectorAll(".next-step");
+    const prevButtons = document.querySelectorAll(".prev-step");
+    const finishButton = document.getElementById("finish-onboarding");
 
-    mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-        const formData = new FormData();
-        formData.append('audio', audioBlob, 'audio.wav');
-
-        // Show loading message
-        let loadingMessage = `<div class="chatbot-message bot-message" id="loading">...</div>`;
-        chatBox.innerHTML += loadingMessage;
-        chatBox.scrollTop = chatBox.scrollHeight;
-
-        const response = await fetch('/voice', {
-            method: 'POST',
-            body: formData
-        });
-        const data = await response.json();
-        document.getElementById("loading").remove(); // Remove loading message
-        addChatbotMessage(data.response);
-    };
-
-    mediaRecorder.start();
-
+    // Open onboarding automatically for new users
     setTimeout(() => {
-        mediaRecorder.stop();
-    }, 5000); // Record for 5 seconds
-}
+        onboardingPopup.style.display = "block";
+        document.getElementById("step-1").classList.add("active-step");
+    }, 1000);
 
-// Integrate send button with Enter key
-document.getElementById("chatbot-input").addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        sendMessage();
-    }
+    // Navigation
+    nextButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+            const nextStep = document.getElementById(this.dataset.next);
+            steps.forEach(step => step.classList.remove("active-step"));
+            nextStep.classList.add("active-step");
+        });
+    });
+
+    prevButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+            const prevStep = document.getElementById(this.dataset.prev);
+            steps.forEach(step => step.classList.remove("active-step"));
+            prevStep.classList.add("active-step");
+        });
+    });
+
+    // Finish onboarding
+    finishButton.addEventListener("click", () => {
+        onboardingPopup.style.display = "none";
+    });
+
+    // Close popup when clicking outside (EXACT FIX HERE)
+    window.addEventListener("click", function (event) {
+        if (event.target === onboardingPopup) {
+            onboardingPopup.style.display = "none";
+        }
+    });
+
+    // Prevent closing when clicking inside the popup
+    popupContent.addEventListener("click", function (event) {
+        event.stopPropagation();
+    });
 });

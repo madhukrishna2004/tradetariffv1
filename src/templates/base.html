@@ -376,13 +376,70 @@ document.addEventListener("DOMContentLoaded", populateTable);
 
 
     <!-- Chatbot Integration -->
-    <div id="chatbot-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
-        <button id="chatbot-toggle" 
-            aria-label="Open Chatbot" 
-            style="background-color: #9cb3ca; color: rgb(80, 140, 160); border: none; padding: 15px; border-radius: 50%; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); cursor: pointer;">
-            💬
-        </button>
-    </div>
+    <!-- Chatbot Integration -->
+<!-- Chatbot Integration -->
+<div id="chatbot-container">
+  <button id="chatbot-toggle" aria-label="Open Chatbot">💬</button>
+</div>
+
+<style>
+  /* Chatbot container styling */
+  #chatbot-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+  }
+
+  /* Chatbot button styling */
+  #chatbot-toggle {
+      background-color: #9cb3ca;
+      color: rgb(80, 140, 160);
+      border: none;
+      padding: 18px;
+      border-radius: 50%;
+      font-size: 22px;
+      cursor: pointer;
+      transition: transform 0.3s ease-out, box-shadow 0.3s ease-in-out;
+      box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
+      animation: rajamouliFloat 5s cubic-bezier(0.5, 0.05, 0.1, 1) infinite, 
+                 pulseAura 2.5s infinite alternate;
+  }
+
+  /* Epic Heroic Floating */
+  @keyframes rajamouliFloat {
+      0% { transform: translateY(0px) rotate(0deg) scale(1); }
+      20% { transform: translateY(-12px) rotate(-3deg) scale(1.08); }
+      40% { transform: translateY(5px) rotate(2deg) scale(1); }
+      60% { transform: translateY(-8px) rotate(-1deg) scale(1.04); }
+      80% { transform: translateY(3px) rotate(1deg) scale(1.02); }
+      100% { transform: translateY(0px) rotate(0deg) scale(1); }
+  }
+
+  /* Electrifying Aura */
+  @keyframes pulseAura {
+      0% { box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3); }
+      100% { box-shadow: 0px 15px 35px rgba(80, 140, 160, 0.8), 
+                    0px 0px 10px rgba(80, 140, 160, 0.6); }
+  }
+
+  /* Hover: Shockwave Explosion */
+  #chatbot-toggle:hover {
+      transform: scale(1.3) rotate(6deg);
+      box-shadow: 0px 20px 50px rgba(80, 140, 160, 0.9), 
+                  0px 0px 15px rgba(255, 255, 255, 0.8);
+      animation: impactShockwave 0.4s ease-out;
+  }
+
+  /* Hover Shockwave */
+  @keyframes impactShockwave {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.4); }
+      100% { transform: scale(1.3); }
+  }
+</style>
+
+
 
     <div id="chatbot-ui" 
         style="display: none; position: fixed; bottom: 20px; right: 20px; width: 400px; height: 600px; background: rgb(16, 16, 16); border: 1px solid #292828; border-radius: 10px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); overflow: hidden; transform: translateX(100%); transition: transform 0.5s ease-in-out;">
@@ -426,6 +483,291 @@ document.addEventListener("DOMContentLoaded", populateTable);
             modal.classList.remove("show");
         }
     </script>
+
+
+
+
+
+<style>
+  /* Full-screen popup background */
+  #tradesphere-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6); /* Dark overlay */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      backdrop-filter: blur(12px); /* Blurred effect */
+      display: none; /* Hidden by default */
+  }
+
+  /* Popup content box */
+  #tradesphere-popup-content {
+      width: 40%;
+      max-width: 600px;
+      background: rgba(255, 255, 255, 0.15); /* Transparent glass effect */
+      backdrop-filter: blur(20px);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0px 0px 20px rgba(0, 255, 255, 0.5);
+      text-align: center;
+      animation: fadeIn 0.4s ease-in-out;
+  }
+
+  /* Popup Header */
+  .onboarding-header h1 {
+      font-size: 26px;
+      color: #00e1ff; /* Bright neon blue */
+      margin-bottom: 10px;
+  }
+
+  .onboarding-header p {
+      font-size: 16px;
+      color: white;
+      opacity: 0.8;
+      margin-bottom: 20px;
+  }
+
+  /* Skip button */
+  #skip-tradesphere {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 14px;
+      color: white;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+  }
+
+  #skip-tradesphere:hover {
+      opacity: 0.7;
+  }
+
+  /* Step container */
+  .steps {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+  }
+
+  /* Steps */
+  .step {
+      display: none;
+      animation: fadeInUp 0.4s ease-in-out;
+  }
+
+  .active-step {
+      display: block;
+  }
+
+  /* Navigation buttons */
+  button {
+      background: #00e1ff; /* Neon blue */
+      border: none;
+      color: #000;
+      font-size: 16px;
+      font-weight: bold;
+      padding: 10px 20px;
+      margin: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+  }
+
+  button:hover {
+      background: #0099cc;
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+      #tradesphere-popup-content {
+          width: 90%;
+          padding: 20px;
+      }
+  }
+</style>
+</head>
+<body>
+
+<!-- Onboarding Popup -->
+<style>
+  /* === Background Overlay === */
+  .onboarding-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+  }
+
+  /* === Popup Container === */
+  .onboarding-popup {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      border-radius: 15px;
+      width: 500px;
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 0.5s ease-in-out;
+  }
+
+  /* === Header Title === */
+  .onboarding-popup h1 {
+      font-size: 22px;
+      color: #fff;
+      margin-bottom: 10px;
+  }
+
+  /* === Step Content === */
+  .step {
+      display: none;
+      font-size: 16px;
+      color: #ddd;
+      margin-bottom: 15px;
+  }
+  .step.active {
+      display: block;
+  }
+
+  /* === Buttons === */
+  .onboarding-btn {
+      background: #00bcd4;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 5px;
+      transition: 0.3s;
+  }
+  .onboarding-btn:hover {
+      background: #008c9e;
+  }
+
+  /* === Skip Button === */
+  .skip-onboarding {
+      background: none;
+      border: none;
+      color: #aaa;
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 10px;
+  }
+
+  /* === Fade In Animation === */
+  @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Onboarding Popup -->
+<div class="onboarding-overlay" id="onboarding-overlay">
+  <div class="onboarding-popup">
+      <h1>Quick Start Guide</h1>
+      <p id="step-text"></p>
+
+      <!-- Navigation Buttons -->
+      <button class="onboarding-btn" id="prev-btn" style="display: none;">← Back</button>
+      <button class="onboarding-btn" id="next-btn">Next →</button>
+      <button class="onboarding-btn" id="finish-btn" style="display: none;">Finish</button>
+
+      <!-- Skip Button -->
+      <button class="skip-onboarding" id="skip-btn">Skip</button>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      const overlay = document.getElementById("onboarding-overlay");
+      const stepText = document.getElementById("step-text");
+      const prevBtn = document.getElementById("prev-btn");
+      const nextBtn = document.getElementById("next-btn");
+      const finishBtn = document.getElementById("finish-btn");
+      const skipBtn = document.getElementById("skip-btn");
+
+      // Steps Content
+      const steps = [
+          "Welcome to <b>TradeSphere Global</b>! Access UK & EU Tariff Codes, and VAT Information in one place.",
+          "🤖 <b>Meet TradeSphere AI Chatbot!</b> Located in the right corner, you can ask anything about HS codes and commodity search. </b> Discuss HS code lookups, tariffs, and trade-related queries easily.",
+          "🔍 <b>Use the Search Bar for HS Codes & VAT Info 🔍</b> Get accurate HS codes using AI-powered search.</b>Access UK & EU Tariff Codes, VAT Information, and commodity details effortlessly.",
+          "📌 <b>Search with Commodity Name or HS Code 🏷️</b>Quickly find tariff details by entering a commodity name or HS code in the search bar.",
+          "🛠️ <b>Explore More Features in the Sidebar⚡<b> 📌 Click ☰ (top-left corner) to explore other powerful features in the sidebar"
+      ];
+
+      let currentStep = 0;
+      stepText.innerHTML = steps[currentStep];
+
+      // Next Button Logic
+      nextBtn.addEventListener("click", function () {
+          currentStep++;
+          if (currentStep < steps.length) {
+              stepText.innerHTML = steps[currentStep];
+              prevBtn.style.display = "inline-block";
+              if (currentStep === steps.length - 1) {
+                  nextBtn.style.display = "none";
+                  finishBtn.style.display = "inline-block";
+              }
+          }
+      });
+
+      // Previous Button Logic
+      prevBtn.addEventListener("click", function () {
+          if (currentStep > 0) {
+              currentStep--;
+              stepText.innerHTML = steps[currentStep];
+              nextBtn.style.display = "inline-block";
+              finishBtn.style.display = "none";
+              if (currentStep === 0) {
+                  prevBtn.style.display = "none";
+              }
+          }
+      });
+
+      // Finish & Skip Logic
+      function closePopup() {
+          overlay.style.display = "none";
+      }
+
+      finishBtn.addEventListener("click", closePopup);
+      skipBtn.addEventListener("click", closePopup);
+
+      // Click outside to close
+      window.addEventListener("click", function (event) {
+          if (event.target === overlay) {
+              closePopup();
+          }
+      });
+  });
+</script>
+
+
+
+
 
 <footer class="govuk-footer" role="contentinfo" style="background-color: #0077b6; color: white; padding: 20px 0;">
   <div class="govuk-width-container" style="display: flex; justify-content: space-between; align-items: center;">
