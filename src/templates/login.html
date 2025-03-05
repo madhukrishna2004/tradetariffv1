@@ -1490,20 +1490,22 @@ button.next {
  <!-- YouTube Video Embed -->
  <!-- Stylish Video Embed Section -->
  <style> 
-    /* Center the video container and set width to 60% */
+    /* Center the video container and set width to 70% */
     .video-wrapper {
         display: flex;
+        flex-direction: column; /* Stack videos vertically */
         justify-content: center;
         align-items: center;
         width: 100%;
-        height: 100vh; /* Full height of viewport */
+        gap: 30px; /* Space between videos */
+        margin-bottom: 50px; /* Prevent overlap with next section */
     }
 
     .video-container {
-        width: 60%; /* 60% of the page width */
-        max-width: 800px; /* Limit maximum width for large screens */
+        width: 70%; /* Increased to 70% of the page width */
+        max-width: 900px; /* Increased maximum width for large screens */
         position: relative;
-        padding-bottom: 33.75%; /* 16:9 aspect ratio (60% width) */
+        padding-bottom: 39.375%; /* Adjusted 16:9 aspect ratio (70% width) */
         height: 0;
         overflow: hidden;
         background: #000;
@@ -1556,17 +1558,68 @@ button.next {
     .video-container.playing .play-button {
         display: none;
     }
+
+    /* Section title styling */
+    .video-section-title {
+        text-align: center;
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #333;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Fix Login Section Overlapping */
+    #login {
+        padding-top: 50px; /* Add space above the login section */
+    }
 </style>
 
-<div class="video-wrapper">
-    <div class="video-container" onclick="playVideo(this)">
-        <!-- Play Button Overlay -->
-        <div class="play-button">▶</div>
+<!-- Section Title -->
+<h2 class="video-section-title">TradeSphere Global: Vision & Walkthrough</h2>
 
-        <!-- YouTube Embed Code -->
-        <iframe id="video" src="https://www.youtube.com/embed/t0tY9Agcsps?autoplay=0" title="YouTube video player" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+<div class="video-wrapper">
+    <!-- Introduction (Theme) Video -->
+    <div class="video-container" onclick="playVideo(this)">
+        <div class="play-button">▶</div>
+        <iframe id="video1" src="https://www.youtube.com/embed/t0tY9Agcsps?autoplay=0" title="Introduction Video - Theme" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+    </div>
+
+    <!-- TradeSphere Global Walkthrough Video -->
+    <div class="video-container" onclick="playVideo(this)">
+        <div class="play-button">▶</div>
+        <iframe id="video2" src="https://www.youtube.com/embed/Wg3p4RgFgMs?autoplay=0" title="TradeSphere Global Walkthrough" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
     </div>
 </div>
+
+<!-- Login Section -->
+<section id="login">
+    <div class="login-container">
+        <h2>Login to Your Account</h2>
+        <form action="/login" method="POST">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="email" id="username" name="username" placeholder="Enter your username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn login-btn">Login</button>
+            </div>
+            <a href="javascript:void(0);" class="forgot-password" onclick="showPopup()">Forgot Password?</a>
+        </form>
+
+        <!-- Error Message Display -->
+        {% if error %}
+        <div class="error-message">
+            <p>{{ error }}</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
 
 <script>
     function playVideo(container) {
@@ -1583,33 +1636,6 @@ button.next {
 
 
 
-    <section id="login">
-        <div class="login-container">
-            <h2>Login to Your Account</h2>
-            <form action="/login" method="POST">
-                <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="email" id="username" name="username" placeholder="Enter your username" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn login-btn">Login</button>
-                </div>
-                <a href="javascript:void(0);" class="forgot-password" onclick="showPopup()">Forgot Password?</a>
-            </form>
-    
-            <!-- Error Message Display -->
-            {% if error %}
-            <div class="error-message">
-                <p>{{ error }}</p>
-            </div>
-            {% endif %}
-        </div>
-    </section>
-    
 
     <!-- Stylish Pop-up Container for Forgot Password -->
 <div class="popup-container" id="forgotPasswordPopup" style="display: none;">
