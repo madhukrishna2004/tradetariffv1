@@ -37,8 +37,6 @@ from werkzeug.utils import secure_filename
 from src.chatbot import chatbot_bp
 from src.chatbot_routes import chatbot_bp
 from dotenv import load_dotenv
-from flask_sqlalchemy import SQLAlchemy
-
 # Load environment variables from .env file
 load_dotenv()
 
@@ -55,13 +53,7 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=15)
 # Disable caching for static files during development
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Disable static file caching
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')  # use your .env variable
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-
- 
 # Elastic APM configuration
 app.config["ELASTIC_APM"] = {
     "SERVICE_NAME": "global-uk-tariff",
@@ -142,12 +134,14 @@ BASE_CURRENCY = "GBP"
 # Example credentials for validation
 users = {
     "tradesphere@admin": "password",
-    "tradesphere@user2": "user2",   
+    "tradesphere@user2": "user2",
+    #
     "tradesphere@user3": "user3",
     "tradesphere@user4": "user4",
     "tradesphere@user5": "user5",
     "tradesphere@user6": "user6",
     "tradesphere@user7": "user7",
+    #
     "tradesphere@user81": "user8",
     "tradesphere@user91": "user9",
     "tradesphere@user101": "user10",
@@ -169,12 +163,6 @@ def before_request():
         session.permanent = True  # Make the session permanent so it respects the lifetime setting
     else:
         session.permanent = False
-import psycopg2
-# Get the database URL
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-def get_db_connection():
-    return psycopg2.connect(DATABASE_URL)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -182,28 +170,14 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
 
-        # Connect to DB and check credentials
-        conn = get_db_connection()
-        cur = conn.cursor()
+        # Validate credentials
+        if username in users and users[username] == password:
+            session["user"] = username  # Store username in the session
+            return redirect("/tariff")  # Redirect to /tariff after login
+        else:
+            return render_template("login.html", error="Invalid username or password!")
 
-        try:
-            cur.execute("""
-                SELECT * FROM users_main 
-                WHERE (email = %s OR phone = %s) AND password = %s
-            """, (username, username, password))
-
-            user = cur.fetchone()
-
-            if user:
-                session["user"] = username  # Set session
-                return redirect("/tariff")  # Redirect on success
-            else:
-                return render_template("login.html", error="Invalid username or password!")
-
-        finally:
-            cur.close()
-            conn.close()
-
+    # Render the login page for GET requests
     return render_template("login.html")
 
 @app.route("/")
@@ -320,7 +294,7 @@ def profile():
 @app.route('/pricings')
 def pricings():
     return render_template('pricings.html')
- 
+
 @app.route('/origin')
 def origin():
     return render_template('origin.html')
@@ -333,95 +307,32 @@ def origin_japan():
 def supplieraccess():
     return render_template('supplieraccess.html')
 
-user_sessions = {}
-# HS Code guided questions
-hs_questions = [
-    "What is the product name?",
-    "What material is it made of?",
-    "What is its primary use or application?",
-    "Are there any other names it’s known by? (Yes/No)"
-]
-import uuid
-# Chat endpoint
-user_sessions = {}  # Stores session context
-
 @app.route("/chat", methods=["POST"])
 def chat():
     try:
-        data = request.json
-        user_id = data.get("user_id", str(uuid.uuid4()))
-        user_message = data.get("message", "").strip()
-
+        # Get the user message from the request
+        user_message = request.json.get("message", "")
+        
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
-
-        # Detect HS intent (very basic check)
-        hs_keywords = ["hs code", "tariff code", "commodity code"]
-        is_hs_query = any(keyword in user_message.lower() for keyword in hs_keywords)
-
-        # Session state
-        session = user_sessions.get(user_id, {"hs_flow": False, "step": 0, "answers": []})
-
-        if is_hs_query:
-            # Reset flow if user triggers HS query again
-            session["hs_flow"] = True
-            session["step"] = 1
-            session["answers"] = []
-        elif session.get("hs_flow", False):
-            # Continue flow
-            session["step"] += 1
-        else:
-            # General question, no flow state needed
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[{"role": "user", "content": user_message}],
-                max_tokens=300,
-                temperature=0.6
-            )
-            reply = response['choices'][0]['message']['content']
-            return jsonify({"response": reply, "user_id": user_id})
-
-        # HS flow questions
-        hs_questions = [
-            "1. What is the product name?",
-            "2. What material is it made of?",
-            "3. What is its primary use or application?",
-            "4. Are there any other names it’s known by? (Yes/No)",
-        ]
-
-        if session["step"] <= len(hs_questions):
-            if session["step"] > 1:
-                session["answers"].append(user_message)
-
-            next_q = hs_questions[session["step"] - 1]
-            user_sessions[user_id] = session
-            return jsonify({"response": next_q, "user_id": user_id})
-        else:
-            # Final step: get HS code suggestion
-            session["answers"].append(user_message)
-            prompt = (
-                "Determine the most accurate HS Code based on the following:\n"
-                f"1. Product Name: {session['answers'][0]}\n"
-                f"2. Material: {session['answers'][1]}\n"
-                f"3. Usage: {session['answers'][2]}\n"
-                f"4. Alternate Names: {session['answers'][3]}\n"
-                "Respond in this format:\n"
-                "🔍 Got it. Searching database...\n"
-                "✅ The closest match is: **[HS CODE] – [Description]**"
-            )
-
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=200,
-                temperature=0.6,
-            )
-
-            reply = response['choices'][0]['message']['content']
-            user_sessions[user_id] = {"hs_flow": False, "step": 0, "answers": []}
-            return jsonify({"response": reply, "user_id": user_id})
+        
+        # OpenAI API call for the chatbot response
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": user_message}],
+            max_tokens=200,
+            temperature=0.6,
+        )
+        
+        # Get the response from OpenAI
+        bot_reply = response['choices'][0]['message']['content']
+        
+        return jsonify({"response": bot_reply})
     except Exception as e:
+        logger.error(f"Error occurred while processing the chatbot message: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
+
 @app.after_request
 def set_cache_control_headers(response: Response):
     # Add headers to disable caching for all responses
@@ -586,7 +497,7 @@ os.environ['MPLBACKEND'] = 'Agg'
 def add_watermark(pdf):
     """Adds a watermark to the current page."""
     pdf.set_text_color(220, 220, 220)  # Light gray for watermark
-    pdf.set_font("ARIAL", 'B', 50)
+    pdf.set_font("Arial", 'B', 50)
     pdf.set_xy(30, 130)  # Position watermark at the center
     pdf.cell(0, 20, "Tradesphere Global", ln=True, align='C')
     pdf.set_text_color(0, 0, 0)  # Reset text color to black
@@ -629,13 +540,13 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
 
     # Title and header
     pdf.set_xy(10, 10)
-    pdf.set_font("ARIAL", 'B', 18)
+    pdf.set_font("Arial", 'B', 18)
     pdf.cell(0, 15, txt="Summary Report", ln=True, align='C')
     pdf.ln(10)
 
     # Table Header
     pdf.set_fill_color(200, 200, 200)  # Header color
-    pdf.set_font("ARIAL", 'B', 12)
+    pdf.set_font("Arial", 'B', 12)
     col_widths = [20, 50, 25, 40, 40, 20, 30]  # Add space for the new column
     headers = ["Item", "Description", "Value (GBP)", "Country of Origin", "Commodity", "Weight"]
 
@@ -644,7 +555,7 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     pdf.ln()
 
     # Table Rows
-    pdf.set_font("ARIAL", size=10)
+    pdf.set_font("Arial", size=10)
     pdf.set_fill_color(240, 240, 240)
     fill = False
 
@@ -661,19 +572,19 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
 
     # Add Summary Section
     pdf.ln(10)
-    pdf.set_font("ARIAL", 'B', 14)
+    pdf.set_font("Arial", 'B', 14)
     #pdf.cell(0, 10, txt="Assembled Place = UK", ln=True)
     pdf.cell(0, 10, txt="Final Product Details:", ln=True)
-    pdf.set_font("ARIAL", size=10)
+    pdf.set_font("Arial", size=10)
     pdf.cell(0, 8, txt=f"Final Product = {final_product}", ln=True) 
     pdf.cell(0, 8, txt=f"Commodity = {commodity}", ln=True)
     pdf.cell(0, 8, txt=f"Principle of Origin = {origin}", ln=True)
     pdf.ln(10)
 
     # Rule of Origin Section
-    pdf.set_font("ARIAL", 'B', 12)
+    pdf.set_font("Arial", 'B', 12)
     pdf.cell(0, 10, txt="Specific Rule of Origin", ln=True)
-    pdf.set_font("ARIAL", size=10)
+    pdf.set_font("Arial", size=10)
     pdf.multi_cell(0, 8, txt=f"{commodity} = {origin}")
     pdf.ln(10)
 
@@ -715,36 +626,36 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
 # Check for CTH rule (excluding non-originating active cathode materials)
     if "cathode" in origin:
         pdf.ln(10)
-        pdf.set_font("ARIAL", size=9)
+        pdf.set_font("Arial", size=9)
         pdf.cell(0, 10, txt="*Please make sure there is no active cathode material in the Bill of Materials to qualify for CTH rule.", ln=True)
 
     # Check for MaxNOM rule
     if "MaxNOM" in origin:
         pdf.ln(10)
-        pdf.set_font("ARIAL", size=12)
+        pdf.set_font("Arial", size=12)
         pdf.cell(0, 10, txt="Alternatively, according to MaxNOM Rule:", ln=True)
 
 
 
 
-    pdf.set_font("ARIAL", size=10)
+    pdf.set_font("Arial", size=10)
     pdf.cell(0, 10, txt=f"Total Value: {total:.2f} GBP", ln=True)
     pdf.cell(0, 10, txt=f"(Calculated using today's exchange rates to convert\n"
                         "non-local currencies into GBP, the currency of the assembled country)", ln=True)
     pdf.ln(5)
 
     # Contribution Breakdown
-    pdf.set_font("ARIAL", size=12)
+    pdf.set_font("Arial", size=12)
     pdf.cell(0, 10, txt="Contribution Breakdown", ln=True)
     #pdf.ln(5)
-    pdf.set_font("ARIAL", size=10)
+    pdf.set_font("Arial", size=10)
     for country, percentage in contributions.items():
         pdf.cell(0, 8, txt=f"{country}: {percentage:.2f}%", ln=True)
     pdf.ln(5)  
 
-    pdf.set_font("ARIAL", size=12)
+    pdf.set_font("Arial", size=12)
     pdf.cell(0, 10, txt="Exchange Rates Used:", ln=True)
-    pdf.set_font("ARIAL", size=10)
+    pdf.set_font("Arial", size=10)
     relevant_currencies = data['currency'].unique()
     for currency in relevant_currencies:
         rate = rates.get(currency)
@@ -842,7 +753,7 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
         match = re.search(r"(\d+)%.*headings ([\d.]+)(?: and ([\d.]+))?", origin)
         if match:
             specified_percentage = int(match.group(1))  # Extract percentage threshold
-            headings = [match.group(2).eplace('.', '')]  # Normalize heading1
+            headings = [match.group(2).replace('.', '')]  # Normalize heading1
             if match.group(3):
                 headings.append(match.group(3).replace('.', ''))  # Normalize heading2 if present
 
@@ -882,13 +793,13 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
 
 
 
-    pdf.set_font("ARIAL", 'I', 11)
+    pdf.set_font("Arial", 'I', 11)
     pdf.multi_cell(0, 8, txt=message)
 
     # Pie Chart for Contributions
     pdf.add_page()
     add_watermark(pdf) 
-    pdf.set_font("ARIAL", 'B', 14)
+    pdf.set_font("Arial", 'B', 14)
     pdf.cell(0, 10, txt="Pie Chart of Contributions", ln=True)
     pdf.ln(5)
 
@@ -925,22 +836,22 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     add_watermark(pdf) 
     pdf.ln(10)
     pdf.set_text_color(255, 0, 0)  # Red for notes
-    pdf.set_font("ARIAL", 'B', 10)
+    pdf.set_font("Arial", 'B', 10)
     pdf.multi_cell(0, 8, txt=(
         "Note: Please note that this calculation assumes that all items within the EU/UK "
         "have valid preference origin statements from the suppliers."
     ))
        
     pdf.set_text_color(0, 0, 255)  # Blue for clickable link
-    pdf.set_font("ARIAL", 'B', 10)
+    pdf.set_font("Arial", 'B', 10)
     pdf.cell(0, 10, txt="Additionally, you can apply for a binding origin decision at HMRC:", ln=True)
-    pdf.set_font("ARIAL", size=10)
+    pdf.set_font("Arial", size=10)
     pdf.cell(0, 10, txt="https://www.gov.uk/guidance/apply-for-a-binding-origin-information-decision", ln=True)
 
-    pdf.set_font("ARIAL", 'B', 10)
+    pdf.set_font("Arial", 'B', 10)
     pdf.cell(0, 10, txt="Apply for an Advance Tariff Ruling:", ln=True)
     pdf.set_text_color(0, 0, 255)  # Blue for clickable link
-    pdf.set_font("ARIAL", size=10)
+    pdf.set_font("Arial", size=10)
 
     # Adding a clickable link
     url = "https://www.gov.uk/guidance/apply-for-an-advance-tariff-ruling#apply-for-an-advance-tariff-ruling"
@@ -948,7 +859,7 @@ def generate_beautiful_pdf(data, total, contributions, rates, excel_file='proces
     
     pdf.set_text_color(0, 0, 0)
     current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    pdf.set_font("ARIAL", 'I', 10)
+    pdf.set_font("Arial", 'I', 10)
     pdf.cell(0, 10, txt=f"Report generated on: {current_datetime}", ln=True)
 
 
@@ -1071,13 +982,13 @@ def generate_beautiful_pdf_japan(data, total, contributions, rates, excel_file='
 
     # Title and header
     pdf.set_xy(10, 10)
-    pdf.set_font("ARIAL", 'B', 18)
+    pdf.set_font("Arial", 'B', 18)
     pdf.cell(0, 15, txt="Summary Report", ln=True, align='C')
     pdf.ln(10)
 
     # Table Header
     pdf.set_fill_color(200, 200, 200)  # Header color
-    pdf.set_font("ARIAL", 'B', 12)
+    pdf.set_font("Arial", 'B', 12)
     col_widths = [20, 50, 25, 40, 40, 20, 30]  # Add space for the new column
     headers = ["Item", "Description", "Value (GBP)", "Country of Origin", "Commodity", "Weight"]
 
@@ -1086,7 +997,7 @@ def generate_beautiful_pdf_japan(data, total, contributions, rates, excel_file='
     pdf.ln()
 
     # Table Rows
-    pdf.set_font("ARIAL", size=10)
+    pdf.set_font("Arial", size=10)
     pdf.set_fill_color(240, 240, 240)
     fill = False
 
@@ -1103,19 +1014,19 @@ def generate_beautiful_pdf_japan(data, total, contributions, rates, excel_file='
 
     # Add Summary Section
     pdf.ln(10)
-    pdf.set_font("ARIAL", 'B', 14)
+    pdf.set_font("Arial", 'B', 14)
     #pdf.cell(0, 10, txt="Assembled Place = UK", ln=True)
     pdf.cell(0, 10, txt="Final Product Details:", ln=True)
-    pdf.set_font("ARIAL", size=10)
+    pdf.set_font("Arial", size=10)
     pdf.cell(0, 8, txt=f"Final Product = {final_product}", ln=True) 
     pdf.cell(0, 8, txt=f"Commodity = {commodity}", ln=True)
     pdf.cell(0, 8, txt=f"Principle of Origin = {origin}", ln=True)
     pdf.ln(10)
 
     # Rule of Origin Section
-    pdf.set_font("ARIAL", 'B', 12)
+    pdf.set_font("Arial", 'B', 12)
     pdf.cell(0, 10, txt="Specific Rule of Origin", ln=True)
-    pdf.set_font("ARIAL", size=10)
+    pdf.set_font("Arial", size=10)
     pdf.multi_cell(0, 8, txt=f"{commodity} = {origin}")
     pdf.ln(10)
 
@@ -1127,7 +1038,7 @@ def generate_beautiful_pdf_japan(data, total, contributions, rates, excel_file='
             "production of the product must be classified under a heading (4-digit level of the Harmonised System) "
             "other than that of the product (i.e. a change in heading).Since the commodity codes in"
             "the bill of materials are not equal to the first four digits of the final product's commodity code," 
-            "this product is eligible under the UK-Japan Preference trade agreement for Zero or reduced Duty while importing."
+            "this product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
         ))
     elif 'CTSH' in origin:
         pdf.multi_cell(0, 8, txt=(
@@ -1135,7 +1046,7 @@ def generate_beautiful_pdf_japan(data, total, contributions, rates, excel_file='
             "this means that any non-originating material used in the production of the product must be classified under "
             "a subheading (6-digit level of the Harmonised System) other than that of the product (i.e. a change in subheading)."
             "the bill of materials are not equal to the first six digits of the final product's commodity code," 
-            "this product is eligible under the UK-Japan Preference trade agreement for Zero or reduced Duty while importing."
+            "this product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
         ))
 
     elif 'CC' in origin:
@@ -1157,36 +1068,36 @@ def generate_beautiful_pdf_japan(data, total, contributions, rates, excel_file='
 # Check for CTH rule (excluding non-originating active cathode materials)
     if "cathode" in origin:
         pdf.ln(10)
-        pdf.set_font("ARIAL", size=9)
+        pdf.set_font("Arial", size=9)
         pdf.cell(0, 10, txt="*Please make sure there is no active cathode material in the Bill of Materials to qualify for CTH rule.", ln=True)
 
     # Check for MaxNOM rule
     if "MaxNOM" in origin:
         pdf.ln(10)
-        pdf.set_font("ARIAL", size=12)
+        pdf.set_font("Arial", size=12)
         pdf.cell(0, 10, txt="Alternatively, according to MaxNOM Rule:", ln=True)
 
 
 
 
-    pdf.set_font("ARIAL", size=10)
+    pdf.set_font("Arial", size=10)
     pdf.cell(0, 10, txt=f"Total Value: {total:.2f} GBP", ln=True)
     pdf.cell(0, 10, txt=f"(Calculated using today's exchange rates to convert\n"
                         "non-local currencies into GBP, the currency of the assembled country)", ln=True)
     pdf.ln(5)
 
     # Contribution Breakdown
-    pdf.set_font("ARIAL", size=12)
+    pdf.set_font("Arial", size=12)
     pdf.cell(0, 10, txt="Contribution Breakdown", ln=True)
     #pdf.ln(5)
-    pdf.set_font("ARIAL", size=10)
+    pdf.set_font("Arial", size=10)
     for country, percentage in contributions.items():
         pdf.cell(0, 8, txt=f"{country}: {percentage:.2f}%", ln=True)
     pdf.ln(5)  
 
-    pdf.set_font("ARIAL", size=12)
+    pdf.set_font("Arial", size=12)
     pdf.cell(0, 10, txt="Exchange Rates Used:", ln=True)
-    pdf.set_font("ARIAL", size=10)
+    pdf.set_font("Arial", size=10)
     relevant_currencies = data['currency'].unique()
     for currency in relevant_currencies:
         rate = rates.get(currency)
@@ -1223,7 +1134,7 @@ def generate_beautiful_pdf_japan(data, total, contributions, rates, excel_file='
     if "wholly obtained" in origin.lower():
         message = (
             f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
-            "The product is eligible under the UK-Japan Preference trade agreement for Zero or reduced Duty while importing."
+            "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
         )
 
     elif "MaxNOM" in origin:
@@ -1234,12 +1145,12 @@ def generate_beautiful_pdf_japan(data, total, contributions, rates, excel_file='
             if max_nom_percentage < threshold:
                 message = (
                     f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
-                    "The product is eligible under the UK-Japan Preference trade agreement for Zero or reduced Duty while importing."
+                    "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
                 )
             else:
                 message = (
                     f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
-                    "The product is not eligible under the UK-Japan Preference trade agreement for Zero or reduced Duty while importing."
+                    "The product is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
                 )
         else:
             message = "Invalid MaxNOM condition specified."
@@ -1265,12 +1176,12 @@ def generate_beautiful_pdf_japan(data, total, contributions, rates, excel_file='
             if all_eligible:
                 message = (
                     f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
-                    "The product is eligible under the UK-Japan Preference trade agreement for Zero or reduced Duty while importing."
+                    "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
                 )
             else:
                 message = (
                     f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
-                    "The product is not eligible under the UK-Japan Preference trade agreement for Zero or reduced Duty while importing."
+                    "The product is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
                 )
         else:
             message = "Invalid heading condition specified."
@@ -1295,12 +1206,12 @@ def generate_beautiful_pdf_japan(data, total, contributions, rates, excel_file='
             if rvc_percentage >= threshold:
                 message = (
                     f"Based on the findings, according to the product-specific rule of origin of the final product: {origin}.\n"
-                    "The product is eligible under the UK-Japan Preference trade agreement for Zero or reduced Duty while importing."
+                    "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
                 )
             else:
                 message = (
                     f"Based on the findings, according to the product-specific rule of origin of the final product: {origin}.\n"
-                    "The product is not eligible under the UK-Japan Preference trade agreement for Zero or reduced Duty while importing."
+                    "The product is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
                 )
         else:
             message = "Invalid RVC condition specified."
@@ -1326,12 +1237,12 @@ def generate_beautiful_pdf_japan(data, total, contributions, rates, excel_file='
             if compliance:
                 message = (
                     f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
-                    "The product is eligible under the UK-Japan Preference trade agreement for Zero or reduced Duty while importing."
+                    "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
                 )
             else:
                 message = (
                     f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
-                    "The product is not eligible under the UK-Japan Preference trade agreement for Zero or reduced Duty while importing."
+                    "The product is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
                 )
         else:
             message = "Invalid origin condition specified."
@@ -1341,23 +1252,23 @@ def generate_beautiful_pdf_japan(data, total, contributions, rates, excel_file='
         if max_nom_percentage < 50:
             message = (
                 f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
-                "The product is eligible under the UK-Japan Preference trade agreement for Zero or reduced Duty while importing."
+                "The product is eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
             )
         else:
             message = (
                 f"Based on the findings, according to product-specific rule of origin of the final product: {origin}.\n"
-                "The product is not eligible under the UK-Japan Preference trade agreement for Zero or reduced Duty while importing."
+                "The product is not eligible under the EU-UK Preference trade agreement for Zero or reduced Duty while importing."
             )
 
 
 
-    pdf.set_font("ARIAL", 'I', 11)
+    pdf.set_font("Arial", 'I', 11)
     pdf.multi_cell(0, 8, txt=message)
 
     # Pie Chart for Contributions
     pdf.add_page()
     add_watermark(pdf) 
-    pdf.set_font("ARIAL", 'B', 14)
+    pdf.set_font("Arial", 'B', 14)
     pdf.cell(0, 10, txt="Pie Chart of Contributions", ln=True)
     pdf.ln(5)
 
@@ -1391,22 +1302,22 @@ def generate_beautiful_pdf_japan(data, total, contributions, rates, excel_file='
     add_watermark(pdf) 
     pdf.ln(10)
     pdf.set_text_color(255, 0, 0)  # Red for notes
-    pdf.set_font("ARIAL", 'B', 10)
+    pdf.set_font("Arial", 'B', 10)
     pdf.multi_cell(0, 8, txt=(
         "Note: Please note that this calculation assumes that all items within the EU/UK "
         "have valid preference origin statements from the suppliers."
     ))
        
     pdf.set_text_color(0, 0, 255)  # Blue for clickable link
-    pdf.set_font("ARIAL", 'B', 10)
+    pdf.set_font("Arial", 'B', 10)
     pdf.cell(0, 10, txt="Additionally, you can apply for a binding origin decision at HMRC:", ln=True)
-    pdf.set_font("ARIAL", size=10)
+    pdf.set_font("Arial", size=10)
     pdf.cell(0, 10, txt="https://www.gov.uk/guidance/apply-for-a-binding-origin-information-decision", ln=True)
 
-    pdf.set_font("ARIAL", 'B', 10)
+    pdf.set_font("Arial", 'B', 10)
     pdf.cell(0, 10, txt="Apply for an Advance Tariff Ruling:", ln=True)
     pdf.set_text_color(0, 0, 255)  # Blue for clickable link
-    pdf.set_font("ARIAL", size=10)
+    pdf.set_font("Arial", size=10)
 
     # Adding a clickable link
     url = "https://www.gov.uk/guidance/apply-for-an-advance-tariff-ruling#apply-for-an-advance-tariff-ruling"
@@ -1414,7 +1325,7 @@ def generate_beautiful_pdf_japan(data, total, contributions, rates, excel_file='
     
     pdf.set_text_color(0, 0, 0)
     current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    pdf.set_font("ARIAL", 'I', 10)
+    pdf.set_font("Arial", 'I', 10)
     pdf.cell(0, 10, txt=f"Report generated on: {current_datetime}", ln=True)
 
 
@@ -1594,200 +1505,6 @@ def privacy():
     return render_template('privacy_policy.html')
 
 
-
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash
-from models import db
-# DB Config
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-
-
-class User(db.Model):
-    __tablename__ = 'users_main'
-    __table_args__ = {'extend_existing': True}
-    id = db.Column(db.Integer, primary_key=True)
-    company_name = db.Column(db.String(150), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    phone = db.Column(db.String(20))
-    plan = db.Column(db.String(50), nullable=False)
-    payment_status = db.Column(db.String(50), default='pending')
-    password = db.Column(db.String(255), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def set_password(self, raw_password):
-        self.password = generate_password_hash(raw_password)
-
-from flask import Flask, render_template, request, redirect, session
-import os
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        session['registration_data'] = {
-            'company': request.form['company_name'],
-            'email': request.form['email'],
-            'phone': request.form.get('phone'),
-            'plan': request.form['plan'],
-            'raw_password': request.form['password']
-        }
-
-        # Redirect to PayPal
-        if session['registration_data']['plan'] == 'basic':
-            return redirect("https://www.paypal.com/ncp/payment/LV48XZ9GJA6J8")
-        elif session['registration_data']['plan'] == 'pro':
-            return redirect("https://www.paypal.com/ncp/payment/P9CSBWRRV9G3L")
-
-    return render_template("register.html")
-from werkzeug.security import generate_password_hash
-from models import db, User
-
-@app.route('/payment-success')
-def payment_success():
-    data = session.get('registration_data')
-    if not data:
-        return redirect('/register')
-
-    # Save user in DB
-    hashed_pw = generate_password_hash(data['raw_password'])
-
-    user = User(
-        company_name=data['company'],
-        email=data['email'],
-        phone=data['phone'],
-        plan=data['plan'],
-        password=hashed_pw
-    )
-
-    db.session.add(user)
-    db.session.commit()
-
-    # Pass to /thanks and clear session
-    session['user_email'] = data['email']
-    session['user_password'] = data['raw_password']
-    session.pop('registration_data', None)
-
-    return redirect('/thanks')
-@app.route('/thanks')
-def thanks():
-    email = session.get('user_email')
-    password = session.get('user_password')
-
-    if not email or not password:
-        return redirect('/register')
-
-    session.pop('user_email', None)
-    session.pop('user_password', None)
-    return render_template("thanks.html", email=email, password=password)
-
-# Define Table
-class ContactSubmission(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120))
-    email = db.Column(db.String(120))
-    company = db.Column(db.String(120))
-    message = db.Column(db.Text)
-    submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-
-from flask import Flask, request, render_template, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_cors import CORS
-from datetime import datetime
-from dotenv import load_dotenv
-import os
-
-# POST API Route
-@app.route("/submit_contact", methods=["POST"])
-def submit_contact():
-    data = request.json
-    try:
-        entry = ContactSubmission(
-            name=data.get("name"),
-            email=data.get("email"),
-            company=data.get("company"),
-            message=data.get("message")
-        )
-        db.session.add(entry)
-        db.session.commit()
-        return jsonify({"success": True}), 200
-    except Exception as e:
-        print("DB Error:", e)
-        return jsonify({"success": False, "error": str(e)}), 500
-
-from flask import Flask, request, jsonify, render_template_string
-
- 
-from flask import Flask, render_template, request, redirect, session
-from dotenv import load_dotenv
-import os
-
-# ✅ Import the db and models
-from models import db, User
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# ✅ Correct way to initialize db
-db.init_app(app)
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")  # or store in .env
-from models import  User
-
-
-# Admin Panel Route
-@app.route('/admin/contacts')
-def admin_contacts():
-    if request.args.get("password") != "Madhu":
-        return "Unauthorized", 401
-
-
-    contacts = ContactSubmission.query.order_by(ContactSubmission.submitted_at.desc()).all()
-
-    html = '''
-    <html>
-    <head>
-        <title>Contact Submissions</title>
-        <style>
-            body { font-family: Arial, sans-serif; background: #f4f7fc; padding: 40px; color: #333; }
-            table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-            th, td { padding: 12px 16px; border-bottom: 1px solid #ddd; }
-            th { background-color: #0073e6; color: white; text-align: left; }
-            tr:hover { background-color: #f1f1f1; }
-            h1 { color: #0073e6; }
-        </style>
-    </head>
-    <body>
-        <h1>📊 Contact Submissions</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Company</th>
-                    <th>Message</th>
-                    <th>Submitted At</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for c in contacts %}
-                <tr>
-                    <td>{{ c.id }}</td>
-                    <td>{{ c.name }}</td>
-                    <td>{{ c.email }}</td>
-                    <td>{{ c.company }}</td>
-                    <td>{{ c.message }}</td>
-                    <td>{{ c.submitted_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </body>
-    </html>
-    '''
-    return render_template_string(html, contacts=contacts)
-
-
 # OpenAI API Key
 part1 = "sk-proj-Jcgx4YzLqRFQq9F9MXwTfq2sk_q1HwfklOFIviaF45ockbK_K7HIUDUngcXZH6ka3jI0kxXYU1T3"
 part2 = "BlbkFJjKGwgEWutYmHyXYAzNCozAUvZVgvDT8wzlhe2sNmugk628iD4XHcmflri96tUZbi-E4J24l14A"
@@ -1814,9 +1531,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # Logging Configuration
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-from flask_sqlalchemy import SQLAlchemy
 
- 
 def allowed_file(filename):
     """Check if file extension is allowed"""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

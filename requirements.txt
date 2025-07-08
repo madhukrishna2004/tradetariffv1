@@ -58,4 +58,29 @@ ujson  # Optional, if needed
 openpyxl
 pyttsx3
 SpeechRecognition==3.14.1  # Or the installed version
+psycopg2-binary
+SQLAlchemy
+Flask
+gunicorn
 
+# PostgreSQL support
+psycopg2-binary
+
+# ORM and DB integration
+Flask-SQLAlchemy
+
+# Authentication and encryption
+bcrypt
+email-validator
+Werkzeug
+
+# Google OAuth and API support
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
+
+# Optional: If you're switching from MySQL, remove the below
+# mysql-connector-python
+flask_login
+dotenv

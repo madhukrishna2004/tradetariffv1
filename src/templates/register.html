@@ -1,0 +1,71 @@
+<form method="POST" action="/register" class="tsg-register-form">
+  <h2 class="tsg-form-title">Register Your Company</h2>
+
+  <input name="company_name" placeholder="Company Name" required>
+  <input name="email" type="email" placeholder="Email Address" required>
+  <input name="phone" placeholder="Phone Number">
+  <input name="password" type="password" placeholder="Create Password" required>
+
+  <select name="plan" required>
+    <option value="">Select a Plan</option>
+    <option value="basic">Trade Essentials – $350/mo • Save 25% (billed annually)</option>
+  <option value="pro">TradeSphere Elite – $500/mo • Save 25% (billed annually)</option>
+  </select>
+
+  <button type="submit" class="btn-glow">Proceed to Payment</button>
+</form>
+
+<style>
+  .tsg-register-form {
+    max-width: 450px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 0 12px rgba(0, 115, 230, 0.1);
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .tsg-form-title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #0073e6;
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .tsg-register-form input,
+  .tsg-register-form select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 18px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+  }
+
+  .tsg-register-form input:focus,
+  .tsg-register-form select:focus {
+    border-color: #0073e6;
+    outline: none;
+    box-shadow: 0 0 4px rgba(0, 115, 230, 0.2);
+  }
+
+  .btn-glow {
+    width: 100%;
+    background-color: #0073e6;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 0 12px rgba(0, 115, 230, 0.4);
+  }
+
+  .btn-glow:hover {
+    background-color: #005bb5;
+    transform: translateY(-2px);
+  }
+</style>

@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     spinner.style.display = 'none'; // Initially hidden
     
-    let finalProduct = "";
+    let finalProduct = ""; 
 
     // Fetch HS Code based on product name
     const fetchHsCodeButton = document.getElementById('fetch-hs-code');
@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 return;
             }
+
             // Set finalProduct to productName, so it's available later for saving
             finalProduct = productName;
 
@@ -229,7 +230,7 @@ if (uploadForm) {
         }
 
         try {
-            const response = await fetch('/process-file', { method: 'POST', body: formData });
+            const response = await fetch('/process-file-japan', { method: 'POST', body: formData });
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -327,7 +328,6 @@ document.addEventListener("DOMContentLoaded", function () {
             prevStep.classList.add("active-step");
         });
     });
-    
 
     // Finish onboarding
     finishButton.addEventListener("click", () => {

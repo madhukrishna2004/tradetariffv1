@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Sidebar -->
+<button id="sidebar-toggle">☰</button>
+
+<div id="sidebar">
+    <h1 class="menu-title">TradeSphere Global</h1>
+    <h3 class="menu-heading">Tap into More Options</h3>
+    <ul class="menu">
+        <li class="menu-item"><a href="/tariff" class="subheading">AI HS Code Lookup</a></li>
+        <li class="menu-item"><a href="javascript:void(0)" onclick="showModal()" class="subheading">Expired Commodity Details</a></li>
+        <li class="menu-item"><a href="/origin" class="subheading">EU-UK Trade Agreement Eligibility</a></li>
+        <li class="menu-item"><a href="/originjapan" class="subheading">UK-Japan Agreement Eligibility</a></li>
+        <li class="menu-item"><a href="https://supplierdeclarations.com/" class="subheading" target="_blank">Supplier Declaration Portal</a></li>
+        <li class="menu-item"><a href="/logout" class="subheading">Logout</a></li>
+    </ul>
+</div>
+
+<!-- Main Dashboard -->
+<div class="main-content" style="margin-left: 260px; padding: 30px;">
+    <h1 class="govuk-heading-l">Welcome, {{ user.company_name }} 👋</h1>
+
+    <p class="govuk-body">This is your central command center for all things trade and compliance.</p>
+
+    <!-- Quick Summary -->
+    <div class="dashboard-summary">
+        <div class="card">
+            <h2>Current Plan</h2>
+            <p><strong>{{ user.plan|capitalize }}</strong></p>
+            <a href="/upgrade" class="govuk-link">Upgrade / Change</a>
+        </div>
+        <div class="card">
+            <h2>Account Settings</h2>
+            <p>Manage company info, email, and password.</p>
+            <a href="/settings" class="govuk-link">Manage Settings</a>
+        </div>
+        <div class="card">
+            <h2>Walkthrough</h2>
+            <p>Need a tour of the portal?</p>
+            <a href="/walkthrough" class="govuk-link">Launch Walkthrough</a>
+        </div>
+    </div>
+
+    <!-- Dashboard Content Grid -->
+    <div class="dashboard-grid">
+        <div class="feature-block">
+            <h3>📦 AI HS Code Lookup</h3>
+            <p>Classify products accurately using AI models.</p>
+            <a href="/tariff" class="govuk-button">Start Lookup</a>
+        </div>
+        <div class="feature-block">
+            <h3>🔍 Trade Agreement Checker</h3>
+            <p>Verify your product’s eligibility for zero tariffs.</p>
+            <a href="/origin" class="govuk-button govuk-button--secondary">Check EU-UK</a>
+            <a href="/originjapan" class="govuk-button govuk-button--secondary">Check UK-Japan</a>
+        </div>
+        <div class="feature-block">
+            <h3>📝 Supplier Declarations</h3>
+            <p>Manage supplier declaration forms with ease.</p>
+            <a href="https://supplierdeclarations.com" target="_blank" class="govuk-link">Go to Portal</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #0b0c0c;
+    color: white;
+    padding: 20px;
+    z-index: 1000;
+    overflow-y: auto;
+}
+#sidebar-toggle {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: #0b0c0c;
+    color: white;
+    border: none;
+    font-size: 20px;
+    padding: 10px;
+    z-index: 1100;
+}
+.menu-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+.menu-heading {
+    font-size: 16px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.menu-item {
+    margin-bottom: 10px;
+}
+.subheading {
+    color: #d4f1ff;
+    text-decoration: none;
+}
+.subheading:hover {
+    text-decoration: underline;
+}
+
+/* Dashboard Layout */
+.main-content {
+    background: #f3f2f1;
+    min-height: 100vh;
+}
+.dashboard-summary {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    flex: 1;
+    box-shadow: 0 0 5px rgba(0,0,0,0.05);
+}
+.card h2 {
+    margin-top: 0;
+}
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+.feature-block {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.05);
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.getElementById('sidebar-toggle').onclick = function () {
+    document.getElementById('sidebar').classList.toggle('active');
+  };
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Sidebar Toggle -->
+<button id="sidebar-toggle">☰</button>
+
+<!-- Sidebar -->
+<div id="sidebar">
+    <h1 class="menu-title">🌐 TradeSphere Global</h1>
+    <h3 class="menu-heading">Tap into More Options</h3>
+    <ul class="menu">
+        <li class="menu-item"><a href="/tariff" class="subheading">🔎 AI HS Code Lookup</a></li>
+        <li class="menu-item"><a href="javascript:void(0)" onclick="showModal()" class="subheading">📂 Expired Commodity Details</a></li>
+        <li class="menu-item"><a href="/origin" class="subheading">🌍 EU-UK Trade Agreement</a></li>
+        <li class="menu-item"><a href="/originjapan" class="subheading">🌏 UK-Japan Trade Agreement</a></li>
+        <li class="menu-item"><a href="https://supplierdeclarations.com/" class="subheading" target="_blank">📝 Supplier Declaration Portal</a></li>
+        <li class="menu-item"><a href="/logout" class="subheading">🚪 Logout</a></li>
+    </ul>
+</div>
+
+<!-- Main Dashboard -->
+<div class="main-content" style="margin-left: 260px; padding: 30px;">
+    <h1 class="govuk-heading-l">Welcome, {{ user.company_name }} 👋</h1>
+    <p class="govuk-body">Your unified compliance and tariff management hub.</p>
+
+    <!-- Summary Cards -->
+    <div class="dashboard-summary">
+        <div class="card">
+            <h2>📦 Plan</h2>
+            <p><strong>{{ user.plan|capitalize }}</strong></p>
+            <a href="/upgrade" class="govuk-link">Upgrade Plan</a>
+        </div>
+        <div class="card">
+            <h2>⚙️ Settings</h2>
+            <p>Manage company info & password.</p>
+            <a href="/settings" class="govuk-link">Account Settings</a>
+        </div>
+        <div class="card">
+            <h2>🎥 Walkthrough</h2>
+            <p>Take a quick tour of the platform.</p>
+            <a href="/walkthrough" class="govuk-link">Launch Tour</a>
+        </div>
+    </div>
+
+    <!-- Grid Features -->
+    <div class="dashboard-grid">
+        <div class="feature-block">
+            <h3>🧠 AI HS Code Lookup</h3>
+            <p>Classify goods with precision using AI models.</p>
+            <a href="/tariff" class="govuk-button">Start Lookup</a>
+        </div>
+        <div class="feature-block">
+            <h3>🌍 Trade Agreement Checker</h3>
+            <p>Ensure your product qualifies for preferential tariffs.</p>
+            <a href="/origin" class="govuk-button govuk-button--secondary">EU-UK</a>
+            <a href="/originjapan" class="govuk-button govuk-button--secondary">UK-Japan</a>
+        </div>
+        <div class="feature-block">
+            <h3>📝 Supplier Declarations</h3>
+            <p>Digitally manage origin proof for your trade goods.</p>
+            <a href="https://supplierdeclarations.com" target="_blank" class="govuk-link">Open Portal</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #0b0c0c;
+    color: #fff;
+    padding: 20px;
+    z-index: 1000;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+}
+#sidebar-toggle {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: #0b0c0c;
+    color: white;
+    border: none;
+    font-size: 20px;
+    padding: 10px;
+    z-index: 1100;
+}
+.menu-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 25px;
+    color: #f1f1f1;
+}
+.menu-heading {
+    font-size: 15px;
+    color: #bbb;
+    margin-bottom: 10px;
+}
+.menu-item {
+    margin: 12px 0;
+}
+.subheading {
+    color: #d4f1ff;
+    text-decoration: none;
+}
+.subheading:hover {
+    text-decoration: underline;
+}
+.main-content {
+    background: #f3f2f1;
+    min-height: 100vh;
+}
+.dashboard-summary {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    flex: 1 1 250px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.card h2 {
+    margin-top: 0;
+}
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+.feature-block {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.getElementById('sidebar-toggle').onclick = function () {
+    document.getElementById('sidebar').classList.toggle('active');
+  };
+
+  function showModal() {
+    alert("🚧 Expired Commodity Insights coming soon!");
+  }
+</script>
+{% endblock %}
+
+  function showModal() {
+    alert("Expired Commodity Insights coming soon!");
+  }
+</script>
+{% endblock %}

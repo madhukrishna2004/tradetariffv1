@@ -1,67 +1,99 @@
-document.getElementById("chatbot-send").addEventListener("click", function() {
-    const userMessage = document.getElementById("chatbot-input").value;
-    if (userMessage.trim() === "") return;  // Don't send empty messages
+let userId = localStorage.getItem("chat_user_id") || null;
 
-    // Display user message in the chat
+// Send message when button is clicked
+document.getElementById("chatbot-send").addEventListener("click", function () {
+    const userMessage = document.getElementById("chatbot-input").value.trim();
+    if (userMessage === "") return;
+
+    // Display user's message
     displayMessage(userMessage, "user");
 
     // Clear input field
     document.getElementById("chatbot-input").value = "";
 
-    // Display loading dots while waiting for the response
+    // Show typing indicator
     document.getElementById("loading-indicator").style.display = 'inline-block';
 
-    // Send message to the backend
-    fetch('/chat', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: userMessage })
+    // Prepare the payload
+    const payload = { message: userMessage };
+    if (userId) payload.user_id = userId;
+
+    // Send the message to the backend
+    fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
     })
     .then(response => response.json())
     .then(data => {
-        // Hide the loading dots once the response is received
+        // Hide typing indicator
         document.getElementById("loading-indicator").style.display = 'none';
 
+        // Set session user ID if new
+        if (data.user_id && !userId) {
+            userId = data.user_id;
+            localStorage.setItem("chat_user_id", userId);
+        }
+
+        // Display the response
         if (data.response) {
-            // Display the bot's reply
             displayMessage(data.response, "bot");
         } else if (data.error) {
-            // Display the error message
-            displayMessage(data.error, "bot");
+            displayMessage("⚠️ " + data.error, "bot");
         }
     })
     .catch(error => {
-        // In case of network or other errors, hide the loading dots and display a generic error message
         document.getElementById("loading-indicator").style.display = 'none';
-        console.error('Error:', error);
-        displayMessage("Oops! Something went wrong. Please try again.", "bot");
+        console.error("Error:", error);
+        displayMessage("❌ Oops! Something went wrong. Please try again.", "bot");
     });
 });
 
-// Function to display messages in the chat
+// Function to display chat messages
 function displayMessage(message, sender) {
     const messageDiv = document.createElement("div");
-    messageDiv.classList.add("chatbot-message");
-    messageDiv.classList.add(sender === "bot" ? "bot-message" : "user-message");
-    messageDiv.textContent = message;
+    messageDiv.classList.add("chatbot-message", sender === "bot" ? "bot-message" : "user-message");
 
-    // Append the message to the chatbot body
-    const chatbotBody = document.getElementById("chatbot-body");
-    chatbotBody.appendChild(messageDiv);
+    // Format Markdown-style bold and line breaks
+    const formattedMessage = message
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br/>');
 
-    // Ensure the chatbot scrolls to the bottom to show the latest message
+    messageDiv.innerHTML = formattedMessage;
+    document.getElementById("chatbot-body").appendChild(messageDiv);
+
     scrollToBottom();
+    playMessageSound();
 }
 
-// Scroll to the bottom of the chatbot body
+// Scroll to the latest message
 function scrollToBottom() {
     const chatbotBody = document.getElementById("chatbot-body");
     chatbotBody.scrollTop = chatbotBody.scrollHeight;
 }
 
-// Automatically scroll to the bottom when user starts typing
-document.getElementById("chatbot-input").addEventListener("focus", function() {
-    scrollToBottom();
+// Play message notification sound
+function playMessageSound() {
+    const sound = document.getElementById("message-sound");
+    if (sound) {
+        sound.play().catch(err => console.log("Audio blocked:", err));
+    }
+}
+
+// Submit on Enter (except Shift+Enter)
+document.getElementById("chatbot-input").addEventListener("keydown", function (event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        document.getElementById("chatbot-send").click();
+    }
 });
+
+// Scroll on focus
+document.getElementById("chatbot-input").addEventListener("focus", scrollToBottom);
+
+// Optional: Reset Chat Session
+function resetChatSession() {
+    localStorage.removeItem("chat_user_id");
+    userId = null;
+    displayMessage("🔄 Chat session reset. Start again with a new query.", "bot");
+}

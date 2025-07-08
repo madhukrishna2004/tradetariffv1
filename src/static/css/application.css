@@ -439,7 +439,7 @@ h2.help {
 
 
 .gem-c-related-navigation {
-    font-family: GDS Transport, Arial, sans-serif;
+    font-family: GDS Transport, Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #0b0c0c;
@@ -459,7 +459,7 @@ h2.help {
 }
 
 .gem-c-cookie-banner {
-    font-family: "nta", Arial, sans-serif;
+    font-family: "nta", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-weight: 400;
