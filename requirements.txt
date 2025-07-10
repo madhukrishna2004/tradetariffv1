@@ -8,7 +8,7 @@ flask-cors==5.0.0
 Flask_Login==0.6.3
 flask_sqlalchemy==3.1.1
 fpdf==1.7.2
-locustio==0.999
+locust
 matplotlib==3.10.3
 openai==0.28.0
 openpyxl==3.1.5
