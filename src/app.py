@@ -318,9 +318,7 @@ def logout():
     session.pop("user", None)  # Remove user from session
     return redirect("/login")
 
-@app.route("/chatbot.html")
-def chatbot():
-    return flask.render_template("chatbot.html", version=VERSION)
+ 
 
  
 
@@ -2025,10 +2023,9 @@ def billing_page():
 def guru_purnima():
     return render_template("guru_purnima.html")
 
-
+from src.chatbot_routes import chatbot_bp
+# Register blueprint
 app.register_blueprint(chatbot_bp, url_prefix='/chatbot')
-@chatbot_bp.route('/')
-def chatbot_ui():
-    return render_template('chatbot.html') 
+
 if __name__ == "__main__":
     app.run(debug=True)
