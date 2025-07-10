@@ -176,6 +176,10 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
 
+from flask import session, redirect, render_template, request
+from preferential_folder_setup import create_user_folders_if_needed
+#from db import get_db_connection  # make sure your DB connector is imported
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -196,7 +200,11 @@ def login():
 
             if user:
                 session["user"] = username  # Set session
-                return redirect("/tariff")  # Redirect on success
+
+                # ✅ Call folder creation function here
+                create_user_folders_if_needed(username)
+
+                return redirect("/tariff")  # or wherever your dashboard starts
             else:
                 return render_template("login.html", error="Invalid username or password!")
 
@@ -205,6 +213,7 @@ def login():
             conn.close()
 
     return render_template("login.html")
+
 
 @app.route("/")
 def home():
@@ -313,9 +322,7 @@ def logout():
 def chatbot():
     return flask.render_template("chatbot.html", version=VERSION)
 
-@app.route('/profile')
-def profile():
-    return render_template('profile.html')
+ 
 
 @app.route('/pricings')
 def pricings():
@@ -1891,6 +1898,133 @@ def ask():
     save_cache()
 
     return jsonify({"response": answer})
+
+from flask import Flask
+from .routes.preferential_origin import preferential_origin_bp
+from preferential_folder_setup import create_user_folders_if_needed
+from dotenv import load_dotenv
+import os
+# Auto-create necessary folders
+#create_user_folders_if_needed(session["username"])
+
+# Register blueprint
+app.register_blueprint(preferential_origin_bp, url_prefix="/preferential-origin")
+
+from scheduler import process_completed_shift
+from apscheduler.schedulers.background import BackgroundScheduler
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=process_completed_shift, trigger="cron", hour="6,12,18,23", minute="59")  # Just before shift ends
+scheduler.start()
+
+# Clean shutdown
+import atexit
+atexit.register(lambda: scheduler.shutdown())
+
+
+import os
+from flask import request, redirect, url_for, flash
+from werkzeug.utils import secure_filename
+from flask_login import current_user, login_required
+
+UPLOAD_FOLDER = os.path.join(app.root_path, 'static/profile_pics')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+from db import get_db
+
+# Define the user-identifying column per table
+TABLE_USER_COLUMN = {
+    "email_logs": "user_id",                     # Only this uses user_id
+    "supplier_declarations": "username",
+    "supplier_received": "username",
+    "bom_uploads": "username",
+    "preferential_results": "username",
+    "ai_lookups": "username",
+    "user_logs": "username",                     # For login tracking
+}
+
+def get_count(cur, table, identifier, conn):
+    try:
+        user_col = TABLE_USER_COLUMN.get(table, "username")
+        cur.execute(f"SELECT COUNT(*) FROM {table} WHERE {user_col} = %s", (identifier,))
+        return cur.fetchone()[0]
+    except Exception as e:
+        conn.rollback()
+        print(f"[WARN] get_count failed for {table}: {e}")
+        return "coming_soon"
+
+
+def get_last_login(cur, identifier, conn):
+    try:
+        cur.execute("SELECT login_time, ip_address FROM user_logs WHERE username = %s ORDER BY login_time DESC LIMIT 1", (identifier,))
+        row = cur.fetchone()
+        if row:
+            return f"{row[0].strftime('%Y-%m-%d @ %I:%M %p')} from {row[1]}"
+    except Exception as e:
+        conn.rollback()
+        print(f"[WARN] get_last_login failed: {e}")
+    return "Unknown"
+
+
+@app.route("/profile")
+def profile_dashboard():
+    if "user" not in session:
+        return redirect("/login")
+
+    username = session["user"]
+    conn = get_db()
+    cur = conn.cursor()
+
+    # Fetch user info
+    cur.execute("SELECT email, phone, language FROM users_main WHERE email = %s", (username,))
+    user_info = cur.fetchone() or ("", "", "English")
+
+    # Pull stats
+    stats = {
+        "emails_sent": get_count(cur, "email_logs", username, conn),
+        "declarations_sent": get_count(cur, "supplier_declarations", username, conn),
+        "declarations_received": get_count(cur, "supplier_received", username, conn),
+        "boms_input": get_count(cur, "bom_uploads", username, conn),
+        "preferential_checked": get_count(cur, "preferential_results", username, conn),
+        "ai_lookups": get_count(cur, "ai_lookups", username, conn),
+        "last_login": get_last_login(cur, username, conn),
+    }
+
+    cur.close()
+    conn.close()
+
+    return render_template("profile_dynamic.html", user_info=user_info, stats=stats, username=username)
+
+@app.route("/billing")
+def billing_page():
+    if "user" not in session:
+        return redirect("/login")
+    
+    username = session["user"]
+    conn = get_db()
+    cur = conn.cursor()
+
+    # Subscription Details
+    cur.execute("SELECT plan_name, start_date, end_date, status, next_billing_date, payment_method FROM subscriptions WHERE user_email = %s", (username,))
+    subscription = cur.fetchone()
+
+    # Invoices
+    cur.execute("SELECT invoice_number, amount, issue_date, due_date, paid, pdf_url FROM invoices WHERE user_email = %s ORDER BY issue_date DESC", (username,))
+    invoices = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template("billing.html", subscription=subscription, invoices=invoices)
+
+@app.route("/guru-purnima")
+def guru_purnima():
+    return render_template("guru_purnima.html")
+
 
 app.register_blueprint(chatbot_bp, url_prefix='/chatbot')
 @chatbot_bp.route('/')

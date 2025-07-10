@@ -3,30 +3,49 @@
 {% set filter = request.args.get('q', '') %}
 
 {% block content %}
-<div class="govuk-body" style="color: #2c2c2c;">
-  <p>
-    Use the <strong>TradeSphere Global</strong> lookup tool to classify your goods and find the appropriate HS/commodity code for UK imports and exports.
-  </p>
-  <p>This tool helps you:</p>
-  <ul>
-    <li>Determine applicable customs duties and VAT</li>
-    <li>Identify any tariff suspensions or reductions</li>
-    <li>Understand rules of origin and UKGT rates</li>
-  </ul>
+<div class="container p-4 mt-3" style="background: linear-gradient(to right, #f0f4fa, #e9f5fb); border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif;">
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <div>
+      <h4 class="text-primary fw-semibold">Hello, <span class="text-dark">{{ session['user'] }}</span> 👋</h4>
+      <p class="text-muted mb-0">Welcome to <strong>TradeSphere Global</strong> Commodity Lookup Tool</p>
+    </div>
+    <div class="text-end text-muted">
+      <div><strong>Date:</strong> <span id="live-date"></span></div>
+      <div><strong>Time:</strong> <span id="live-time"></span></div>
+    </div>
+  </div>
 
-  <p>To classify goods accurately, gather product details like:</p>
-  <ul>
-    <li>Product category and function</li>
-    <li>Material composition</li>
-    <li>Usage and purpose</li>
-    <li>Manufacturing method</li>
-    <li>Packaging or presentation style</li>
-  </ul>
+  <div style="color: #2c2c2c;">
+    <p>
+      Use the <strong>TradeSphere Global</strong> lookup tool to classify your goods and find the appropriate HS/commodity code for <strong>UK, EU, Japan, and other global regions</strong>.
+    </p>
 
-  <p>
-    <strong>Note:</strong> UKGT classifications are based on 8-digit codes. If you have a 10-digit code, use only the first 8 digits.
-  </p>
+    <p>To classify goods accurately, gather product details like:</p>
+    <ul>
+      <li>Product category and function</li>
+      <li>Material composition</li>
+      <li>Usage and purpose</li>
+      <li>Manufacturing method</li>
+      <li>Packaging or presentation style</li>
+    </ul>
+
+    <p>
+      <strong>Note:</strong> Most HS code classifications are based on the first 6–8 digits. Country-specific codes may be longer (up to 10 digits). Use only the required digits when searching.
+    </p>
+  </div>
 </div>
+
+<!-- Live Date & Time Script -->
+<script>
+  function updateDateTime() {
+    const now = new Date();
+    document.getElementById('live-date').textContent = now.toLocaleDateString('en-GB');
+    document.getElementById('live-time').textContent = now.toLocaleTimeString('en-GB');
+  }
+  setInterval(updateDateTime, 1000);
+  updateDateTime();
+</script>
+
 
 <div id="dataTable">
   <noscript>
