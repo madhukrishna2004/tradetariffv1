@@ -74,7 +74,7 @@
       margin: 40px 0;
     }
 
-    .btn {
+    .btn, .download-btn {
       display: inline-block;
       background-color: var(--primary);
       color: #fff;
@@ -85,16 +85,17 @@
       text-decoration: none;
       border: 2px solid var(--accent);
       transition: all 0.3s ease-in-out;
+      margin-top: 10px;
     }
 
-    .btn:hover {
+    .btn:hover, .download-btn:hover {
       background-color: var(--accent);
       color: var(--primary);
     }
 
     footer {
       background-color: var(--primary);
-      color: #fff;
+      color: #ffffff;
       text-align: center;
       padding: 20px;
       font-size: 15px;
@@ -102,12 +103,12 @@
     }
 
     footer a {
-      color: var(--accent);
-      text-decoration: none;
+      color: #ffffff;
+      text-decoration: underline;
     }
 
     footer a:hover {
-      color: #fff;
+      color: var(--accent);
     }
 
     /* Responsive */
@@ -129,7 +130,7 @@
         font-size: 16px;
       }
 
-      .btn {
+      .btn, .download-btn {
         padding: 10px 18px;
         font-size: 15px;
       }
@@ -140,73 +141,75 @@
 
   <div class="container">
     <div class="hero-text">Terms of Service</div>
-    <div class="subtitle">KrisLynx LLP | A Product of TradeSphere Global </div>
+    <div class="subtitle">TradeSphere Global | A Product of KrisLynx LLP</div>
 
     <h2>1. Agreement to Terms</h2>
-    <p>By using TradeSphere Global, you acknowledge and accept these Terms of Service. These terms establish a legally binding agreement between you and KrisLynx LLP, governed under RKLS Groups Pvt. Ltd.</p>
+    <p>By accessing and using TradeSphere Global, you confirm that you have read, understood, and agreed to be bound by these Terms of Service. These terms are legally binding and govern your access to all services offered by KrisLynx LLP under RKLS Groups Pvt. Ltd.</p>
 
     <div class="divider"></div>
 
     <h2>2. Eligibility</h2>
-    <p>You must be 18 years or older to use our platform. You represent that you have the authority to enter into this agreement on behalf of your organization or entity.</p>
+    <p>You must be at least 18 years of age. If you are using our services on behalf of an entity, you affirm that you have the authority to bind that entity to these terms.</p>
 
     <div class="divider"></div>
 
-    <h2>3. Services Offered</h2>
+    <h2>3. Scope of Services</h2>
+    <p>TradeSphere provides digital trade tools including, but not limited to:</p>
     <ul>
-      <li>HS code lookup powered by AI</li>
-      <li>Tariff classification (UK, EU, third country)</li>
-      <li>Origin calculation under trade agreements</li>
-      <li>Automated documentation and export</li>
-      <li>Real-time analytics and compliance support</li>
+      <li>AI-powered HS code classification</li>
+      <li>Global tariff data (UK, EU, others)</li>
+      <li>Origin calculation tools under FTAs</li>
+      <li>Automated generation of export documents</li>
+      <li>Analytics for trade insights and compliance alerts</li>
     </ul>
 
     <div class="divider"></div>
 
-    <h2>4. Data Protection & Privacy</h2>
-    <p>We implement secure protocols in accordance with GDPR, UK Data Protection Act, and Google’s Limited Use Policy. No unnecessary data is stored, and API requests are encrypted.</p>
+    <h2>4. Privacy & Data Protection</h2>
+    <p>Your data privacy is important. We comply with GDPR, UK Data Protection Act, and Google API Limited Use policies. Only necessary data is processed. All API requests are encrypted and logged securely.</p>
 
     <div class="divider"></div>
 
     <h2>5. API Integrations</h2>
-    <p>TradeSphere utilizes Google APIs (Gmail, Forms, Sheets) to enhance user experience. Access tokens are never stored permanently. Misuse may result in account suspension.</p>
+    <p>We use Google APIs (like Gmail and Sheets) only with explicit user consent. OAuth tokens are managed using industry-standard security and are not stored unless required for background processing.</p>
 
     <div class="divider"></div>
 
     <h2>6. Intellectual Property</h2>
-    <p>All trademarks, UI designs, AI models, and backend logic are the exclusive property of KrisLynx LLP. Any replication, reverse-engineering, or redistribution is prohibited.</p>
+    <p>All trademarks, brand assets, software, machine learning models, and content are owned by KrisLynx LLP. You may not copy, modify, or distribute them without written permission.</p>
 
     <div class="divider"></div>
 
-    <h2>7. Subscription & Billing</h2>
-    <p>Services may be free or paid, depending on your plan. Custom billing agreements must be signed formally. Refunds are only processed based on SLA breaches or platform faults.</p>
+    <h2>7. Subscriptions, Billing & Refunds</h2>
+    <p>We offer tiered pricing and custom enterprise agreements. Refunds are issued only when the service fails to meet its commitments as per your SLA. No refunds for user misuse or account inactivity.</p>
 
     <div class="divider"></div>
 
-    <h2>8. Disclaimers & Liability</h2>
-    <p>We are not liable for financial loss arising from reliance on our AI-based classifications. All final trade decisions should be cross-verified with official government portals.</p>
+    <h2>8. Disclaimers</h2>
+    <p>Our platform assists in trade classification and compliance but is not a substitute for professional or legal advice. Users must verify outputs via official trade bodies before filing or shipment.</p>
 
     <div class="divider"></div>
 
-    <h2>9. Termination</h2>
-    <p>We reserve the right to suspend or terminate access for violations of these terms, unlawful activity, or system abuse.</p>
+    <h2>9. Termination of Access</h2>
+    <p>We may suspend or terminate your access if you breach these terms, misuse the platform, or engage in any unlawful or unethical conduct.</p>
 
     <div class="divider"></div>
 
-    <h2>10. Governing Law</h2>
-    <p>These terms are governed under Indian law. Any disputes will be handled through arbitration in Andhra Pradesh, India, under RKLS Groups’ legal jurisdiction.</p>
+    <h2>10. Governing Law & Disputes</h2>
+    <p>These terms are governed by Indian law. Disputes shall be subject to binding arbitration in Andhra Pradesh under RKLS Groups Pvt. Ltd.’s jurisdiction.</p>
 
     <div class="divider"></div>
 
-    <h2>11. Amendments</h2>
-    <p>We reserve the right to amend these Terms at any time. Continued use after updates implies your agreement to the revised terms.</p>
+    <h2>11. Updates & Modifications</h2>
+    <p>These terms may be updated without prior notice. We encourage you to review this page regularly. Continued use after changes implies your acceptance of the new terms.</p>
 
     <div class="divider"></div>
 
-    <h2>12. Contact Information</h2>
-    <p>For legal or technical queries, contact us at:</p>
-    <a href="mailto:support@tradesphere.com" class="btn">support@tradesphere.com</a>
-  </div>
+    <h2>12. Contact Us</h2>
+    <p>If you have any questions about these Terms, please reach out:</p>
+    <a href="mailto:tradesphereglobalqueries@gmail.com" class="btn">support@tradesphere.com</a>
+    <br>
+   </div>
 
   <footer>
     <p>

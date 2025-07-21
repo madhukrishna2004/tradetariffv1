@@ -100,86 +100,73 @@
     <div class="subtitle">Effective Date: June 2025 | TradeSphere Global, KrisLynx LLP</div>
 
     <h2>1. Introduction</h2>
-    <p>This Privacy Policy outlines how KrisLynx LLP , collects, uses, and protects your personal information when using TradeSphere Global.</p>
+    <p>This Privacy Policy describes how KrisLynx LLP, operating under TradeSphere Global, collects, uses, and protects your information when interacting with our services, including integrations using Google OAuth and Gmail APIs.</p>
 
     <div class="divider"></div>
 
     <h2>2. Information We Collect</h2>
     <ul>
-      <li><strong>Personal identifiers:</strong> Name, email, business details (only if provided).</li>
-      <li><strong>Technical data:</strong> Browser, IP address, location, usage stats.</li>
-      <li><strong>Interaction data:</strong> Chat inputs, HS code queries (processed via OpenAI APIs).</li>
-      <li><strong>Google OAuth data:</strong> If connected, Sheets/Form permissions under Limited Use Policy.</li>
+      <li><strong>Basic identifiers:</strong> Name, email address (only after explicit OAuth consent).</li>
+      <li><strong>OAuth authorization:</strong> We request the Gmail send permission to enable automated email sending actions initiated by you.</li>
     </ul>
 
     <div class="divider"></div>
 
-    <h2>3. Use of Data</h2>
-    <p>Your information is used solely for the purposes of enhancing platform functionality, AI-based classification support, analytics, and authorized communication. We do not sell or share data for marketing.</p>
+    <h2>3. Use of Gmail API</h2>
+    <p>We only use the Gmail API with your consent to send transactional emails on your behalf. For example, confirmations, alerts, or notifications triggered by your actions on the platform. We do <strong>not</strong> read, access, or store your inbox, emails, or personal Gmail data.</p>
 
     <div class="divider"></div>
 
-    <h2>4. Google API Compliance</h2>
-    <p>Our integration with Google services strictly follows the <strong>Google API Services User Data Policy</strong>, including the Limited Use requirements. We do not use Gmail, Drive, or Forms data for any unauthorized purpose.</p>
+    <h2>4. Google API Services Compliance</h2>
+<p>Our application’s use of Google APIs, including Gmail and other Google Workspace APIs, strictly adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank"><strong>Google API Services User Data Policy</strong></a>, including its <strong>Limited Use requirements</strong>. We only use access to Google user data to provide or improve user-facing features that are prominent in the requesting application's user interface.</p>
+
+<p>Additionally, we confirm that our use of Google user data complies with:</p>
+<ul>
+  <li><a href="https://developers.google.com/terms/api-services-user-data-policy#additional_requirements_for_specific_api_scopes" target="_blank">Google Workspace API User Data Policy</a></li>
+  <li><a href="https://developers.google.com/terms/api-services-user-data-policy#photos-api" target="_blank">Google Photos API User Data Policy</a></li>
+</ul>
+
+<p>We do not transfer or sell user data to third parties. All access and use of data is solely for the purpose of enabling user-initiated actions like sending email notifications through the Gmail API or processing authorized user photos if applicable.</p>
 
     <div class="divider"></div>
 
-    <h2>5. AI Interaction & Chat Storage</h2>
-    <p>All AI interactions are processed securely via OpenAI’s API. Session data is ephemeral and not stored unless explicitly saved for client-specific workflows.</p>
+    <h2>5. Data Security</h2>
+    <p>All data transmission is protected using HTTPS and OAuth 2.0 industry-standard encryption. Gmail tokens are securely handled and never stored beyond the session unless required for enterprise login continuity with user consent.</p>
 
     <div class="divider"></div>
 
-    <h2>6. Data Security</h2>
-    <p>We use HTTPS, token-based access, server firewalls, and encryption to protect your data. Access is role-restricted, and logs are monitored for anomalous behavior.</p>
-
-    <div class="divider"></div>
-
-    <h2>7. Your Rights</h2>
+    <h2>6. User Rights</h2>
     <ul>
-      <li>Right to request data access or deletion</li>
-      <li>Right to revoke third-party access (e.g., Google Sheets integration)</li>
-      <li>Right to withdraw consent at any time</li>
+      <li>You can revoke access at any time via your <a href="https://myaccount.google.com/permissions" target="_blank">Google Account Permissions</a>.</li>
+      <li>You may request deletion of any stored data related to your session by emailing us.</li>
     </ul>
 
     <div class="divider"></div>
 
-    <h2>8. Data Retention</h2>
-    <p>Unless part of a paid enterprise integration, personal data is deleted within 30 days. Log files and analytics data are anonymized.</p>
+    <h2>7. Contact Information</h2>
+    <p>If you have any questions about this Privacy Policy or your data, contact:</p>
+    <p><a href="mailto:tradesphereglobalqueries@gmail.com">support@tradesphere.com</a></p>
 
-    <div class="divider"></div>
-
-    <h2>9. Cookies</h2>
-    <p>We use minimal, session-based cookies for login state and performance tracking. No third-party marketing cookies are active on this platform.</p>
-
-    <div class="divider"></div>
-
-    <h2>10. Jurisdiction</h2>
-    <p>This policy is governed under the laws of the Republic of India. Disputes shall be subject to arbitration in Kurnool or Hyderabad, Andhra Pradesh.</p>
-
-    <div class="divider"></div>
-
-    <h2>11. Contact</h2>
-    <p>For privacy concerns or to make a formal request, email us at:</p>
-    <p><a href="mailto:support@tradesphere.com">support@tradesphere.com</a></p>
   </div>
 
   <footer>
-    <p>&copy; 2025 TradeSphere Global | KrisLynx LLP | <a href="/terms-of-service" class="text-light text-decoration-none">Terms of Service</a></p>
-  </footer>
+  <p style="color: #ffffff;">&copy; 2025 TradeSphere Global | KrisLynx LLP | 
+    <a href="/terms-of-service" style="color: #ffffff;">Terms of Service</a>
+  </p>
+</footer>
 
-</body>
-</html>
-<!-- Cookie Notice Banner Script -->
-<script>
-  window.addEventListener("DOMContentLoaded", () => {
-    if (!localStorage.getItem("cookieNotice")) {
-      const bar = document.createElement("div");
-      bar.style.cssText = "position:fixed;bottom:0;width:100%;background:#1a2b49;color:#fff;padding:10px;text-align:center;z-index:9999;";
-      bar.innerHTML = `We use cookies to enhance site functionality. <button style="margin-left:15px;padding:5px 12px;background:#d4af37;color:#1a2b49;border:none;border-radius:4px;cursor:pointer;" onclick="this.parentElement.remove();localStorage.setItem('cookieNotice', 'accepted')">Accept</button>`;
-      document.body.appendChild(bar);
-    }
-  });
-</script>
+
+  <!-- Cookie Notice Banner Script -->
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      if (!localStorage.getItem("cookieNotice")) {
+        const bar = document.createElement("div");
+        bar.style.cssText = "position:fixed;bottom:0;width:100%;background:#1a2b49;color:#fff;padding:10px;text-align:center;z-index:9999;";
+        bar.innerHTML = `We use cookies to enhance site functionality. <button style="margin-left:15px;padding:5px 12px;background:#d4af37;color:#1a2b49;border:none;border-radius:4px;cursor:pointer;" onclick="this.parentElement.remove();localStorage.setItem('cookieNotice', 'accepted')">Accept</button>`;
+        document.body.appendChild(bar);
+      }
+    });
+  </script>
 
 </body>
 </html>
