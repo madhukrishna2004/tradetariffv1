@@ -5,7 +5,7 @@ import numpy as np
 from tqdm import tqdm
 
 # ==== CONFIG ====
-EXCEL_FILE = "global-uk-tariff - Copy (2).xlsx"
+EXCEL_FILE = "global-uk-tariff.xlsx"
 PICKLE_OUTPUT = "hs_code_data.pkl"
 FAISS_OUTPUT = "hs_code_index.faiss"
 EMBEDDING_MODEL = "text-embedding-3-small"

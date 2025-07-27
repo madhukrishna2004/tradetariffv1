@@ -5,6 +5,8 @@ from datetime import datetime, date
 import pandas as pd
 from db import get_db
 from preferential_folder_setup import get_user_folder_paths, create_user_folders_if_needed
+import re
+import matplotlib.pyplot as plt
 
 preferential_origin_bp = Blueprint("preferential_origin", __name__)
 
@@ -564,10 +566,16 @@ def check_uk_eu_preference(final_commodity_code: str) -> str:
         return None
 
 
+from datetime import datetime
+import uuid
+from fpdf import FPDF
+from datetime import datetime
+import os, uuid
+from textwrap import wrap
+
 def generate_uk_eu_report(df, conversion_dict, origin_lookup):
     os.makedirs("originreports/uk_eu", exist_ok=True)
 
-    # Generate unique filename using timestamp and UUID
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     unique_code = uuid.uuid4().hex[:6].upper()
     filename = f"report_{timestamp}_{unique_code}_uk_eu.pdf"
@@ -576,19 +584,26 @@ def generate_uk_eu_report(df, conversion_dict, origin_lookup):
     pdf = PDFWithFooter(orientation='L')
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.add_font('DejaVu', '', 'src/static/assets/fonts/DejaVuSans.ttf', uni=True)
 
-    # PDF Setup
-    pdf = PDFWithFooter(orientation='L')
-    pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_font('DejaVu', '', 'src/static/assets/fonts/DejaVuSans.ttf', uni=True)
     pdf.set_font('DejaVu', '', 12)
-
     pdf.cell(0, 10, "UK–EU Origin Report", ln=True, align='C')
     pdf.ln(5)
 
     df = df[df["Item Number"].notna() & (df["Item Number"].astype(str).str.strip() != "")]
+
+    # --- Country Contribution Calculations ---
+    total_value = df['Value'].apply(lambda v: convert_to_gbp(v, df.loc[df['Value'] == v, 'Currency'].values[0], conversion_dict)).sum()
+
+    # Grouped contribution by Country of Origin
+    contributions = (
+        df.groupby('COO')['Value']
+        .apply(lambda s: sum([convert_to_gbp(v, df.loc[df['Value'] == v, 'Currency'].values[0], conversion_dict) for v in s]))
+        .apply(lambda x: (x / total_value) * 100 if total_value else 0)
+        .round(2)
+        .to_dict()
+)
+
 
     excluded_cols = ["Currency", "SAC"]
     display_cols = [col for col in df.columns if col not in excluded_cols]
@@ -602,9 +617,7 @@ def generate_uk_eu_report(df, conversion_dict, origin_lookup):
         else:
             display_headers.append(safe_text(col))
 
-    # Font for table
     pdf.set_font("DejaVu", '', 9)
-
     table_width = pdf.w * 0.95
     col_width = table_width / len(display_cols)
     line_height = 6
@@ -612,14 +625,12 @@ def generate_uk_eu_report(df, conversion_dict, origin_lookup):
     x_start = pdf.get_x()
     y_start = pdf.get_y()
 
-    # Header row
     for i, header in enumerate(display_headers):
         pdf.set_xy(x_start + i * col_width, y_start)
         pdf.multi_cell(col_width, line_height, header, border=1, align='C')
 
     pdf.set_xy(x_start, y_start + line_height)
 
-    # Data rows
     for _, row in df.iterrows():
         x = x_start
         y = pdf.get_y()
@@ -630,8 +641,8 @@ def generate_uk_eu_report(df, conversion_dict, origin_lookup):
             val = row[col]
             if col == "Value":
                 val = convert_to_gbp(row["Value"], row["Currency"], conversion_dict)
-            elif col == "Sub Assembly Value":
-                val = convert_to_gbp(row["Sub Assembly Value"], row["Sub Assembly Currency"], conversion_dict)
+            elif col == "SAV":
+                val = convert_to_gbp(row["SAV"], row["SAC"], conversion_dict)
             text = safe_text(val)
             row_cells.append(text)
             lines = max(1, int(len(text) / (col_width / 2)))
@@ -645,13 +656,81 @@ def generate_uk_eu_report(df, conversion_dict, origin_lookup):
 
         pdf.set_y(y + row_height)
 
-    # Final Commodity Codes
+    # Final Commodity Codes Section
     pdf.ln(5)
     pdf.set_font("DejaVu", '', 10)
     final_codes = df["FCC"].dropna().unique()
     clean_codes = ", ".join(safe_text(code) for code in final_codes)
     pdf.cell(0, 10, "Final Commodity Code(s): " + clean_codes, ln=True)
-    
+
+    # Rule Lookup Section
+    seen_codes = set()
+    pdf.ln(3)
+    pdf.set_font("DejaVu", '', 10)
+
+    final_code_rules = {}  # 🔁 Store rule per code for later use
+
+    for code in final_codes:
+        clean_code = sanitize_commodity_code(str(code).strip())
+        if clean_code in seen_codes or not clean_code:
+            continue
+        seen_codes.add(clean_code)
+
+        try:
+            rule = check_uk_eu_preference(clean_code)
+        except Exception as e:
+            rule = f"⚠️ Rule lookup failed: {str(e)}"
+
+        # 🔐 Store for later use
+        final_code_rules[clean_code] = rule
+
+        # 📜 Immediate rule print section
+        rule_text = f"• Rule of Origin for {clean_code}: {safe_text(rule)}"
+        wrapped_rule = "\n".join(wrap(rule_text, width=100))
+        pdf.multi_cell(pdf.w - 20, 8, wrapped_rule, border=0)
+
+
+        # Interpret Rules
+        #rule = rule.upper()
+    for code, rule in final_code_rules.items():
+        pdf.set_text_color(0, 0, 0)
+        pdf.ln(5)
+
+        if 'CTH' in rule:
+            pdf.multi_cell(0, 8, txt=(
+                "According to CTH: CTH means production from non-originating materials of any heading, "
+                "except that of the product. This means that any non-originating material used must be classified "
+                "under a heading (4-digit level of the Harmonised System) other than the final product (i.e., a change in heading). "
+                "Since the commodity codes in the bill of materials differ from the first four digits of the final product's code, "
+                "this product qualifies for UK–Japan Preferential Duty (Zero or reduced rate)."
+            ))
+
+        elif 'CTSH' in rule:
+            pdf.multi_cell(0, 8, txt=(
+                "According to CTSH: Production must use materials from a different subheading "
+                "(6-digit level). Since BOM codes differ from the first six digits of the final product's code, "
+                "this product qualifies under the UK–Japan Preference for reduced or zero import duty."
+            ))
+
+        elif 'CC' in rule:
+            pdf.multi_cell(0, 8, txt=(
+                "According to CC: Production from non-originating materials must involve a change in Chapter (2-digit level). "
+                "Since the BOM components are from different Chapters, this product qualifies under the trade preference rule."
+            ))
+
+        # Extra rule clarifications
+        if "cathode" in rule.lower():
+            pdf.ln(5)
+            pdf.set_font("ARIAL", size=9)
+            pdf.cell(0, 10, txt="*Ensure no active cathode materials are present to qualify under the CTH rule.", ln=True)
+
+        if "MaxNOM" in rule:
+            pdf.ln(5)
+            pdf.set_font("ARIAL", size=9)
+            pdf.cell(0, 10, txt="Alternatively, this product may qualify under the MaxNOM Rule.", ln=True)
+        
+    pdf.set_font("DejaVu", '', 11)  # Reset font if changed
+
     # Abbreviations Section
     pdf.ln(8)
     pdf.set_font("DejaVu", '', 10)
@@ -666,26 +745,223 @@ def generate_uk_eu_report(df, conversion_dict, origin_lookup):
         "SA HS Code = Sub Assembly HS Code\n"
         "FCC = Final Commodity Code"
     )
-    # Rules of Origin
-    seen_codes = set()
-    pdf.ln(3)
-    for code in final_codes:
-        clean_code = sanitize_commodity_code(str(code).strip())
-        if clean_code in seen_codes or not clean_code:
-            continue
-        seen_codes.add(clean_code)
-        try:
-            rule = check_uk_japan_preference(clean_code)
-        except Exception as e:
-            rule = f"⚠️ Rule lookup failed: {str(e)}"
-        pdf.multi_cell(0, 8, f"- Rule of Origin for {clean_code}: {safe_text(rule)}", border=0)
-
     for line in abbrev_text.split("\n"):
         pdf.cell(0, 6, line, ln=True)
-    out_path = f"originreports/uk_eu/{filename}_uk_eu.pdf"
+
+    # --- Country Contributions Section ---
+    pdf.ln(8)
+    pdf.set_font("DejaVu", '', 10)
+    pdf.cell(0, 8, "Country Contribution (% of total value):", ln=True)
+
+    if contributions:
+        for country, pct in contributions.items():
+            line = f"- {country}: {pct:.2f}%"
+            pdf.cell(0, 6, line, ln=True)
+    else:
+        pdf.cell(0, 6, "No contribution data available.", ln=True)
+        
+
+    # --- Contribution Analysis ---
+    pdf.ln(6)
+    pdf.set_font("ARIAL", size=12)
+    pdf.cell(0, 10, txt="Country Contribution Analysis:", ln=True)
+    pdf.set_font("ARIAL", size=10)
+
+    eu_countries = [
+        "Austria", "Belgium", "Bulgaria", "Croatia", "Republic of Cyprus", "Czech Republic",
+        "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland",
+        "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland",
+        "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden"
+    ]
+    uk_countries = ["England", "Scotland", "Wales", "Northern Ireland", "UK", "United Kingdom", "Great Britain"]
+
+    # Total % from UK and eu
+    uk_eu_percentage = sum(
+        percent for country, percent in contributions.items()
+        if country.strip() in eu_countries + uk_countries
+    )
+
+    # Rest of world %
+    rest_percentage = sum(
+        percent for country, percent in contributions.items()
+        if country.strip() not in eu_countries + uk_countries
+    )
+
+    # Get highest contributing non-UK/Japan country
+    filtered_contributions = {
+        country: percent for country, percent in contributions.items()
+        if country.strip() not in eu_countries + uk_countries
+    }
+    highest_contributed_country = max(filtered_contributions, key=filtered_contributions.get, default="Unknown")
+
+    # Display %
+    pdf.cell(0, 8, txt=f"Total UK & EU Contribution: {uk_eu_percentage:.2f}%", ln=True)
+    pdf.cell(0, 8, txt=f"Rest of World Contribution: {rest_percentage:.2f}%", ln=True)
+    pdf.cell(0, 8, txt=f"Highest Non-UK/EU Contributor: {highest_contributed_country} ({filtered_contributions.get(highest_contributed_country, 0):.2f}%)", ln=True)
+
+    # Optional logic usage for further origin rule checks
+    max_nom_percentage = rest_percentage  # For rule logic if needed
+        
+
+    # Eligibility Analysis Summary Section (Final PDF Content)
+    pdf.add_page()
+    pdf.set_font("DejaVu", '', 10)
+     
+    pdf.ln(5)
+
+    for clean_code in final_code_rules:
+        origin = final_code_rules.get(clean_code, "")
+        message = ""
+
+         
+        # Rule Check Logic
+        if "wholly obtained" in origin.lower():
+            message = (
+                f"Based on the findings, according to the product-specific rule of origin of the final product: {origin}.\n"
+                " The product is eligible under the UK-EU Preference trade agreement for zero or reduced duty while importing."
+            )
+
+        elif "MaxNOM" in origin:
+            match = re.search(r"MaxNOM\s*(\d+)\s?%", origin)
+            if match:
+                threshold = int(match.group(1))
+                if max_nom_percentage < threshold:
+                    message = (
+                        f"Based on the findings, according to the product-specific rule of origin of the final product: {origin}.\n"
+                        " The product is eligible under the UK-Japan Preference trade agreement for zero or reduced duty while importing."
+                    )
+                else:
+                    message = (
+                        f"Based on the findings, according to the product-specific rule of origin of the final product: {origin}.\n"
+                        "The product is not eligible under the UK-EU Preference trade agreement for zero or reduced duty while importing."
+                    )
+            else:
+                message = " Invalid MaxNOM condition specified."
+
+         
+
+        else:
+            if max_nom_percentage < 50:
+                message = (
+                    f"Based on the findings, according to the product-specific rule of origin of the final product: {origin}.\n"
+                    "The product is eligible under the UK-EU Preference trade agreement for zero or reduced duty while importing."
+                )
+            else:
+                message = (
+                    f"Based on the findings, according to the product-specific rule of origin of the final product: {origin}.\n"
+                    "The product is not eligible under the UK-EU Preference trade agreement for zero or reduced duty while importing."
+                )
+
+        # Final Message Section
+        #pdf.set_font("DejaVu", '', 10)
+        #pdf.multi_cell(0, 5, message)
+        #pdf.ln(4)
+
+
+    # Ensure this font is registered, or use 'Arial' which FPDF2 allows if available in system
+    pdf.set_font("Arial", 'I', 11)
+
+    # Instead of ❌ or symbols not supported by Helvetica/Arial, use plain text
+    clean_message = message.replace("❌", "Error:")  # Or just remove the symbol
+    pdf.multi_cell(0, 8, txt=clean_message)
+
+     
+
+    # Pie Chart for Contributions
+    pdf.add_page()
+
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(0, 10, txt="Pie Chart of Contributions", ln=True)
+    pdf.ln(5)
+
+    eu_countries = [
+        "Austria", "Belgium", "Bulgaria", "Croatia", "Republic of Cyprus", "Czech Republic",
+        "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland",
+        "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland",
+        "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden"
+    ]
+    uk_countries = [
+        "England", "Scotland", "Wales", "Northern Ireland",
+        "UK", "United Kingdom", "Great Britain"
+    ]
+
+    # Calculate contributions
+    uk_eu_percentage = sum(
+        percent for country, percent in contributions.items()
+        if country in eu_countries or country in uk_countries
+    )
+    rest_percentage = sum(
+        percent for country, percent in contributions.items()
+        if country not in eu_countries and country not in uk_countries
+    )
+
+    labels = ['Other Countries', 'UK & EU']
+    sizes = [rest_percentage, uk_eu_percentage]
+    colors = ['#FF9999', '#66B2FF']
+
+    # Save pie chart
+    plt.figure(figsize=(6, 6))
+    plt.pie(
+        sizes, labels=labels, autopct='%1.1f%%', startangle=140,
+        colors=colors, wedgeprops=dict(edgecolor='black')
+    )
+    plt.axis('equal')
+    plt.title('Contribution Breakdown', fontsize=14)
+
+    # Make sure the folder exists
+    
+    os.makedirs('pdf_report', exist_ok=True)
+
+    pie_chart_path = 'pdf_report/pie_chart.png'
+    plt.savefig(pie_chart_path)
+    plt.close()
+
+    pdf.image(pie_chart_path, x=50, y=30, w=180)
+
+    # Final Page with Notes and Links
+    pdf.add_page()
+    pdf.ln(10)
+
+    # Red Note
+    pdf.set_text_color(255, 0, 0)
+    pdf.set_font("Arial", 'B', 10)
+    pdf.multi_cell(0, 8, txt=(
+        "Note: This calculation assumes that all items within the UK/EU "
+        "have valid preference origin statements from their suppliers."
+    ))
+
+    # Blue Link: Binding Origin Decision
+    pdf.set_text_color(0, 0, 255)
+    pdf.set_font("Arial", 'B', 10)
+    pdf.cell(0, 10, txt="Apply for a binding origin decision (HMRC):", ln=True)
+    pdf.set_font("Arial", size=10)
+    pdf.cell(
+        0, 10,
+        txt="https://www.gov.uk/guidance/apply-for-a-binding-origin-information-decision",
+        ln=True
+    )
+
+    # Blue Link: Advance Tariff Ruling
+    pdf.set_font("Arial", 'B', 10)
+    pdf.cell(0, 10, txt="Apply for an Advance Tariff Ruling:", ln=True)
+    pdf.set_text_color(0, 0, 255)
+    pdf.set_font("Arial", size=10)
+    pdf.cell(
+        0, 10,
+        txt="Go to Website",
+        ln=True,
+        link="https://www.gov.uk/guidance/apply-for-an-advance-tariff-ruling#apply-for-an-advance-tariff-ruling"
+    )
+
+    # Footer: Generation Timestamp
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font("Arial", 'I', 10)
+    current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    pdf.cell(0, 10, txt=f"Report generated on: {current_datetime}", ln=True)
+
     pdf.output(out_path)
     print(f"[✔] UK–EU report saved: {out_path}")
-
+    return out_path
 
 
 def check_uk_japan_preference(final_commodity_code: str) -> str:
@@ -770,6 +1046,19 @@ def generate_uk_japan_report(df, conversion_dict, origin_lookup):
     pdf.ln(5)
 
     df = df[df["Item Number"].notna() & (df["Item Number"].astype(str).str.strip() != "")]
+
+    # --- Country Contribution Calculations ---
+    total_value = df['Value'].apply(lambda v: convert_to_gbp(v, df.loc[df['Value'] == v, 'Currency'].values[0], conversion_dict)).sum()
+
+    # Grouped contribution by Country of Origin
+    contributions = (
+        df.groupby('COO')['Value']
+        .apply(lambda s: sum([convert_to_gbp(v, df.loc[df['Value'] == v, 'Currency'].values[0], conversion_dict) for v in s]))
+        .apply(lambda x: (x / total_value) * 100 if total_value else 0)
+        .round(2)
+        .to_dict()
+)
+
 
     excluded_cols = ["Currency", "SAC"]
     display_cols = [col for col in df.columns if col not in excluded_cols]
@@ -913,6 +1202,228 @@ def generate_uk_japan_report(df, conversion_dict, origin_lookup):
     )
     for line in abbrev_text.split("\n"):
         pdf.cell(0, 6, line, ln=True)
+
+    # --- Country Contributions Section ---
+    pdf.ln(8)
+    pdf.set_font("DejaVu", '', 10)
+    pdf.cell(0, 8, "Country Contribution (% of total value):", ln=True)
+
+    if contributions:
+        for country, pct in contributions.items():
+            line = f"- {country}: {pct:.2f}%"
+            pdf.cell(0, 6, line, ln=True)
+    else:
+        pdf.cell(0, 6, "No contribution data available.", ln=True)
+        
+
+    # --- Contribution Analysis ---
+    pdf.ln(6)
+    pdf.set_font("ARIAL", size=12)
+    pdf.cell(0, 10, txt="Country Contribution Analysis:", ln=True)
+    pdf.set_font("ARIAL", size=10)
+
+    japan_countries = ["Japan"]
+    uk_countries = ["England", "Scotland", "Wales", "Northern Ireland", "UK", "United Kingdom", "Great Britain"]
+
+    # Total % from UK and Japan
+    uk_japan_percentage = sum(
+        percent for country, percent in contributions.items()
+        if country.strip() in japan_countries + uk_countries
+    )
+
+    # Rest of world %
+    rest_percentage = sum(
+        percent for country, percent in contributions.items()
+        if country.strip() not in japan_countries + uk_countries
+    )
+
+    # Get highest contributing non-UK/Japan country
+    filtered_contributions = {
+        country: percent for country, percent in contributions.items()
+        if country.strip() not in japan_countries + uk_countries
+    }
+    highest_contributed_country = max(filtered_contributions, key=filtered_contributions.get, default="Unknown")
+
+    # Display %
+    pdf.cell(0, 8, txt=f"Total UK & Japan Contribution: {uk_japan_percentage:.2f}%", ln=True)
+    pdf.cell(0, 8, txt=f"Rest of World Contribution: {rest_percentage:.2f}%", ln=True)
+    pdf.cell(0, 8, txt=f"Highest Non-UK/Japan Contributor: {highest_contributed_country} ({filtered_contributions.get(highest_contributed_country, 0):.2f}%)", ln=True)
+
+    # Optional logic usage for further origin rule checks
+    max_nom_percentage = rest_percentage  # For rule logic if needed
+        
+
+    # Eligibility Analysis Summary Section (Final PDF Content)
+    pdf.add_page()
+    pdf.set_font("DejaVu", '', 10)
+     
+    pdf.ln(5)
+
+    for clean_code in final_code_rules:
+        origin = final_code_rules.get(clean_code, "")
+        message = ""
+
+         
+        # Rule Check Logic
+        if "wholly obtained" in origin.lower():
+            message = (
+                f"Based on the findings, according to the product-specific rule of origin of the final product: {origin}.\n"
+                " The product is eligible under the UK-Japan Preference trade agreement for zero or reduced duty while importing."
+            )
+
+        elif "MaxNOM" in origin:
+            match = re.search(r"MaxNOM\s*(\d+)\s?%", origin)
+            if match:
+                threshold = int(match.group(1))
+                if max_nom_percentage < threshold:
+                    message = (
+                        f"Based on the findings, according to the product-specific rule of origin of the final product: {origin}.\n"
+                        " The product is eligible under the UK-Japan Preference trade agreement for zero or reduced duty while importing."
+                    )
+                else:
+                    message = (
+                        f"Based on the findings, according to the product-specific rule of origin of the final product: {origin}.\n"
+                        " The product is not eligible under the UK-Japan Preference trade agreement for zero or reduced duty while importing."
+                    )
+            else:
+                message = " Invalid MaxNOM condition specified."
+
+        elif "RVC" in origin:
+            match = re.search(r"RVC\s*(\d+)\s?%\s?\(FOB\)", origin)
+            if match:
+                threshold = int(match.group(1))
+                originating_percentage = sum(
+                    percent for country, percent in contributions.items()
+                    if country in japan_countries or country in uk_countries
+                )
+                rvc_percentage = (originating_percentage / 100) * total_value / total_value * 100
+
+                if rvc_percentage >= threshold:
+                    message = (
+                        f"Based on the findings, according to the product-specific rule of origin of the final product: {origin}.\n"
+                        " The product is eligible under the UK-Japan Preference trade agreement for zero or reduced duty while importing."
+                    )
+                else:
+                    message = (
+                        f"Based on the findings, according to the product-specific rule of origin of the final product: {origin}.\n"
+                        " The product is not eligible under the UK-Japan Preference trade agreement for zero or reduced duty while importing."
+                    )
+            else:
+                message = " Invalid RVC condition specified."
+
+        else:
+            if max_nom_percentage < 50:
+                message = (
+                    f"Based on the findings, according to the product-specific rule of origin of the final product: {origin}.\n"
+                    "✅ The product is eligible under the UK-Japan Preference trade agreement for zero or reduced duty while importing."
+                )
+            else:
+                message = (
+                    f"Based on the findings, according to the product-specific rule of origin of the final product: {origin}.\n"
+                    " The product is not eligible under the UK-Japan Preference trade agreement for zero or reduced duty while importing."
+                )
+
+        # Final Message Section
+        #pdf.set_font("DejaVu", '', 10)
+        #pdf.multi_cell(0, 5, message)
+        #pdf.ln(4)
+
+
+    # Ensure this font is registered, or use 'Arial' which FPDF2 allows if available in system
+    pdf.set_font("Arial", 'I', 11)
+
+    # Instead of ❌ or symbols not supported by Helvetica/Arial, use plain text
+    clean_message = message.replace("❌", "Error:")  # Or just remove the symbol
+    pdf.multi_cell(0, 8, txt=clean_message)
+
+     
+
+    # Pie Chart for Contributions
+    pdf.add_page()
+
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(0, 10, txt="Pie Chart of Contributions", ln=True)
+    pdf.ln(5)
+
+    japan_countries = ["Japan"]
+    uk_countries = [
+        "England", "Scotland", "Wales", "Northern Ireland",
+        "UK", "United Kingdom", "Great Britain"
+    ]
+
+    # Calculate contributions
+    uk_japan_percentage = sum(
+        percent for country, percent in contributions.items()
+        if country in japan_countries or country in uk_countries
+    )
+    rest_percentage = sum(
+        percent for country, percent in contributions.items()
+        if country not in japan_countries and country not in uk_countries
+    )
+
+    labels = ['Other Countries', 'UK & Japan']
+    sizes = [rest_percentage, uk_japan_percentage]
+    colors = ['#FF9999', '#66B2FF']
+
+    # Save pie chart
+    plt.figure(figsize=(6, 6))
+    plt.pie(
+        sizes, labels=labels, autopct='%1.1f%%', startangle=140,
+        colors=colors, wedgeprops=dict(edgecolor='black')
+    )
+    plt.axis('equal')
+    plt.title('Contribution Breakdown', fontsize=14)
+
+    # Make sure the folder exists
+    
+    os.makedirs('pdf_report', exist_ok=True)
+
+    pie_chart_path = 'pdf_report/pie_chart.png'
+    plt.savefig(pie_chart_path)
+    plt.close()
+
+    pdf.image(pie_chart_path, x=50, y=30, w=180)
+
+    # Final Page with Notes and Links
+    pdf.add_page()
+    pdf.ln(10)
+
+    # Red Note
+    pdf.set_text_color(255, 0, 0)
+    pdf.set_font("Arial", 'B', 10)
+    pdf.multi_cell(0, 8, txt=(
+        "Note: This calculation assumes that all items within the UK/Japan "
+        "have valid preference origin statements from their suppliers."
+    ))
+
+    # Blue Link: Binding Origin Decision
+    pdf.set_text_color(0, 0, 255)
+    pdf.set_font("Arial", 'B', 10)
+    pdf.cell(0, 10, txt="Apply for a binding origin decision (HMRC):", ln=True)
+    pdf.set_font("Arial", size=10)
+    pdf.cell(
+        0, 10,
+        txt="https://www.gov.uk/guidance/apply-for-a-binding-origin-information-decision",
+        ln=True
+    )
+
+    # Blue Link: Advance Tariff Ruling
+    pdf.set_font("Arial", 'B', 10)
+    pdf.cell(0, 10, txt="Apply for an Advance Tariff Ruling:", ln=True)
+    pdf.set_text_color(0, 0, 255)
+    pdf.set_font("Arial", size=10)
+    pdf.cell(
+        0, 10,
+        txt="Go to Website",
+        ln=True,
+        link="https://www.gov.uk/guidance/apply-for-an-advance-tariff-ruling#apply-for-an-advance-tariff-ruling"
+    )
+
+    # Footer: Generation Timestamp
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font("Arial", 'I', 10)
+    current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    pdf.cell(0, 10, txt=f"Report generated on: {current_datetime}", ln=True)
 
     pdf.output(out_path)
     print(f"[✔] UK–Japan report saved: {out_path}")
