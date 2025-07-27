@@ -1818,8 +1818,8 @@ def admin_contacts():
 
 
 # OpenAI API Key
-part1 = "sk-proj-Jcgx4YzLqRFQq9F9MXwTfq2sk_q1HwfklOFIviaF45ockbK_K7HIUDUngcXZH6ka3jI0kxXYU1T3"
-part2 = "BlbkFJjKGwgEWutYmHyXYAzNCozAUvZVgvDT8wzlhe2sNmugk628iD4XHcmflri96tUZbi-E4J24l14A"
+part1 = "sk-proj-fvklz_6_Tj59t08ujEDuIbpAogQodt7OlYS17LiWPCUXpQ_whsFPbxhIfN98c9GaOXOLMlgGJwT3BlbkFJ"
+part2 = "Gip4LXebCvprjoIlnOOPcDLcDiX97cM4nVNw6Iy_FJPYYHWXec66U9oSr-1Rkh7H8VBIRsOVcA"
 encryption_key = generate_encryption_key()
 save_encryption_key(encryption_key)
 encrypt_api_key_parts(part1, part2, encryption_key)
