@@ -90,7 +90,7 @@ zope.interface==7.2
 ujson==5.9.0
 cryptography==45.0.5
 beautifulsoup4==4.9.1
-numpy<2
+numpy==1.26.4
 
 faiss-cpu==1.7.4
 
