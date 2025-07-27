@@ -142,13 +142,14 @@ def upload_bom():
                 file.save(local_path)
                 shutil.copy(local_path, server_path)
 
-                # Save in DB
+                # Save initial file info in DB
                 cur.execute("""
                     INSERT INTO bom_uploads (username, original_filename, saved_path, server_path, shift, upload_date)
                     VALUES (%s, %s, %s, %s, %s, %s)
+                    RETURNING id
                 """, (username, filename, local_path, server_path, shift, upload_date))
+                bom_id = cur.fetchone()[0]
 
-                # ✅ Now parse and generate reports
                 try:
                     df = pd.read_excel(local_path)
 
@@ -160,12 +161,21 @@ def upload_bom():
                         "EUR": 0.85
                     }
 
-                    # Clean filename for saving (without extension)
                     clean_name = os.path.splitext(filename)[0]
 
-                    generate_uk_eu_report(df, conversion_data, clean_name)
-                    generate_uk_japan_report(df, conversion_data, clean_name)
-                    print(f"📄 PDF reports generated for {filename}")
+                    # ✅ Generate both reports and capture paths
+                    eu_path = generate_uk_eu_report(df, conversion_data, clean_name)
+                    jp_path = generate_uk_japan_report(df, conversion_data, clean_name)
+
+                    # ✅ Store report paths only
+                    cur.execute("""
+                        UPDATE bom_uploads
+                        SET uk_eu_report_path = %s,
+                            uk_japan_report_path = %s
+                        WHERE id = %s
+                    """, (eu_path, jp_path, bom_id))
+
+                    print(f"[✔] Reports saved: {eu_path} and {jp_path}")
 
                 except Exception as e:
                     print(f"❌ Error processing {filename}: {e}")
@@ -178,7 +188,35 @@ def upload_bom():
         return redirect(url_for("preferential_origin.upload_bom"))
 
     return render_template("preferential_origin_upload.html")
-# ✅ Export Dashboard
+
+from flask import send_file
+import urllib.parse
+
+@preferential_origin_bp.route("/view-report")
+def view_report():
+    if "user" not in session:
+        return redirect("/login")
+
+    raw_path = request.args.get("path")
+    if not raw_path:
+        return "Invalid file path", 400
+
+    # Decode the URL-encoded path
+    decoded_path = urllib.parse.unquote(raw_path)
+
+    # Construct absolute path from current working dir
+    abs_path = os.path.abspath(os.path.join(os.getcwd(), decoded_path))
+
+    # Optional security check (ensure inside `originreports`)
+    base_dir = os.path.abspath(os.path.join(os.getcwd(), "originreports"))
+    if not abs_path.startswith(base_dir):
+        return "Access denied", 403
+
+    if not os.path.isfile(abs_path):
+        return f"File not found: {abs_path}", 404
+
+    return send_file(abs_path, mimetype="application/pdf", as_attachment=False)
+
 @preferential_origin_bp.route("/exports", methods=["GET"])
 def show_exports():
     if "user" not in session:
@@ -189,17 +227,37 @@ def show_exports():
 
     conn = get_db()
     cur = conn.cursor()
+    
+    # Fetch from bom_uploads
     cur.execute("""
-        SELECT shift, export_type, file_name, file_path
-        FROM export_files
-        WHERE username = %s AND export_date = %s
-        ORDER BY shift, export_type, export_timestamp DESC
+        SELECT shift, original_filename, uk_eu_report_path, uk_japan_report_path
+        FROM bom_uploads
+        WHERE username = %s AND upload_date = %s
+        ORDER BY shift, id DESC
     """, (username, selected_date))
-    files = [dict(shift=row[0], export_type=row[1], file_name=row[2], file_path=row[3]) for row in cur.fetchall()]
+    
+    files = []
+    for row in cur.fetchall():
+        shift, original_filename, eu_path, jp_path = row
+        if eu_path:
+            files.append({
+                "shift": shift,
+                "export_type": "UK–EU Report",
+                "file_name": f"{original_filename} – UK–EU",
+                "file_path": eu_path
+            })
+        if jp_path:
+            files.append({
+                "shift": shift,
+                "export_type": "UK–Japan Report",
+                "file_name": f"{original_filename} – UK–Japan",
+                "file_path": jp_path
+            })
+
     cur.close()
     conn.close()
 
-    # Check for existing abstracts per shift
+    # Abstract reports, if any
     base_local = get_user_folder_paths(username)[1]
     abstracts = {}
     for shift in ["Shift 1", "Shift 2", "Shift 3", "Shift 4"]:

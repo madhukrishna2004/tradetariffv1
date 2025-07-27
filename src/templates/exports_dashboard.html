@@ -180,7 +180,8 @@
                     </td>
                     <td>
                       {% if f.file_path %}
-                        <a href="{{ url_for('preferential_origin.download_file', file_path=f.file_path) }}" class="btn btn-sm btn-outline-primary">View</a>
+                        <a href="{{ url_for('preferential_origin.view_report') }}?path={{ f.file_path | urlencode }}" class="btn btn-sm btn-outline-primary">View</a>
+
                       {% else %}
                         <span class="text-muted">No File</span>
                       {% endif %}
