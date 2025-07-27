@@ -19,7 +19,9 @@
     <meta property="og:image" content="https://trade-sphereglobal.com/assets/tradesphere-banner.jpg" />
     <meta property="og:url" content="https://trade-sphereglobal.com/" />
     <meta property="og:type" content="website" />
-    
+    <!-- Tailwind CSS CDN (Add This in Your <head> Section) -->
+<script src="https://cdn.tailwindcss.com"></script>
+
     <link rel="stylesheet" href="static/css/govuk-frontend-3.4.0.min.css?v=20250105">
     <link rel="stylesheet" href="static/css/application.css?v=20250105">
     <link rel="stylesheet" href="static/css/chatbot.css?v=20250105">
@@ -36,64 +38,7 @@
         padding: 0;
       }
     
-      /* Sidebar styles */
-      #sidebar {
-        position: fixed;
-        top: 0;
-        left: -250px;
-        width: 250px;
-        height: 100%;
-        background-color: #dff6ff; /* Soft pastel blue */
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-        overflow-y: auto;
-        transition: left 0.3s ease;
-        z-index: 999;
-      }
-    
-      #sidebar.open {
-        left: 0;
-      }
-    
-      #sidebar .menu {
-        list-style-type: none;
-        padding: 10px 0;
-        margin: 0;
-      }
-    
-      #sidebar .menu-item {
-        padding: 15px;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        font-size: 16px;
-        color: #0077b6; /* Fresh blue */
-        font-weight: bold;
-      }
-    
-      #sidebar .menu-item a {
-        text-decoration: none;
-        color: #0077b6;
-        display: block;
-        font-weight: bold;
-      }
-    
-      #sidebar .menu-item a:hover {
-        text-decoration: underline;
-      }
-    
-      #sidebar-toggle {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        background-color: #0d6efd;
-        color: #000; /* Changed from white to black */
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        font-size: 16px;
-        cursor: pointer;
-        z-index: 1000;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-      }
-    
+       
       /* Sidebar headings */
       .menu-heading {
         padding: 15px;
@@ -253,65 +198,7 @@
         background-color: #00a8cc;
       }
 
-      /* Sidebar toggle button */
-.ts-sidebar-toggle {
-  position: fixed;
-  top: 15px;
-  left: 15px;
-  background-color: #0d6efd; /* Bootstrap primary */
-  color: #fff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  z-index: 1100;
-  font-size: 1.25rem;
-  cursor: pointer;
-}
-
-/* Sidebar container */
-.ts-sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 280px;
-  background: linear-gradient(to right, #f0f4fa, #e9f5fb);
-  color: #1a1a1a;
-  padding: 2rem 1.5rem;
-  font-family: 'Poppins', sans-serif;
-  border-top-right-radius: 16px;
-  border-bottom-right-radius: 16px;
-  transition: all 0.3s ease-in-out;
-  overflow-y: auto;
-  z-index: 1000;
-}
-
-/* Hide sidebar on mobile by default */
-@media (max-width: 768px) {
-  .ts-sidebar {
-    left: -300px;
-  }
-  .ts-sidebar.active {
-    left: 0;
-  }
-}
-
-/* Headings */
-.ts-sidebar-title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  color: transparent;
-}
-
-.ts-sidebar-subheading {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #343a40;
-  margin-bottom: 1.25rem;
-  text-transform: uppercase;
-}
-
+     
 /* Menu styling */
 .ts-menu {
   list-style: none;
@@ -343,32 +230,7 @@
 .ts-link i {
   margin-right: 6px;
 }
-
-.ts-sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 250px;
-  height: 100%;
-  background-color: #fff;
-  padding: 1.5rem;
-  z-index: 1000;
-  border-right: 2px solid #e0e0e0;
-  transition: all 0.3s ease-in-out;
-}
-
-.ts-sidebar-title {
-  font-weight: bold;
-  font-size: 1.4rem;
-  color: #005EA5;
-  margin-bottom: 10px;
-}
-
-.ts-sidebar-subheading {
-  font-size: 0.9rem;
-  color: #6c757d;
-  margin-bottom: 1rem;
-}
+ 
 
 .ts-menu {
   list-style: none;
@@ -393,805 +255,383 @@
   color: #0d6efd;
 }
 
-.ts-sidebar-toggle {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  background-color: #0d6efd;
-  color: white;
-  border: none;
-  font-size: 1.2rem;
-  padding: 8px 12px;
-  border-radius: 4px;
-  z-index: 1100;
-}
-.ts-sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 250px;
-  height: 100%;
-  background-color: #fff;
-  padding: 1.5rem;
-  z-index: 1000;
-  border-right: 2px solid #e0e0e0;
-  transition: all 0.3s ease-in-out;
-}
-
-.ts-sidebar-title {
-  font-weight: bold;
-  font-size: 1.4rem;
-  color: #005EA5;
-  margin-bottom: 10px;
-}
-
-.ts-sidebar-subheading {
-  font-size: 0.9rem;
-  color: #6c757d;
-  margin-bottom: 1rem;
-}
-
-.ts-menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.ts-menu-item {
-  margin: 12px 0;
-}
-
-.ts-link {
-  text-decoration: none;
-  color: #333;
-  font-weight: 500;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-}
-
-.ts-link:hover {
-  color: #0d6efd;
-}
-
-.ts-sidebar-toggle {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  background-color: #0d6efd;
-  color: white;
-  border: none;
-  font-size: 1.2rem;
-  padding: 8px 12px;
-  border-radius: 4px;
-  z-index: 1100;
-}
+ 
 
     </style>
     
+
+    <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+      background-color: #f0faff;
+    }
+
+    /* Sidebar */
+    aside {
+      width: 240px;
+      background-color: #0c0f1c;
+      color: white;
+      padding: 20px 0;
+    }
+
+    .ts-menu {
+      list-style: none;
+      padding: 0 20px;
+      margin: 0;
+    }
+
+    .ts-menu-item {
+      margin: 10px 0;
+    }
+
+    .ts-link {
+      color: #fff;
+      text-decoration: none;
+      display: block;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+
+    .ts-link:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .ts-link.text-danger {
+      color: #f66;
+    }
+
+    /* Main content */
+    main {
+      flex: 1;
+      padding: 30px;
+      background-color: #f0faff;
+    }
+
+    .page-heading {
+      font-size: 24px;
+      font-weight: bold;
+      color: #0077b6;
+      margin-bottom: 20px;
+    }
+
+    .subheading {
+      font-size: 18px;
+      color: #0077b6;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    .subheading:hover {
+      text-decoration: underline;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      width: 80%;
+      max-width: 600px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #0077b6;
+    }
+
+    .modal-close {
+      float: right;
+      background: #e63946;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
     
+  </style>
+     
 </head>
+
 <body class="govuk-template__body js-enabled">
-    <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
+  <div style="display: flex; min-height: 100vh;">
 
-    <!-- Sidebar toggle button -->
-<!-- Sidebar Toggle Button -->
-<button id="sidebar-toggle" class="ts-sidebar-toggle">☰</button>
-
-<!-- Sidebar -->
-<div id="sidebar" class="ts-sidebar shadow-lg">
-  <h1 class="ts-sidebar-title">TradeSphere</h1>
-  <h3 class="ts-sidebar-subheading"></h3>
-
-  <ul class="ts-menu">
-    <li class="ts-menu-item">
-      <a href="/profile" class="ts-link">
-        👤 <span class="ms-1">Your Profile</span>
-      </a>
-    </li>
-    <li class="ts-menu-item">
-      <a href="/tariff" class="ts-link">
-        🤖 <span class="ms-1">AI HS Code Lookup</span>
-      </a>
-    </li>
-    <li class="ts-menu-item">
-      <a href="javascript:void(0)" onclick="showModal()" class="ts-link">
-        ⌛ <span class="ms-1">Expired Commodity Details</span>
-      </a>
-    </li>
-    <li class="ts-menu-item">
-      <a href="/origin" class="ts-link">
-        🇪🇺🇬🇧 <span class="ms-1">EU-UK Agreement Check</span>
-      </a>
-    </li>
-    <li class="ts-menu-item">
-      <a href="/originjapan" class="ts-link">
-        🇯🇵 <span class="ms-1">UK-Japan Agreement Check</span>
-      </a>
-    </li>
-    <li class="ts-menu-item">
-      <a href="/preferential-origin/exports" class="ts-link">
-        🇪🇺🇬🇧 <span class="ms-1">Export Dashboard</span>
-      </a>
-    </li>
-    <li class="ts-menu-item">
-      <a href="/preferential-origin/upload" class="ts-link">
-        🇪🇺🇬🇧 <span class="ms-1">Upload BOMs</span>
-      </a>
-    </li>
-
-    <li class="ts-menu-item">
-      <a href="https://supplierdeclarations.com/" target="_blank" class="ts-link">
-        📝 <span class="ms-1">Supplier Declaration Portal</span>
-      </a>
-    </li>
-    <li class="ts-menu-item">
-      <a href="/logout" class="ts-link text-danger">
-        🚪 <span class="ms-1">Logout</span>
-      </a>
-    </li>
-  </ul>
-</div>
-
-
+    <!-- Sidebar -->
+    <aside>
+      <div class="text-center mb-4">
+        <h4 class="text-white fw-bold"></h4>
+      </div>
+      <ul class="ts-menu">
+        <li class="ts-menu-item"><a href="/dashboard" class="ts-link">Dashboard</a></li>
+        <li class="ts-menu-item"><a href="/tariff" class="ts-link">HS Code Lookup</a></li>
+        <li class="ts-menu-item"><a href="/expired-codes" class="ts-link">Expired Codes</a></li>
+        <li class="ts-menu-item"><a href="/origin" class="ts-link">Trade Eligibility</a></li>
+        <li class="ts-menu-item"><a href="/preferential-origin/exports" class="ts-link">Exports Dashboard</a></li>
+        <li class="ts-menu-item"><a href="/preferential-origin/upload" class="ts-link">Upload BoM</a></li>
+        <li class="ts-menu-item"><a href="https://supplierdeclarations.com" class="ts-link" target="_blank">Supplier Portal</a></li>
+        <li class="ts-menu-item mt-4"><a href="/logout" class="ts-link text-danger">Logout</a></li>
+      </ul>
+    </aside>
 
     <!-- Main Content -->
-    <div class="govuk-width-container" id="main-content">
-        <main class="govuk-main-wrapper" role="main">
-            <!-- Page Heading -->
-             
-            <div class="govuk-grid-row">
-                <div class="govuk-grid-column-full">
-                    {% block content %}
-                    <p>Welcome to the TradeSphere Dashboard. Explore the features using the menu on the left.</p>
-                    <div class="subheading" onclick="showModal()">Expired Commodity Details</div>
-                    {% endblock %}
-                </div>
+    <main>
+      <div class="govuk-width-container">
+        <div class="govuk-main-wrapper">
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+              {% block content %}
+              <h1 class="page-heading">TradeSphere Global Dashboard</h1>
+              <p>Welcome to the TradeSphere Dashboard. Explore the features using the menu on the left.</p>
+              <div class="subheading" onclick="showModal()">Expired Commodity Details</div>
+              {% endblock %}
             </div>
-        </main>
-    </div>
+          </div>
+        </div>
+      </div>
+    </main>
 
-    <title>Expired Commodity Modal</title>
-
-  <!-- Bootstrap + Fonts -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to right, #f0f4fa, #e9f5fb);
-    }
-
-    .ts-modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background-color: rgba(0, 0, 0, 0.4);
-      align-items: center;
-      justify-content: center;
-      z-index: 1055;
-    }
-
-    .ts-modal.show {
-      display: flex;
-    }
-
-    .ts-modal-content {
-      background: linear-gradient(to right, #f0f4fa, #e9f5fb);
-      border-radius: 16px;
-      padding: 2rem;
-      width: 95%;
-      max-width: 900px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 1rem 2rem rgba(0,0,0,0.15);
-    }
-
-    .ts-modal-header {
-      font-size: 1.25rem;
-      font-weight: 600;
-      border-bottom: 1px solid #dee2e6;
-      margin-bottom: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .ts-commodity-table th {
-      background-color: #e2ecf8;
-      text-align: center;
-    }
-
-    .ts-commodity-table td {
-      text-align: center;
-      vertical-align: middle;
-    }
-
-    .ts-close-btn {
-      background: none;
-      border: none;
-      color: #dc3545;
-      font-weight: 600;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-
-  <title>Expired Commodity Modal</title>
-
-  <!-- Bootstrap & Fonts -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to right, #f0f4fa, #e9f5fb);
-    }
-
-    .ts-modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background-color: rgba(0, 0, 0, 0.4);
-      align-items: center;
-      justify-content: center;
-      z-index: 1055;
-    }
-
-    .ts-modal.show {
-      display: flex;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .ts-modal-content {
-      background: linear-gradient(to right, #f0f4fa, #e9f5fb);
-      border-radius: 16px;
-      padding: 2rem;
-      width: 95%;
-      max-width: 1000px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
-    }
-
-    .ts-modal-header {
-      font-size: 1.25rem;
-      font-weight: 600;
-      border-bottom: 1px solid #dee2e6;
-      margin-bottom: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .ts-close-btn {
-      background: none;
-      border: none;
-      color: #dc3545;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .ts-commodity-table th {
-      background-color: #e2ecf8;
-      text-align: center;
-      font-weight: 600;
-    }
-
-    .ts-commodity-table td {
-      text-align: center;
-      vertical-align: middle;
-      font-size: 0.95rem;
-    }
-
-    @media (max-width: 768px) {
-      .ts-modal-content {
-        padding: 1rem;
-      }
-    }
-  </style>
-</head>
-<body>
+  </div>
 
   <!-- Modal -->
-<div class="ts-modal" id="commodity-modal">
-  <div class="ts-modal-content">
-    <div class="ts-modal-header">
-      <span>Expired Commodity Details</span>
-      <button class="ts-close-btn" onclick="closeModal()">✖ Close</button>
-    </div>
-
-    <div class="table-responsive">
-      <table class="table table-bordered table-hover align-middle ts-commodity-table mb-0">
-        <thead>
-          <tr>
-            <th>Sl. No.</th>
-            <th>Commodity</th>
-            <th>Description</th>
-            <th>Expired On</th>
-          </tr>
-        </thead>
-        <tbody id="commodity-table-body">
-          <!-- Rows will be injected here -->
-        </tbody>
-      </table>
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">Close</button>
+      <div class="modal-header">Expired Commodity Details</div>
+      <p>This section will display historical data of expired commodity codes along with amendments and legal references.</p>
     </div>
   </div>
-</div>
- 
 
-
-  <!-- JS Script -->
-  <script>
-    const commodities = [
-      { slNo: 1, commodity: "7210701010", description: "Hot-rolled steel, flat product", expiredOn: "May 15, 2024" },
-      { slNo: 2, commodity: "7210701090", description: "Another type of hot-rolled steel", expiredOn: "May 15, 2024" },
-      { slNo: 3, commodity: "7210708019", description: "Hot-rolled steel with features", expiredOn: "May 15, 2024" },
-      { slNo: 4, commodity: "7210708099", description: "Another steel variant", expiredOn: "May 15, 2024" },
-      { slNo: 5, commodity: "7210903010", description: "Cold-rolled steel", expiredOn: "May 15, 2024" },
-      { slNo: 6, commodity: "7210903090", description: "Another cold-rolled variant", expiredOn: "May 15, 2024" },
-      { slNo: 7, commodity: "7210908010", description: "Cold-rolled with features", expiredOn: "May 15, 2024" },
-      { slNo: 8, commodity: "7212408009", description: "Flat alloy steel", expiredOn: "May 15, 2024" },
-      { slNo: 9, commodity: "7212408029", description: "Alloy steel product", expiredOn: "May 15, 2024" },
-      { slNo: 10, commodity: "7212408091", description: "Steel with specifications", expiredOn: "May 15, 2024" },
-      { slNo: 11, commodity: "7212408099", description: "Another flat alloy steel", expiredOn: "May 15, 2024" },
-      { slNo: 12, commodity: "7212600011", description: "Alloy steel bars", expiredOn: "May 15, 2024" },
-      { slNo: 13, commodity: "7212600019", description: "Bars or rods", expiredOn: "May 15, 2024" },
-      { slNo: 14, commodity: "7212600091", description: "Bars for specific uses", expiredOn: "May 15, 2024" },
-      { slNo: 15, commodity: "7212600093", description: "Bar with applications", expiredOn: "May 15, 2024" },
-      { slNo: 16, commodity: "7212600099", description: "Specialized alloy bars", expiredOn: "May 15, 2024" }
-    ];
-
-    function openModal() {
-      const modal = document.getElementById('commodity-modal');
-      modal.classList.add('show');
-      setTimeout(populateTable, 100); // Wait to ensure modal is painted
-    }
-
-    function closeModal() {
-      const modal = document.getElementById('commodity-modal');
-      modal.classList.remove('show');
-    }
-
-    function populateTable() {
-      const tableBody = document.getElementById('commodity-table-body');
-      tableBody.innerHTML = "";
-
-      if (!commodities || commodities.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="4" class="text-muted text-center">No expired commodities</td></tr>`;
-        return;
-      }
-
-      commodities.forEach(item => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${item.slNo}</td>
-          <td>${item.commodity}</td>
-          <td>${item.description}</td>
-          <td>${item.expiredOn}</td>
-        `;
-        tableBody.appendChild(row);
-      });
-    }
-  </script>
-
- 
- 
-</script>
-
-<!-- Chatbot Integration -->
-<div id="chatbot-container">
-  <button id="chatbot-toggle" aria-label="Open Chatbot">💬</button>
+  <!-- 🌐 Floating KlynnAI Chatbot Button -->
+<div id="klynnai-float-wrap">
+  <button id="klynnai-toggle" aria-label="Launch KlynnAI Chatbot">
+    <span class="icon">
+      <!-- Robot Icon -->
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#0077b6" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.48 2 2 6.48 2 12C2 14.39 2.93 16.58 4.47 18.24L4 22L8.11 20.03C9.34 20.47 10.64 20.75 12 20.75C17.52 20.75 22 16.27 22 10.75C22 5.23 17.52 2 12 2ZM7.5 10.5C8.05 10.5 8.5 10.95 8.5 11.5C8.5 12.05 8.05 12.5 7.5 12.5C6.95 12.5 6.5 12.05 6.5 11.5C6.5 10.95 6.95 10.5 7.5 10.5ZM16.5 10.5C17.05 10.5 17.5 10.95 17.5 11.5C17.5 12.05 17.05 12.5 16.5 12.5C15.95 12.5 15.5 12.05 15.5 11.5C15.5 10.95 15.95 10.5 16.5 10.5ZM12 17C10.14 17 8.56 16.11 7.74 14.81H16.26C15.44 16.11 13.86 17 12 17Z"/>
+      </svg>
+    </span>
+    <span class="label">KlynnAI</span>
+  </button>
 </div>
 
-<!-- Chatbot UI Box -->
-<div id="chatbot-ui">
-  <iframe 
-    src="/chatbot/" 
-    title="Chatbot Assistant" 
-    style="width: 100%; height: 100%; border: none;">
-  </iframe>
+<!-- 🧠 KlynnAI Chatbot Panel (iframe loading chatbot.html) -->
+<div id="klynnai-ui">
+  <iframe src="/chatbot/" title="KlynnAI Chat Assistant" style="width:100%; height:100%; border:none; border-radius:20px;"></iframe>
 </div>
 
-<!-- Styles -->
+<!-- 💅 Styling -->
 <style>
-  #chatbot-container {
+  /* Floating Button Wrapper */
+  #klynnai-float-wrap {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1000;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
   }
 
-  #chatbot-toggle {
-    background-color: #1c64ad;
-    color: rgb(80, 125, 160);
+  /* Floating Button */
+  #klynnai-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #48cae4, #0077b6);
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
     border: none;
-    padding: 18px;
-    border-radius: 50%;
-    font-size: 22px;
+    border-radius: 30px;
+    box-shadow: 0 0 20px rgba(72, 202, 228, 0.5);
     cursor: pointer;
-    transition: transform 0.3s ease-out, box-shadow 0.3s ease-in-out;
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
-    animation: rajamouliFloat 5s cubic-bezier(0.5, 0.05, 0.1, 1) infinite, 
-               pulseAura 2.5s infinite alternate;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    backdrop-filter: blur(10px);
+    font-family: 'Poppins', sans-serif;
   }
 
-  @keyframes rajamouliFloat {
-    0% { transform: translateY(0px) rotate(0deg) scale(1); }
-    20% { transform: translateY(-12px) rotate(-3deg) scale(1.08); }
-    40% { transform: translateY(5px) rotate(2deg) scale(1); }
-    60% { transform: translateY(-8px) rotate(-1deg) scale(1.04); }
-    80% { transform: translateY(3px) rotate(1deg) scale(1.02); }
-    100% { transform: translateY(0px) rotate(0deg) scale(1); }
+  #klynnai-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(72, 202, 228, 0.8);
   }
 
-  @keyframes pulseAura {
-    0% { box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3); }
-    100% { box-shadow: 0px 15px 35px rgba(80, 140, 160, 0.8), 0px 0px 10px rgba(80, 140, 160, 0.6); }
+  #klynnai-toggle .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    padding: 6px;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
   }
 
-  #chatbot-toggle:hover {
-    transform: scale(1.3) rotate(6deg);
-    box-shadow: 0px 20px 50px rgba(80, 140, 160, 0.9), 0px 0px 15px rgba(255, 255, 255, 0.8);
-    animation: impactShockwave 0.4s ease-out;
+  #klynnai-toggle .icon svg {
+    width: 24px;
+    height: 24px;
   }
 
-  @keyframes impactShockwave {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.4); }
-    100% { transform: scale(1.3); }
+  #klynnai-toggle .label {
+    letter-spacing: 0.5px;
   }
 
-  #chatbot-ui {
+  /* Chatbot Panel (hidden by default) */
+  #klynnai-ui {
     position: fixed;
     bottom: 90px;
-    right: 20px;
-    width: 400px;
-    height: 600px;
-    background: rgb(16, 16, 16);
-    border: 1px solid #292828;
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0,0,0,0.2);
+    right: 24px;
+    width: 350px;
+    height: 500px;
+    background: white;
+    border-radius: 20px;
+    border: 2px solid rgba(72, 202, 228, 0.3);
+    box-shadow: 0 0 30px rgba(72, 202, 228, 0.3);
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    z-index: 999;
+    transition: all 0.4s ease;
+    z-index: 9998;
+    overflow: hidden;
   }
 
-  #chatbot-ui.open {
+  /* Show when open */
+  #klynnai-ui.open {
     opacity: 1;
     visibility: visible;
   }
-</style>
 
-<!-- Script -->
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const chatbotToggle = document.getElementById("chatbot-toggle");
-    const chatbotUI = document.getElementById("chatbot-ui");
+  /* Responsive for Mobile */
+  @media screen and (max-width: 480px) {
+    #klynnai-ui {
+      width: 95%;
+      height: 88%;
+      bottom: 90px;
+      right: 2.5%;
+    }
 
-    chatbotToggle.addEventListener("click", () => {
-      chatbotUI.classList.toggle("open");
-    });
-
-    const sidebarToggle = document.getElementById("sidebar-toggle");
-    const sidebar = document.getElementById("sidebar");
-
-    sidebarToggle.addEventListener("click", function () {
-      sidebar.classList.toggle("open");
-    });
-  });
-</script>
-
-
-<style>
-  /* Full-screen popup background */
-  #tradesphere-popup {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6); /* Dark overlay */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      backdrop-filter: blur(12px); /* Blurred effect */
-      display: none; /* Hidden by default */
-  }
-
-  /* Popup content box */
-  #tradesphere-popup-content {
-      width: 40%;
-      max-width: 600px;
-      background: rgba(255, 255, 255, 0.15); /* Transparent glass effect */
-      backdrop-filter: blur(20px);
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0px 0px 20px rgba(0, 255, 255, 0.5);
-      text-align: center;
-      animation: fadeIn 0.4s ease-in-out;
-  }
-
-  /* Popup Header */
-  .onboarding-header h1 {
-      font-size: 26px;
-      color: #00e1ff; /* Bright neon blue */
-      margin-bottom: 10px;
-  }
-
-  .onboarding-header p {
-      font-size: 16px;
-      color: white;
-      opacity: 0.8;
-      margin-bottom: 20px;
-  }
-
-  /* Skip button */
-  #skip-tradesphere {
-      position: absolute;
-      top: 15px;
-      right: 20px;
+    #klynnai-toggle {
+      padding: 10px 16px;
       font-size: 14px;
-      color: white;
-      cursor: pointer;
-      transition: opacity 0.3s ease;
-  }
+    }
 
-  #skip-tradesphere:hover {
-      opacity: 0.7;
-  }
-
-  /* Step container */
-  .steps {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-  }
-
-  /* Steps */
-  .step {
-      display: none;
-      animation: fadeInUp 0.4s ease-in-out;
-  }
-
-  .active-step {
-      display: block;
-  }
-
-  /* Navigation buttons */
-  button {
-      background: #00e1ff; /* Neon blue */
-      border: none;
-      color: #000;
-      font-size: 16px;
-      font-weight: bold;
-      padding: 10px 20px;
-      margin: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-  }
-
-  button:hover {
-      background: #0099cc;
-  }
-
-  /* Animations */
-  @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-  }
-
-  @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* Mobile responsiveness */
-  @media (max-width: 768px) {
-      #tradesphere-popup-content {
-          width: 90%;
-          padding: 20px;
-      }
+    #klynnai-toggle .icon svg {
+      width: 20px;
+      height: 20px;
+    }
   }
 </style>
-</head>
-<body>
 
-<!-- Onboarding Popup -->
-<style>
-  /* === Background Overlay === */
-  .onboarding-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-  }
-
-  /* === Popup Container === */
-  .onboarding-popup {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(20px);
-      border-radius: 15px;
-      width: 500px;
-      padding: 25px;
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-      animation: fadeIn 0.5s ease-in-out;
-  }
-
-  /* === Header Title === */
-  .onboarding-popup h1 {
-      font-size: 22px;
-      color: #fff;
-      margin-bottom: 10px;
-  }
-
-  /* === Step Content === */
-  .step {
-      display: none;
-      font-size: 16px;
-      color: #ddd;
-      margin-bottom: 15px;
-  }
-  .step.active {
-      display: block;
-  }
-
-  /* === Buttons === */
-  .onboarding-btn {
-      background: #00bcd4;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      margin: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      border-radius: 5px;
-      transition: 0.3s;
-  }
-  .onboarding-btn:hover {
-      background: #008c9e;
-  }
-
-  /* === Skip Button === */
-  .skip-onboarding {
-      background: none;
-      border: none;
-      color: #aaa;
-      font-size: 12px;
-      cursor: pointer;
-      margin-top: 10px;
-  }
-
-  /* === Fade In Animation === */
-  @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-  }
-</style>
-</head>
-<body>
-
-<!-- Onboarding Popup -->
-<div class="onboarding-overlay" id="onboarding-overlay">
-  <div class="onboarding-popup">
-      <h1>Quick Start Guide</h1>
-      <p id="step-text"></p>
-
-      <!-- Navigation Buttons -->
-      <button class="onboarding-btn" id="prev-btn" style="display: none;">← Back</button>
-      <button class="onboarding-btn" id="next-btn">Next →</button>
-      <button class="onboarding-btn" id="finish-btn" style="display: none;">Finish</button>
-
-      <!-- Skip Button -->
-      <button class="skip-onboarding" id="skip-btn">Skip</button>
-  </div>
-</div>
-
+<!-- 🔁 Toggle Script -->
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-      const overlay = document.getElementById("onboarding-overlay");
-      const stepText = document.getElementById("step-text");
-      const prevBtn = document.getElementById("prev-btn");
-      const nextBtn = document.getElementById("next-btn");
-      const finishBtn = document.getElementById("finish-btn");
-      const skipBtn = document.getElementById("skip-btn");
+  const toggleKlynn = document.getElementById("klynnai-toggle");
+  const klynnUI = document.getElementById("klynnai-ui");
 
-      // Steps Content
-      const steps = [
-          "Welcome to <b>TradeSphere Global</b>! Access UK & EU Tariff Codes, and VAT Information in one place.",
-          "🤖 <b>Meet TradeSphere AI Chatbot!</b> Located in the right corner, you can ask anything about HS codes and commodity search. </b> Discuss HS code lookups, tariffs, and trade-related queries easily.",
-          "🔍 <b>Use the Search Bar for HS Codes & VAT Info 🔍</b> Get accurate HS codes using AI-powered search.</b>Access UK & EU Tariff Codes, VAT Information, and commodity details effortlessly.",
-          "📌 <b>Search with Commodity Name or HS Code 🏷️</b>Quickly find tariff details by entering a commodity name or HS code in the search bar.",
-          "🛠️ <b>Explore More Features in the Sidebar⚡<b> 📌 Click ☰ (top-left corner) to explore other powerful features in the sidebar"
-      ];
-
-      let currentStep = 0;
-      stepText.innerHTML = steps[currentStep];
-
-      // Next Button Logic
-      nextBtn.addEventListener("click", function () {
-          currentStep++;
-          if (currentStep < steps.length) {
-              stepText.innerHTML = steps[currentStep];
-              prevBtn.style.display = "inline-block";
-              if (currentStep === steps.length - 1) {
-                  nextBtn.style.display = "none";
-                  finishBtn.style.display = "inline-block";
-              }
-          }
-      });
-
-      // Previous Button Logic
-      prevBtn.addEventListener("click", function () {
-          if (currentStep > 0) {
-              currentStep--;
-              stepText.innerHTML = steps[currentStep];
-              nextBtn.style.display = "inline-block";
-              finishBtn.style.display = "none";
-              if (currentStep === 0) {
-                  prevBtn.style.display = "none";
-              }
-          }
-      });
-
-      // Finish & Skip Logic
-      function closePopup() {
-          overlay.style.display = "none";
-      }
-
-      finishBtn.addEventListener("click", closePopup);
-      skipBtn.addEventListener("click", closePopup);
-
-      // Click outside to close
-      window.addEventListener("click", function (event) {
-          if (event.target === overlay) {
-              closePopup();
-          }
-      });
+  toggleKlynn.addEventListener("click", () => {
+    klynnUI.classList.toggle("open");
   });
 </script>
 
 
 
+  <!-- ✅ Updated Footer -->
+<footer class="bg-gray-900 text-gray-300 pt-16 pb-8 text-sm">
+  <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-8">
 
+    <!-- Company Info -->
+    <div class="md:col-span-2 space-y-4">
+      <h5 class="text-yellow-400 font-semibold">KrisLynx & TradeSphere Global</h5>
+      <p class="text-gray-300">
+  <strong class="text-white">KrisLynx LLP</strong> is your AI/IT innovation partner — igniting tomorrow’s solutions with intelligence, insight, and integrity. From enterprise AI to compliance tools, we engineer modern systems that simplify and empower businesses globally.
+</p>
 
-<footer class="govuk-footer" role="contentinfo" style="background-color: #0077b6; color: white; padding: 20px 0;">
-  <div class="govuk-width-container" style="display: flex; justify-content: space-between; align-items: center;">
-      <div style="font-size: 14px;">
-          <p style="margin: 0; font-weight: bold;">TradeSphere Global - RKLS Groups Pvt. Ltd.</p>
-          <p style="margin: 0;">All rights reserved &copy; 2025</p>
-      </div>
-      <div style="background-color: #48cae4; padding: 5px; border-radius: 5px;">
-          <img src="/static/assets/images/rklsss.png" alt="TradeSphere Global Logo - AI for Trade Compliance" style="height: 40px; width: auto;">
-      </div>
+<p class="text-gray-300 mt-4">
+  <strong class="text-white">TradeSphere Global</strong> is our flagship platform simplifying supplier declarations and tariff compliance across UK, EU, Japan & more.
+</p>
+
+    </div>
+
+    <!-- Explore -->
+    <div>
+      <h6 class="text-cyan-400 font-semibold mb-3">Explore</h6>
+      <ul class="space-y-2">
+        <li><a href="/" class="hover:underline">Home</a></li>
+        <li><a href="/solutions.html" class="hover:underline">Services</a></li>
+        <li><a href="/our-story.html" class="hover:underline">About</a></li>
+        <li><a href="/industries.html" class="hover:underline">Industries</a></li>
+      </ul>
+    </div>
+
+    <!-- Products -->
+    <div>
+      <h6 class="text-cyan-400 font-semibold mb-3">Products</h6>
+      <ul class="space-y-2">
+        <li><a href="https://trade-sphereglobal.com" target="_blank" class="hover:underline">TradeSphere Global</a></li>
+        <li><span class="text-gray-400">AI Insights (Coming Soon)</span></li>
+      </ul>
+    </div>
+
+    <!-- Contact -->
+    <div>
+      <h6 class="text-cyan-400 font-semibold mb-3">Contact</h6>
+      <ul class="space-y-2">
+        <li><a href="mailto:connect@trade-sphereglobal.com" class="text-blue-400 hover:underline">connect@trade-sphereglobal.com</a></li>
+        <li>Kurnool, Andhra Pradesh, India</li>
+        <li><a href="tel:+919381757484" class="hover:underline">+91 93817 57484</a></li>
+        <li><a href="https://www.krislynx.com" target="_blank" class="hover:underline">Explore KrisLynx</a></li>
+        <li><a href="https://www.linkedin.com/company/krislynx" target="_blank" class="hover:underline">LinkedIn: @KrisLynx</a></li>
+      </ul>
+      <p class="italic mt-2 text-gray-400">Building trust globally. Delivering locally.</p>
+    </div>
+
   </div>
-  <div class="govuk-width-container">
-      <hr class="govuk-footer__section-break" style="border-top: 1px solid #90e0ef; margin: 10px 0;">
+
+  <!-- Bottom Bar -->
+  <div class="border-t border-gray-700 mt-10 pt-4 px-6 text-center md:text-left text-xs flex flex-col md:flex-row justify-between items-center gap-2 text-gray-400">
+    <span>© 2025 KrisLynx LLP. All rights reserved.</span>
+    <div class="flex gap-4 flex-wrap justify-center md:justify-end">
+      <span>SSL Secure</span>
+      <span>ISO Compliant</span>
+      <span>AI-Ready</span>
+    </div>
   </div>
 </footer>
 
 
-{% block extra_js %}{% endblock %}
+
+  <!-- Scripts -->
+  <script>
+    function showModal() {
+      document.getElementById("modal").classList.add("show");
+    }
+
+    function closeModal() {
+      document.getElementById("modal").classList.remove("show");
+    }
+
+    document.getElementById("chatbot-toggle").addEventListener("click", function () {
+      document.getElementById("chatbot-ui").classList.toggle("open");
+    });
+  </script>
+
+  {% block extra_js %}{% endblock %}
 </body>
 </html>
+

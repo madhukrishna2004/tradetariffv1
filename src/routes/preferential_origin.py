@@ -9,7 +9,7 @@ from preferential_folder_setup import get_user_folder_paths, create_user_folders
 preferential_origin_bp = Blueprint("preferential_origin", __name__)
 
 # 🔁 Determine shift based on current time
-def get_current_shift():
+'''def get_current_shift():
     now = datetime.now().time()
     if now <= datetime.strptime("06:00", "%H:%M").time():
         return "Shift 1"
@@ -18,7 +18,7 @@ def get_current_shift():
     elif now <= datetime.strptime("18:00", "%H:%M").time():
         return "Shift 3"
     else:
-        return "Shift 4"
+        return "Shift 4"'''
 
 # 🔁 Simulate PDF generation
 def generate_dummy_pdf_report(bom_path, pdf_output_path):
@@ -36,7 +36,7 @@ def create_shift_abstract(username, shift, export_date, export_files, abstract_p
 from datetime import datetime, time
 
 import os
-from datetime import datetime
+ 
 from fpdf import FPDF
 import pandas as pd
 from db import get_db
@@ -92,6 +92,8 @@ def process_and_store_export(username, filename, shift, export_date):
     cur.close()
     conn.close()
 
+from datetime import datetime, time
+
 def get_current_shift():
     now = datetime.now().time()
     if time(0, 0) <= now <= time(6, 0):
@@ -103,6 +105,10 @@ def get_current_shift():
     else:
         return 'Shift 4'
 
+from flask import Markup, url_for
+
+from flask import Markup, url_for
+ 
 @preferential_origin_bp.route("/upload", methods=["GET", "POST"])
 def upload_bom():
     if "user" not in session:
@@ -134,25 +140,42 @@ def upload_bom():
                 file.save(local_path)
                 shutil.copy(local_path, server_path)
 
-                # Insert into bom_uploads with shift and date
+                # Save in DB
                 cur.execute("""
                     INSERT INTO bom_uploads (username, original_filename, saved_path, server_path, shift, upload_date)
                     VALUES (%s, %s, %s, %s, %s, %s)
                 """, (username, filename, local_path, server_path, shift, upload_date))
 
-                # 🚀 Optional: Trigger processing logic here
-                process_and_store_export(username, filename, shift, upload_date)
+                # ✅ Now parse and generate reports
+                try:
+                    df = pd.read_excel(local_path)
+
+                    conversion_data = {
+                        "USD": 0.78,
+                        "SEK": 0.074,
+                        "PLN": 0.19,
+                        "GBP": 1.0,
+                        "EUR": 0.85
+                    }
+
+                    # Clean filename for saving (without extension)
+                    clean_name = os.path.splitext(filename)[0]
+
+                    generate_uk_eu_report(df, conversion_data, clean_name)
+                    generate_uk_japan_report(df, conversion_data, clean_name)
+                    print(f"📄 PDF reports generated for {filename}")
+
+                except Exception as e:
+                    print(f"❌ Error processing {filename}: {e}")
 
         conn.commit()
         cur.close()
         conn.close()
 
-        flash("BoM files uploaded and recorded successfully.")
+        flash("BoM files uploaded and reports generated successfully.")
         return redirect(url_for("preferential_origin.upload_bom"))
 
     return render_template("preferential_origin_upload.html")
-
-
 # ✅ Export Dashboard
 @preferential_origin_bp.route("/exports", methods=["GET"])
 def show_exports():
@@ -325,3 +348,572 @@ def process_completed_shift():
 
     cur.close()
     conn.close()
+
+import requests
+
+EXCHANGE_RATE_API_URL = "https://api.exchangerate-api.com/v4/latest/"  # Replace with your actual base
+
+# 1. Fetch exchange rates
+def get_exchange_rates(base_currency):
+    response = requests.get(f"{EXCHANGE_RATE_API_URL}{base_currency}")
+    if response.status_code == 200:
+        return response.json().get("rates", {})
+    else:
+        raise ValueError("Failed to fetch exchange rates.")
+
+# 2. Convert amount from one currency to another
+def convert_currency(amount, from_currency, to_currency="GBP"):
+    if from_currency == to_currency:
+        return amount  # No conversion needed
+
+    try:
+        rates = get_exchange_rates(from_currency)
+        rate = rates.get(to_currency)
+        if not rate:
+            raise ValueError(f"No exchange rate found for {to_currency}")
+        return round(amount * rate, 2)
+    except Exception as e:
+        print(f"❌ Currency conversion failed: {e}")
+        return None
+
+ 
+import pandas as pd
+
+ 
+    
+ 
+import pandas as pd
+from fpdf import FPDF
+import os
+import pandas as pd
+
+def parse_uploaded_excel(file_path):
+    try:
+        df = pd.read_excel(file_path)
+        required_columns = [
+            "Item Number", "Description", "Value", "Currency", "COO",
+            "Preference", "CC", "SAV", "SAC",
+            "SA COO", "SAP", "SA HS Code",
+            "FCC", "Weight (kg)"
+        ]
+        # Ensure all required columns are present
+        if not all(col in df.columns for col in required_columns):
+            missing = set(required_columns) - set(df.columns)
+            raise ValueError(f"❌ Missing columns in Excel: {', '.join(missing)}")
+
+        return df
+    except Exception as e:
+        print(f"❌ Error parsing Excel: {e}")
+        return None
+
+# Ensure folders exist
+os.makedirs("originreports/uk_eu", exist_ok=True)
+os.makedirs("originreports/uk_japan", exist_ok=True)
+
+ 
+
+from fpdf import FPDF
+import os
+
+def convert_to_gbp(value, currency, conversion_dict):
+    try:
+        if pd.isna(value) or pd.isna(currency):
+            return ""
+        rate = conversion_dict.get(currency.upper(), 1)
+        return round(float(value) * rate, 2)
+    except:
+        return ""
+
+import os
+from fpdf import FPDF
+
+def safe_text(text):
+    """
+    Safely normalize text for PDF: replaces problematic Unicode characters.
+    """
+    if isinstance(text, str):
+        return (
+            text.replace("–", "-")   # en dash
+                .replace("—", "-")   # em dash
+                .replace("’", "'")   # right apostrophe
+                .replace("‘", "'")   # left apostrophe
+                .replace("“", '"')   # left double quote
+                .replace("”", '"')   # right double quote
+                .replace("\xa0", " ")  # non-breaking space
+                .strip()
+        )
+    return str(text)
+
+from fpdf import FPDF
+import os
+import pandas as pd
+
+def safe_text(text):
+    if pd.isna(text):
+        return ""
+    if isinstance(text, str):
+        return text.replace("–", "-").replace("’", "'").strip()
+    return str(int(text)) if isinstance(text, float) and text.is_integer() else str(text)
+
+class PDFWithFooter(FPDF):
+    def header(self):
+        self.add_font('DejaVu', '', 'src/static/assets/fonts/DejaVuSans.ttf', uni=True)
+        self.set_font("DejaVu", '', 40)
+        self.set_text_color(230, 230, 230)
+
+        # Calculate text width for horizontal centering
+        watermark_text = "TradeSphere Global"
+        text_width = self.get_string_width(watermark_text)
+        page_width = self.w
+        page_height = self.h
+
+        x = (page_width - text_width) / 2
+        y = page_height / 2
+
+        self.text(x=x, y=y, txt=watermark_text)
+
+        # Reset text color to black
+        self.set_text_color(0, 0, 0)
+
+
+    def footer(self):
+        self.set_y(-15)
+        self.add_font('DejaVu', '', 'src/static/assets/fonts/DejaVuSans.ttf', uni=True)
+        self.set_font("DejaVu", '', 8)
+        self.set_text_color(0)
+        self.cell(0, 5, f"TradeSphere Global | Krislynx LLP | 2025", 0, 1, 'C')
+        self.cell(0, 5, f"Page {self.page_no()}", 0, 0, 'C')
+
+def sanitize_commodity_code(code: str) -> str:
+    """
+    Sanitize a commodity code by removing non-digit characters and preserving valid 8 or 10 digit format.
+    """
+    if not code:
+        return ""
+
+    code = str(code).strip().replace('.', '').replace(' ', '').replace('-', '')
+    code = ''.join(filter(str.isdigit, code))
+
+    # Allow only 8 or 10 digit codes — fallback to original if invalid
+    if len(code) in [8, 10]:
+        return code
+    elif len(code) < 8:
+        # Optionally pad with trailing zeros to reach 8 digits
+        return code.ljust(8, '0')
+    elif 8 < len(code) < 10:
+        # If 9 digits — treat it as malformed, fallback to 8
+        return code[:8]
+    else:
+        return code[:10]
+
+def check_uk_eu_preference(final_commodity_code: str) -> str:
+    """
+    Get UK–Japan product-specific rule of origin.
+    Cleanly handles exact and fallback lookups (10/8/6/4 digits) 
+    without corrupting the commodity code (e.g., avoids leading zero issues).
+    """
+    try:
+        import pandas as pd
+
+        df = pd.read_excel("global-uk-tariff.xlsx", dtype=str)
+
+        # Step 1: Clean and validate input
+        code_raw = final_commodity_code.strip().replace('.', '')
+
+        # Remove accidental leading zeros (but NOT zeros inside the code)
+        code_raw = code_raw.lstrip('0')
+
+        if not code_raw.isdigit():
+            return None  # invalid format
+
+        # Pad back correctly if needed (never adding leading zeros!)
+        fallback_codes = []
+
+        code_len = len(code_raw)
+        if code_len in [10, 8, 6, 4]:
+            fallback_codes.append(code_raw)
+            if code_len < 10:
+                fallback_codes.append(code_raw.ljust(10, '0'))  # trailing only
+        elif code_len < 4:
+            return None  # too short to be valid
+        else:
+            # Unknown length, fallback safely
+            fallback_codes.append(code_raw[:10])
+            fallback_codes.append(code_raw[:8])
+            fallback_codes.append(code_raw[:6])
+            fallback_codes.append(code_raw[:4])
+
+        # Deduplicate while keeping order
+        seen = set()
+        fallback_codes = [x for x in fallback_codes if not (x in seen or seen.add(x))]
+
+        # Step 3: Match from top to bottom
+        for code in fallback_codes:
+            matched = df[df['commodity'].astype(str).str.strip() == code]
+            if not matched.empty:
+                rule_col = 'Product-specific rule of origin'
+                if rule_col in matched.columns:
+                    rule = matched.iloc[0][rule_col]
+                    if isinstance(rule, str) and rule.strip():
+                        return rule.strip()
+
+        return None  # No valid match
+
+    except Exception as e:
+        print(f"⚠️ Japan rule lookup failed for code {final_commodity_code}: {e}")
+        return None
+
+
+def generate_uk_eu_report(df, conversion_dict, origin_lookup):
+    os.makedirs("originreports/uk_eu", exist_ok=True)
+
+    # Generate unique filename using timestamp and UUID
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    unique_code = uuid.uuid4().hex[:6].upper()
+    filename = f"report_{timestamp}_{unique_code}_uk_eu.pdf"
+    out_path = os.path.join("originreports/uk_eu", filename)
+
+    pdf = PDFWithFooter(orientation='L')
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_font('DejaVu', '', 'src/static/assets/fonts/DejaVuSans.ttf', uni=True)
+
+    # PDF Setup
+    pdf = PDFWithFooter(orientation='L')
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_font('DejaVu', '', 'src/static/assets/fonts/DejaVuSans.ttf', uni=True)
+    pdf.set_font('DejaVu', '', 12)
+
+    pdf.cell(0, 10, "UK–EU Origin Report", ln=True, align='C')
+    pdf.ln(5)
+
+    df = df[df["Item Number"].notna() & (df["Item Number"].astype(str).str.strip() != "")]
+
+    excluded_cols = ["Currency", "SAC"]
+    display_cols = [col for col in df.columns if col not in excluded_cols]
+
+    display_headers = []
+    for col in display_cols:
+        if col == "Value":
+            display_headers.append("Value (GBP)")
+        elif col == "SAV":
+            display_headers.append("SAV (GBP)")
+        else:
+            display_headers.append(safe_text(col))
+
+    # Font for table
+    pdf.set_font("DejaVu", '', 9)
+
+    table_width = pdf.w * 0.95
+    col_width = table_width / len(display_cols)
+    line_height = 6
+
+    x_start = pdf.get_x()
+    y_start = pdf.get_y()
+
+    # Header row
+    for i, header in enumerate(display_headers):
+        pdf.set_xy(x_start + i * col_width, y_start)
+        pdf.multi_cell(col_width, line_height, header, border=1, align='C')
+
+    pdf.set_xy(x_start, y_start + line_height)
+
+    # Data rows
+    for _, row in df.iterrows():
+        x = x_start
+        y = pdf.get_y()
+        max_lines = 1
+        row_cells = []
+
+        for col in display_cols:
+            val = row[col]
+            if col == "Value":
+                val = convert_to_gbp(row["Value"], row["Currency"], conversion_dict)
+            elif col == "Sub Assembly Value":
+                val = convert_to_gbp(row["Sub Assembly Value"], row["Sub Assembly Currency"], conversion_dict)
+            text = safe_text(val)
+            row_cells.append(text)
+            lines = max(1, int(len(text) / (col_width / 2)))
+            max_lines = max(max_lines, lines)
+
+        row_height = max_lines * line_height
+
+        for i, cell in enumerate(row_cells):
+            pdf.set_xy(x + i * col_width, y)
+            pdf.multi_cell(col_width, line_height, cell, border=1, align='L')
+
+        pdf.set_y(y + row_height)
+
+    # Final Commodity Codes
+    pdf.ln(5)
+    pdf.set_font("DejaVu", '', 10)
+    final_codes = df["FCC"].dropna().unique()
+    clean_codes = ", ".join(safe_text(code) for code in final_codes)
+    pdf.cell(0, 10, "Final Commodity Code(s): " + clean_codes, ln=True)
+    
+    # Abbreviations Section
+    pdf.ln(8)
+    pdf.set_font("DejaVu", '', 10)
+    pdf.cell(0, 8, "Abbreviations:", ln=True)
+    abbrev_text = (
+        "COO = Country Of Origin\n"
+        "CC = Commodity Code\n"
+        "SAV = Sub Assembly Value\n"
+        "SAC = Sub Assembly Currency\n"
+        "SA COO = Sub Assembly COO\n"
+        "SAP = Sub Assembly Preference\n"
+        "SA HS Code = Sub Assembly HS Code\n"
+        "FCC = Final Commodity Code"
+    )
+    # Rules of Origin
+    seen_codes = set()
+    pdf.ln(3)
+    for code in final_codes:
+        clean_code = sanitize_commodity_code(str(code).strip())
+        if clean_code in seen_codes or not clean_code:
+            continue
+        seen_codes.add(clean_code)
+        try:
+            rule = check_uk_japan_preference(clean_code)
+        except Exception as e:
+            rule = f"⚠️ Rule lookup failed: {str(e)}"
+        pdf.multi_cell(0, 8, f"- Rule of Origin for {clean_code}: {safe_text(rule)}", border=0)
+
+    for line in abbrev_text.split("\n"):
+        pdf.cell(0, 6, line, ln=True)
+    out_path = f"originreports/uk_eu/{filename}_uk_eu.pdf"
+    pdf.output(out_path)
+    print(f"[✔] UK–EU report saved: {out_path}")
+
+
+
+def check_uk_japan_preference(final_commodity_code: str) -> str:
+    """
+    Get UK–Japan product-specific rule of origin.
+    Cleanly handles exact and fallback lookups (10/8/6/4 digits) 
+    without corrupting the commodity code (e.g., avoids leading zero issues).
+    """
+    try:
+        import pandas as pd
+
+        df = pd.read_excel("global-uk-tariff.xlsx", dtype=str)
+
+        # Step 1: Clean and validate input
+        code_raw = final_commodity_code.strip().replace('.', '')
+
+        # Remove accidental leading zeros (but NOT zeros inside the code)
+        code_raw = code_raw.lstrip('0')
+
+        if not code_raw.isdigit():
+            return None  # invalid format
+
+        # Pad back correctly if needed (never adding leading zeros!)
+        fallback_codes = []
+
+        code_len = len(code_raw)
+        if code_len in [10, 8, 6, 4]:
+            fallback_codes.append(code_raw)
+            if code_len < 10:
+                fallback_codes.append(code_raw.ljust(10, '0'))  # trailing only
+        elif code_len < 4:
+            return None  # too short to be valid
+        else:
+            # Unknown length, fallback safely
+            fallback_codes.append(code_raw[:10])
+            fallback_codes.append(code_raw[:8])
+            fallback_codes.append(code_raw[:6])
+            fallback_codes.append(code_raw[:4])
+
+        # Deduplicate while keeping order
+        seen = set()
+        fallback_codes = [x for x in fallback_codes if not (x in seen or seen.add(x))]
+
+        # Step 3: Match from top to bottom
+        for code in fallback_codes:
+            matched = df[df['commodity'].astype(str).str.strip() == code]
+            if not matched.empty:
+                rule_col = 'Product-specific rule of origin japan'
+                if rule_col in matched.columns:
+                    rule = matched.iloc[0][rule_col]
+                    if isinstance(rule, str) and rule.strip():
+                        return rule.strip()
+
+        return None  # No valid match
+
+    except Exception as e:
+        print(f"⚠️ Japan rule lookup failed for code {final_commodity_code}: {e}")
+        return None
+
+from datetime import datetime
+import uuid
+from fpdf import FPDF
+from datetime import datetime
+import os, uuid
+from textwrap import wrap
+
+def generate_uk_japan_report(df, conversion_dict, origin_lookup):
+    os.makedirs("originreports/uk_japan", exist_ok=True)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    unique_code = uuid.uuid4().hex[:6].upper()
+    filename = f"report_{timestamp}_{unique_code}_uk_japan.pdf"
+    out_path = os.path.join("originreports/uk_japan", filename)
+
+    pdf = PDFWithFooter(orientation='L')
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+
+    pdf.add_font('DejaVu', '', 'src/static/assets/fonts/DejaVuSans.ttf', uni=True)
+    pdf.set_font('DejaVu', '', 12)
+    pdf.cell(0, 10, "UK–Japan Origin Report", ln=True, align='C')
+    pdf.ln(5)
+
+    df = df[df["Item Number"].notna() & (df["Item Number"].astype(str).str.strip() != "")]
+
+    excluded_cols = ["Currency", "SAC"]
+    display_cols = [col for col in df.columns if col not in excluded_cols]
+
+    display_headers = []
+    for col in display_cols:
+        if col == "Value":
+            display_headers.append("Value (GBP)")
+        elif col == "SAV":
+            display_headers.append("SAV (GBP)")
+        else:
+            display_headers.append(safe_text(col))
+
+    pdf.set_font("DejaVu", '', 9)
+    table_width = pdf.w * 0.95
+    col_width = table_width / len(display_cols)
+    line_height = 6
+
+    x_start = pdf.get_x()
+    y_start = pdf.get_y()
+
+    for i, header in enumerate(display_headers):
+        pdf.set_xy(x_start + i * col_width, y_start)
+        pdf.multi_cell(col_width, line_height, header, border=1, align='C')
+
+    pdf.set_xy(x_start, y_start + line_height)
+
+    for _, row in df.iterrows():
+        x = x_start
+        y = pdf.get_y()
+        max_lines = 1
+        row_cells = []
+
+        for col in display_cols:
+            val = row[col]
+            if col == "Value":
+                val = convert_to_gbp(row["Value"], row["Currency"], conversion_dict)
+            elif col == "Sub Assembly Value":
+                val = convert_to_gbp(row["Sub Assembly Value"], row["Sub Assembly Currency"], conversion_dict)
+            text = safe_text(val)
+            row_cells.append(text)
+            lines = max(1, int(len(text) / (col_width / 2)))
+            max_lines = max(max_lines, lines)
+
+        row_height = max_lines * line_height
+
+        for i, cell in enumerate(row_cells):
+            pdf.set_xy(x + i * col_width, y)
+            pdf.multi_cell(col_width, line_height, cell, border=1, align='L')
+
+        pdf.set_y(y + row_height)
+
+    # Final Commodity Codes Section
+    pdf.ln(5)
+    pdf.set_font("DejaVu", '', 10)
+    final_codes = df["FCC"].dropna().unique()
+    clean_codes = ", ".join(safe_text(code) for code in final_codes)
+    pdf.cell(0, 10, "Final Commodity Code(s): " + clean_codes, ln=True)
+
+    # Rule Lookup Section
+    seen_codes = set()
+    pdf.ln(3)
+    pdf.set_font("DejaVu", '', 10)
+
+    final_code_rules = {}  # 🔁 Store rule per code for later use
+
+    for code in final_codes:
+        clean_code = sanitize_commodity_code(str(code).strip())
+        if clean_code in seen_codes or not clean_code:
+            continue
+        seen_codes.add(clean_code)
+
+        try:
+            rule = check_uk_japan_preference(clean_code)
+        except Exception as e:
+            rule = f"⚠️ Rule lookup failed: {str(e)}"
+
+        # 🔐 Store for later use
+        final_code_rules[clean_code] = rule
+
+        # 📜 Immediate rule print section
+        rule_text = f"• Rule of Origin for {clean_code}: {safe_text(rule)}"
+        wrapped_rule = "\n".join(wrap(rule_text, width=100))
+        pdf.multi_cell(pdf.w - 20, 8, wrapped_rule, border=0)
+
+
+        # Interpret Rules
+        #rule = rule.upper()
+    for code, rule in final_code_rules.items():
+        pdf.set_text_color(0, 0, 0)
+        pdf.ln(5)
+
+        if 'CTH' in rule:
+            pdf.multi_cell(0, 8, txt=(
+                "According to CTH: CTH means production from non-originating materials of any heading, "
+                "except that of the product. This means that any non-originating material used must be classified "
+                "under a heading (4-digit level of the Harmonised System) other than the final product (i.e., a change in heading). "
+                "Since the commodity codes in the bill of materials differ from the first four digits of the final product's code, "
+                "this product qualifies for UK–Japan Preferential Duty (Zero or reduced rate)."
+            ))
+
+        elif 'CTSH' in rule:
+            pdf.multi_cell(0, 8, txt=(
+                "According to CTSH: Production must use materials from a different subheading "
+                "(6-digit level). Since BOM codes differ from the first six digits of the final product's code, "
+                "this product qualifies under the UK–Japan Preference for reduced or zero import duty."
+            ))
+
+        elif 'CC' in rule:
+            pdf.multi_cell(0, 8, txt=(
+                "According to CC: Production from non-originating materials must involve a change in Chapter (2-digit level). "
+                "Since the BOM components are from different Chapters, this product qualifies under the trade preference rule."
+            ))
+
+        # Extra rule clarifications
+        if "cathode" in rule.lower():
+            pdf.ln(5)
+            pdf.set_font("ARIAL", size=9)
+            pdf.cell(0, 10, txt="*Ensure no active cathode materials are present to qualify under the CTH rule.", ln=True)
+
+        if "MaxNOM" in rule:
+            pdf.ln(5)
+            pdf.set_font("ARIAL", size=9)
+            pdf.cell(0, 10, txt="Alternatively, this product may qualify under the MaxNOM Rule.", ln=True)
+        
+    pdf.set_font("DejaVu", '', 11)  # Reset font if changed
+
+    # Abbreviations Section
+    pdf.ln(8)
+    pdf.set_font("DejaVu", '', 10)
+    pdf.cell(0, 8, "Abbreviations:", ln=True)
+    abbrev_text = (
+        "COO = Country Of Origin\n"
+        "CC = Commodity Code\n"
+        "SAV = Sub Assembly Value\n"
+        "SAC = Sub Assembly Currency\n"
+        "SA COO = Sub Assembly COO\n"
+        "SAP = Sub Assembly Preference\n"
+        "SA HS Code = Sub Assembly HS Code\n"
+        "FCC = Final Commodity Code"
+    )
+    for line in abbrev_text.split("\n"):
+        pdf.cell(0, 6, line, ln=True)
+
+    pdf.output(out_path)
+    print(f"[✔] UK–Japan report saved: {out_path}")
+    return out_path

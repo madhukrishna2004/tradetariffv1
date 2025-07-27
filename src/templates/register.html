@@ -1,71 +1,195 @@
-<form method="POST" action="/register" class="tsg-register-form">
-  <h2 class="tsg-form-title">Register Your Company</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Join TradeSphere Global</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+  <style>
+    body {
+      background: linear-gradient(145deg, #eaf3ff 0%, #f5faff 100%);
+      font-family: 'Segoe UI', sans-serif;
+    }
 
-  <input name="company_name" placeholder="Company Name" required>
-  <input name="email" type="email" placeholder="Email Address" required>
-  <input name="phone" placeholder="Phone Number">
-  <input name="password" type="password" placeholder="Create Password" required>
+    .glass {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      box-shadow: 0 0 40px rgba(0, 102, 204, 0.08);
+    }
 
-  <select name="plan" required>
-    <option value="">Select a Plan</option>
-    <option value="basic">Trade Essentials – $350/mo • Save 25% (billed annually)</option>
-  <option value="pro">TradeSphere Elite – $500/mo • Save 25% (billed annually)</option>
-  </select>
+    .plan-card {
+      transition: all 0.3s ease-in-out;
+    }
 
-  <button type="submit" class="btn-glow">Proceed to Payment</button>
-</form>
+    .plan-card:hover,
+    .plan-card.selected {
+      border-color: #4f46e5;
+      background: white;
+      transform: translateY(-4px);
+      box-shadow: 0 0 20px rgba(79, 70, 229, 0.2);
+    }
+  </style>
+</head>
+<body>
 
-<style>
-  .tsg-register-form {
-    max-width: 450px;
-    margin: 40px auto;
-    padding: 30px;
-    background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 0 12px rgba(0, 115, 230, 0.1);
-    font-family: 'Segoe UI', sans-serif;
-  }
+  <!-- ✨ CTA Banner -->
+  <section class="text-center py-20 bg-gradient-to-r from-blue-800 to-violet-700 text-white">
+    <div class="max-w-3xl mx-auto px-4">
+      <h1 class="text-4xl font-extrabold mb-4 leading-tight">Step Into the Future of Global Trade</h1>
+      <p class="text-lg text-blue-100 mb-6">Join TradeSphere Global and unlock automated compliance, smart AI, and effortless declarations across the UK, EU & Japan — starting now.</p>
+    </div>
+  </section>
 
-  .tsg-form-title {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #0073e6;
-    font-size: 24px;
-    font-weight: bold;
-  }
+  <!-- 💼 Registration Section -->
+  <section class="py-20 px-6">
+    <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-center">
 
-  .tsg-register-form input,
-  .tsg-register-form select {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 18px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 15px;
-  }
+      <!-- Left Content -->
+      <div data-aos="fade-right">
+        <h2 class="text-3xl font-bold text-blue-900 mb-4">Create Your TradeSphere Account</h2>
+        <p class="text-gray-700 mb-4">Register your company and get instant access to HS code lookup, FTA eligibility tools, bulk supplier declarations, and AI-powered trade compliance.</p>
+        <ul class="text-sm text-gray-600 space-y-2">
+          <li>✔ AI-backed 10-digit HS code precision</li>
+          <li>✔ UK • EU • Japan origin validation</li>
+          <li>✔ Full access for all plans including 30-day free trial</li>
+          <li>✔ Cancel anytime — zero commitment</li>
+        </ul>
+      </div>
 
-  .tsg-register-form input:focus,
-  .tsg-register-form select:focus {
-    border-color: #0073e6;
-    outline: none;
-    box-shadow: 0 0 4px rgba(0, 115, 230, 0.2);
-  }
+      <!-- Right Form -->
+      <form method="POST" action="/register" class="glass p-10 space-y-6" data-aos="fade-left">
+        <h3 class="text-2xl font-semibold text-blue-800 text-center">Register Now</h3>
 
-  .btn-glow {
-    width: 100%;
-    background-color: #0073e6;
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 0 12px rgba(0, 115, 230, 0.4);
-  }
+        <input type="text" name="company_name" placeholder="Company Name" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-violet-600 focus:outline-none">
+        <input type="email" name="email" placeholder="Work Email" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-violet-600 focus:outline-none">
+        <input type="text" name="phone" placeholder="Phone Number" class="w-full p-3 border border-gray-300 rounded-md focus:ring-violet-600 focus:outline-none">
+        <input type="password" name="password" placeholder="Create Password" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-violet-600 focus:outline-none">
+        <input type="password" name="confirm_password" placeholder="Confirm Password" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-violet-600 focus:outline-none">
 
-  .btn-glow:hover {
-    background-color: #005bb5;
-    transform: translateY(-2px);
-  }
-</style>
+        <!-- Plan Cards -->
+        <div>
+          <p class="text-blue-800 font-semibold mb-2">Choose Your Plan</p>
+          <div id="plan-options" class="grid sm:grid-cols-3 gap-4">
+            <div class="plan-card border border-gray-300 p-4 rounded-md cursor-pointer" data-plan="trial">
+              <h4 class="text-lg font-bold text-blue-700 mb-1">30-Day Trial</h4>
+              <p class="text-sm text-gray-600">Free full access. No payment required now.</p>
+            </div>
+            <div class="plan-card border border-gray-300 p-4 rounded-md cursor-pointer" data-plan="basic">
+              <h4 class="text-lg font-bold text-blue-700 mb-1">Essentials – $350/mo</h4>
+              <p class="text-sm text-gray-600">All tools for SME compliance. 25% off annual billing.</p>
+            </div>
+            <div class="plan-card border border-gray-300 p-4 rounded-md cursor-pointer" data-plan="pro">
+              <h4 class="text-lg font-bold text-blue-700 mb-1">Elite – $500/mo</h4>
+              <p class="text-sm text-gray-600">For global teams: bulk features, analytics, AI edge.</p>
+            </div>
+          </div>
+          <input type="hidden" name="plan" id="selected-plan" required>
+        </div>
+
+        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-violet-600 text-white font-semibold py-3 rounded-full hover:opacity-90 transition">
+          Start Setup
+        </button>
+
+        <p class="text-center text-sm text-gray-500">
+          Already registered?
+          <a href="/login" class="text-blue-700 font-medium hover:underline">Log in here</a>
+        </p>
+      </form>
+    </div>
+  </section>
+
+  <footer class="bg-gray-900 text-gray-300 pt-16 pb-8 text-sm">
+  <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-5 gap-8">
+
+    <!-- Company Intro -->
+    <div class="md:col-span-2">
+      <h5 class="text-yellow-400 font-semibold mb-2">KrisLynx & TradeSphere Global</h5>
+      <p class="mb-2">
+        <strong>KrisLynx LLP</strong> is your AI/IT innovation partner — igniting tomorrow’s solutions with intelligence, insight, and integrity. From enterprise AI to compliance tools, we engineer modern systems that simplify and empower businesses globally.
+      </p>
+      <p>
+        <strong>TradeSphere Global</strong> is our flagship platform simplifying supplier declarations and tariff compliance across UK, EU, Japan & more.
+      </p>
+    </div>
+
+    <!-- Explore -->
+    <div>
+      <h6 class="text-cyan-400 font-semibold mb-3">Explore</h6>
+      <ul class="space-y-2">
+        <li><a href="/" class="hover:underline text-gray-300">Home</a></li>
+        <li><a href="/solutions.html" class="hover:underline text-gray-300">Services</a></li>
+        <li><a href="/our-story.html" class="hover:underline text-gray-300">About</a></li>
+        <li><a href="/industries.html" class="hover:underline text-gray-300">Industries</a></li>
+      </ul>
+    </div>
+
+    <!-- Products -->
+    <div>
+      <h6 class="text-cyan-400 font-semibold mb-3">Products</h6>
+      <ul class="space-y-2">
+        <li>
+          <a href="https://trade-sphereglobal.com" target="_blank" class="hover:underline text-gray-300">
+            TradeSphere Global
+          </a>
+        </li>
+        <li><span class="text-gray-400">AI Insights (Coming Soon)</span></li>
+      </ul>
+    </div>
+
+    <!-- Resources -->
+    <div>
+      <h6 class="text-cyan-400 font-semibold mb-3">Resources</h6>
+      <ul class="space-y-2">
+        <li><a href="/contact" class="hover:underline text-gray-300">Contact</a></li>
+        <li><a href="/privacy-policy" class="hover:underline text-gray-300">Privacy Policy</a></li>
+        <li><a href="/terms-of-service" class="hover:underline text-gray-300">Terms of Service</a></li>
+      </ul>
+    </div>
+
+    <!-- Contact -->
+    <div>
+      <h6 class="text-cyan-400 font-semibold mb-3">Contact</h6>
+      <p class="mb-1">
+        <a href="mailto:connect@trade-sphereglobal.com" class="text-blue-400 hover:underline">connect@trade-sphereglobal.com</a>
+      </p>
+      <p>   Kurnool, Andhra Pradesh, India</p>
+      <p>   <a href="tel:+919381757484" class="hover:underline text-gray-300">+91 93817 57484</a></p>
+      <p>
+        <a href="https://www.krislynx.com" target="_blank" class="hover:underline text-gray-300">Explore KrisLynx</a>
+      </p>
+      <p>
+        <a href="https://www.linkedin.com/company/krislynx" target="_blank" class="hover:underline text-gray-300">LinkedIn: @KrisLynx</a>
+      </p>
+      <p class="italic mt-2 text-gray-400">Building trust globally. Delivering locally.</p>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="border-t border-gray-700 mt-10 pt-4 px-6 text-center md:text-left text-xs flex flex-col md:flex-row justify-between items-center gap-2 text-gray-400">
+    <span>© 2025 KrisLynx LLP. All rights reserved.</span>
+    <div class="flex gap-4">
+      <span>SSL Secure</span>
+      <span>ISO Compliant</span>
+      <span>AI-Ready</span>
+    </div>
+  </div>
+</footer>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>AOS.init();</script>
+  <script>
+    // Plan card selection
+    const cards = document.querySelectorAll('.plan-card');
+    const planInput = document.getElementById('selected-plan');
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        cards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        planInput.value = card.dataset.plan;
+      });
+    });
+  </script>
+</body>
+</html>

@@ -6,7 +6,7 @@
 <div class="container p-4 mt-3" style="background: linear-gradient(to right, #f0f4fa, #e9f5fb); border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif;">
   <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
     <div>
-      <h4 class="text-primary fw-semibold">Hello, <span class="text-dark">{{ session['user'] }}</span> 👋</h4>
+      <h4 class="text-primary fw-semibold">Hello, <span class="text-dark">{{ session['user'] }}</span> </h4>
       <p class="text-muted mb-0">Welcome to <strong>TradeSphere Global</strong> Commodity Lookup Tool</p>
     </div>
     <div class="text-end text-muted">
@@ -75,10 +75,11 @@
           <tr class="govuk-table__row">
             <th scope="col" class="govuk-table__header" style="background-color: #005EA5; color: white;">Commodity</th>
             <th scope="col" class="govuk-table__header" style="background-color: #005EA5; color: white;">Description</th>
-            <th scope="col" class="govuk-table__header" style="background-color: #005EA5; color: white;">EU External Tariff</th>
-            <th scope="col" class="govuk-table__header" style="background-color: #005EA5; color: white;">UK Global Tariff</th>
+            <th scope="col" class="govuk-table__header" style="background-color: #005EA5; color: white;">Global Tariff</th>
+            <th scope="col" class="govuk-table__header" style="background-color: #005EA5; color: white;">UK Tariff</th>
             <th scope="col" class="govuk-table__header" style="background-color: #005EA5; color: white;">VAT</th>
-            <th scope="col" class="govuk-table__header" style="background-color: #005EA5; color: white;">Rule of Origin</th>
+            <th scope="col" class="govuk-table__header" style="background-color: #005EA5; color: white;">Rule of Origin UK</th>
+            <th scope="col" class="govuk-table__header" style="background-color: #005EA5; color: white;">Rule of Origin Japan</th>
           </tr>
         </thead>
         <tbody class="govuk-table__body">

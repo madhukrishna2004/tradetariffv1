@@ -167,6 +167,76 @@
       <a href="/terms-of-service" style="color: #ffffff;">Terms of Service</a>
     </p>
   </footer>
+<!-- FLOATING CHATBOT -->
+<button onclick="toggleChat()" class="fixed bottom-6 right-6 bg-purple-700 hover:bg-purple-800 text-white p-4 rounded-full shadow-lg z-50">
+  💬
+</button>
+
+<div id="chatbot" class="hidden fixed bottom-24 right-6 w-80 bg-white rounded-lg shadow-2xl border border-gray-200 z-50 flex flex-col">
+  <div class="bg-purple-700 text-white px-4 py-2 font-semibold rounded-t-lg">KlynnAI – Trade Assistant</div>
+  
+  <div id="chat-messages" class="p-3 space-y-2 text-sm text-gray-800 h-64 overflow-y-auto">
+    <div class="bg-gray-100 p-2 rounded">Hi! I’m KlynnAI. Ask anything about TradeSphere Global or choose a question below 👇</div>
+  </div>
+
+  <div class="p-2 border-t text-sm text-gray-700">
+    <div class="flex flex-wrap gap-2 mb-2">
+      <button onclick="askBot('What is TradeSphere Global?')" class="bg-purple-100 text-purple-800 px-2 py-1 rounded hover:bg-purple-200">What is TradeSphere Global?</button>
+      <button onclick="askBot('What does KlynnAI do?')" class="bg-purple-100 text-purple-800 px-2 py-1 rounded hover:bg-purple-200">What does KlynnAI do?</button>
+      <button onclick="askBot('How does origin check work?')" class="bg-purple-100 text-purple-800 px-2 py-1 rounded hover:bg-purple-200">How does origin check work?</button>
+      <button onclick="askBot('Is this ready for production?')" class="bg-purple-100 text-purple-800 px-2 py-1 rounded hover:bg-purple-200">Is this ready for production?</button>
+    </div>
+    <input id="user-input" type="text" placeholder="Type your question..." class="w-full border rounded px-2 py-1 mb-1" onkeydown="if(event.key==='Enter'){askBot(this.value)}">
+  </div>
+</div>
+
+<script>
+  function toggleChat() {
+    document.getElementById('chatbot').classList.toggle('hidden');
+  }
+
+  function askBot(question) {
+    if (!question.trim()) return;
+    const chatBox = document.getElementById('chat-messages');
+    
+    // Add user message
+    const userMsg = document.createElement('div');
+    userMsg.className = "text-right";
+    userMsg.innerHTML = `<div class="inline-block bg-purple-100 text-purple-800 px-2 py-1 rounded mb-1">${question}</div>`;
+    chatBox.appendChild(userMsg);
+
+    // Clear input
+    document.getElementById('user-input').value = '';
+
+    // Bot response (match simplified)
+    let answer = "I'm still learning! Please ask something else.";
+
+    if (question.toLowerCase().includes("what is tradesphere")) {
+      answer = "TradeSphere Global is a project by KrisLynx LLP (powered by RKLS Groups Pvt. Ltd.) to simplify UK–EU trade compliance using AI tools.";
+    } else if (question.toLowerCase().includes("klynnai")) {
+      answer = "KlynnAI is the AI assistant for HS code lookup, rule-of-origin checks, VAT guidance, and auto-filling trade forms.";
+    } else if (question.toLowerCase().includes("origin check")) {
+      answer = "Origin check uses smart rules for EU–UK and UK–Japan agreements to determine trade eligibility and request supplier declarations.";
+    } else if (question.toLowerCase().includes("production")) {
+      answer = "Yes, this is built with real backend logic, secure uploads, PostgreSQL DB, and can scale to 10,000+ users.";
+    } else if (question.toLowerCase().includes("features")) {
+      answer = "Features include HS Code Lookup, Tariff Data, Origin Check, Supplier Upload, Excel Export, and Auto Duty Estimate.";
+    } else if (question.toLowerCase().includes("tech stack")) {
+      answer = "Frontend: HTML + Tailwind, Backend: Python Flask/FastAPI, DB: PostgreSQL on Render. Data preloaded from CSV.";
+    } else if (question.toLowerCase().includes("demo")) {
+      answer = "Demo builds are available. You can request a trial via our landing page contact form.";
+    }
+
+    // Add bot response
+    const botMsg = document.createElement('div');
+    botMsg.className = "text-left";
+    botMsg.innerHTML = `<div class="inline-block bg-gray-100 px-2 py-1 rounded mb-1">${answer}</div>`;
+    chatBox.appendChild(botMsg);
+
+    // Auto-scroll to bottom
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+</script>
 
   <!-- Cookie Notice Banner Script -->
   <script>

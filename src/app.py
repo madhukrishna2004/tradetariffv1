@@ -34,7 +34,7 @@ import pyttsx3
 import speech_recognition as sr
 from flask import Flask, render_template, request, jsonify, session
 from werkzeug.utils import secure_filename
-from src.chatbot import chatbot_bp
+#from src.chatbot import chatbot_bp
 from src.chatbot_routes import chatbot_bp
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
@@ -180,33 +180,40 @@ from flask import session, redirect, render_template, request
 from preferential_folder_setup import create_user_folders_if_needed
 #from db import get_db_connection  # make sure your DB connector is imported
 
+from werkzeug.security import check_password_hash
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form.get("username")
+        identifier = request.form.get("username")  # Could be email or phone
         password = request.form.get("password")
 
-        # Connect to DB and check credentials
         conn = get_db_connection()
         cur = conn.cursor()
 
         try:
+            # First fetch the user by email or phone
             cur.execute("""
-                SELECT * FROM users_main 
-                WHERE (email = %s OR phone = %s) AND password = %s
-            """, (username, username, password))
+                SELECT id, company_name, email, phone, password, plan 
+                FROM users_main 
+                WHERE email = %s OR phone = %s
+            """, (identifier, identifier))
 
             user = cur.fetchone()
 
-            if user:
-                session["user"] = username  # Set session
+            if user and check_password_hash(user[4], password):
+                # Example indices:
+                # user[0] = id
+                # user[1] = company_name
+                # user[2] = email
+                # user[3] = phone
+                # user[4] = hashed password
+                # user[5] = plan
 
-                # ✅ Call folder creation function here
-                create_user_folders_if_needed(username)
-
-                return redirect("/tariff")  # or wherever your dashboard starts
+                session["user"] = user[2]  # Store email or ID or a dict if needed
+                return redirect("/dashboard")
             else:
-                return render_template("login.html", error="Invalid username or password!")
+                return render_template("login.html", error="Invalid credentials.")
 
         finally:
             cur.close()
@@ -215,12 +222,120 @@ def login():
     return render_template("login.html")
 
 
+
+ 
 @app.route("/")
 def home():
-    # Redirect to login page if not logged in
-    if "user" not in session:
-        return redirect("/login")
-    return redirect("/tariff")
+    if "user" in session:
+        return redirect("/dashboard")  # or /tariff
+    return render_template("home.html")  # public homepage
+
+
+
+@app.route("/our-story.html")
+def story():
+    return render_template("our-story.html")
+
+@app.route("/solutions.html")
+def solutions():
+    return render_template("solutions.html")
+
+@app.route("/industries.html")
+def industries():
+    return render_template("industries.html")
+
+@app.route("/platform.html")
+def platform():
+    return render_template("platform.html")
+
+@app.route("/pricing.html")
+def pricing():
+    return render_template("pricing.html")
+
+@app.route("/expired-codes")
+def expired_codes():
+    return render_template("expired_commodity_codes.html")
+
+
+@app.route("/request-demo.html")
+def request_demo():
+    return render_template("request-demo.html")
+
+
+@app.route("/dashboard")
+def dashboard():
+    # Check if user is logged in
+    if not session.get("user"):
+        return redirect(url_for("/"))
+
+    return render_template("dashboard.html", user=session.get("user"))
+
+from flask import Flask, render_template, request, redirect, session, url_for
+from werkzeug.security import generate_password_hash
+from datetime import datetime
+
+from flask import Flask, render_template, request, redirect, session, url_for
+from datetime import datetime
+
+from flask import Flask, render_template, request, redirect, session
+from werkzeug.security import generate_password_hash
+from datetime import datetime
+#`from your_db_module import get_db_connection  # make sure it's correctly imported
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        company = request.form.get('company_name')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        plan = request.form.get('plan')
+
+        print("✅ Received POST data:", request.form.to_dict())
+
+        if password != confirm_password:
+            return render_template("register.html", error="Passwords do not match.")
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        try:
+            cur.execute("SELECT id FROM users_main WHERE email = %s OR phone = %s", (email, phone))
+            existing_user = cur.fetchone()
+
+            if existing_user:
+                return render_template("register.html", error="Email or phone already registered.")
+
+            hashed_password = generate_password_hash(password)
+            created_at = datetime.now()
+
+            cur.execute("""
+                INSERT INTO users_main (company_name, email, phone, password, plan, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (company, email, phone, hashed_password, plan, created_at))
+            conn.commit()
+
+            session["user"] = email
+
+        except Exception as e:
+            print("🔴 DB INSERT ERROR:", e)
+            return render_template("register.html", error="Registration failed: " + str(e))
+
+        finally:
+            cur.close()
+            conn.close()
+
+        # Plan-based redirection
+        plan_links = {
+            "trial": "/login",
+            "basic": "https://www.paypal.com/ncp/payment/LV48XZ9GJA6J8",
+            "pro": "https://www.paypal.com/ncp/payment/P9CSBWRRV9G3L"
+        }
+        return redirect(plan_links.get(plan, "/register"))
+
+    return render_template("register.html")
+
 
 @app.route("/accessibility", strict_slashes=False)
 def accessibility():
@@ -230,11 +345,12 @@ def accessibility():
 @decorators.cache_without_request_args(
     q=utils.DEFAULT_FILTER, p=utils.DEFAULT_PAGE, n=utils.DEFAULT_SAMPLE_SIZE
 )
+
 @decorators.compress_response
 def tariff():
     # Ensure user is logged in
     if "user" not in session:
-        return redirect("/login")
+        return redirect("/")
 
     # Existing tariff logic
     data, total = utils.get_data_from_request()
@@ -316,7 +432,7 @@ def dcat_metadata():
 @app.route("/logout")
 def logout():
     session.pop("user", None)  # Remove user from session
-    return redirect("/login")
+    return redirect("/")
 
  
 
@@ -350,83 +466,7 @@ import uuid
 # Chat endpoint
 user_sessions = {}  # Stores session context
 
-@app.route("/chat", methods=["POST"])
-def chat():
-    try:
-        data = request.json
-        user_id = data.get("user_id", str(uuid.uuid4()))
-        user_message = data.get("message", "").strip()
-
-        if not user_message:
-            return jsonify({"error": "No message provided"}), 400
-
-        # Detect HS intent (very basic check)
-        hs_keywords = ["hs code", "tariff code", "commodity code"]
-        is_hs_query = any(keyword in user_message.lower() for keyword in hs_keywords)
-
-        # Session state
-        session = user_sessions.get(user_id, {"hs_flow": False, "step": 0, "answers": []})
-
-        if is_hs_query:
-            # Reset flow if user triggers HS query again
-            session["hs_flow"] = True
-            session["step"] = 1
-            session["answers"] = []
-        elif session.get("hs_flow", False):
-            # Continue flow
-            session["step"] += 1
-        else:
-            # General question, no flow state needed
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[{"role": "user", "content": user_message}],
-                max_tokens=300,
-                temperature=0.6
-            )
-            reply = response['choices'][0]['message']['content']
-            return jsonify({"response": reply, "user_id": user_id})
-
-        # HS flow questions
-        hs_questions = [
-            "1. What is the product name?",
-            "2. What material is it made of?",
-            "3. What is its primary use or application?",
-            "4. Are there any other names it’s known by? (Yes/No)",
-        ]
-
-        if session["step"] <= len(hs_questions):
-            if session["step"] > 1:
-                session["answers"].append(user_message)
-
-            next_q = hs_questions[session["step"] - 1]
-            user_sessions[user_id] = session
-            return jsonify({"response": next_q, "user_id": user_id})
-        else:
-            # Final step: get HS code suggestion
-            session["answers"].append(user_message)
-            prompt = (
-                "Determine the most accurate HS Code based on the following:\n"
-                f"1. Product Name: {session['answers'][0]}\n"
-                f"2. Material: {session['answers'][1]}\n"
-                f"3. Usage: {session['answers'][2]}\n"
-                f"4. Alternate Names: {session['answers'][3]}\n"
-                "Respond in this format:\n"
-                "🔍 Got it. Searching database...\n"
-                "✅ The closest match is: **[HS CODE] – [Description]**"
-            )
-
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=200,
-                temperature=0.6,
-            )
-
-            reply = response['choices'][0]['message']['content']
-            user_sessions[user_id] = {"hs_flow": False, "step": 0, "answers": []}
-            return jsonify({"response": reply, "user_id": user_id})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+ 
 @app.after_request
 def set_cache_control_headers(response: Response):
     # Add headers to disable caching for all responses
@@ -548,7 +588,7 @@ def process_excel(file):
     df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
     # Check if all required columns are present
-    required_columns = ['item_number', 'description', 'value', 'currency', 'country_of_origin', 'commodity_code', 'weight']
+    required_columns = ['item_number', 'description', 'value', 'currency', 'country_of_origin', 'commodity_code', 'weight',]
     if not all(col in df.columns for col in required_columns):
         missing_columns = [col for col in required_columns if col not in df.columns]
         raise KeyError(f"Missing required column(s): {', '.join(missing_columns)}")
@@ -1627,24 +1667,7 @@ class User(db.Model):
 from flask import Flask, render_template, request, redirect, session
 import os
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        session['registration_data'] = {
-            'company': request.form['company_name'],
-            'email': request.form['email'],
-            'phone': request.form.get('phone'),
-            'plan': request.form['plan'],
-            'raw_password': request.form['password']
-        }
 
-        # Redirect to PayPal
-        if session['registration_data']['plan'] == 'basic':
-            return redirect("https://www.paypal.com/ncp/payment/LV48XZ9GJA6J8")
-        elif session['registration_data']['plan'] == 'pro':
-            return redirect("https://www.paypal.com/ncp/payment/P9CSBWRRV9G3L")
-
-    return render_template("register.html")
 from werkzeug.security import generate_password_hash
 from models import db, User
 
@@ -1674,6 +1697,7 @@ def payment_success():
     session.pop('registration_data', None)
 
     return redirect('/thanks')
+
 @app.route('/thanks')
 def thanks():
     email = session.get('user_email')
@@ -1851,51 +1875,7 @@ def save_cache():
 def index():
     return render_template('index.html')
 
-@app.route('/ask', methods=['POST'])
-def ask():
-    """Handles chatbot interaction with conversation context"""
-    global cache
-
-    user_input = request.json.get('user_input')
-    if not user_input:
-        return jsonify({"error": "Empty input received."})
-
-    session_id = session.get('session_id', 'default')  # Assign a session ID (default for now)
-
-    if session_id not in cache:
-        cache[session_id] = []  # Create conversation history for this session
-
-    conversation = cache[session_id]  # Retrieve conversation history
-
-    # Append user's input to the conversation history
-    conversation.append({"role": "user", "content": user_input})
-
-    logger.info(f"Processing conversation history for session: {session_id}")
-
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=conversation,  # Send full conversation history
-            max_tokens=150
-        )
-
-        if "choices" in response and len(response["choices"]) > 0:
-            answer = response["choices"][0]["message"]["content"].strip()
-        else:
-            return jsonify({"error": "Unexpected OpenAI API response format."})
-
-    except Exception as e:
-        logger.error(f"Failed to get response from OpenAI: {e}")
-        return jsonify({"error": "Failed to get response from OpenAI."})
-
-    # Append AI response to conversation history
-    conversation.append({"role": "assistant", "content": answer})
-
-    # Save updated conversation in cache
-    cache[session_id] = conversation
-    save_cache()
-
-    return jsonify({"response": answer})
+ 
 
 from flask import Flask
 from .routes.preferential_origin import preferential_origin_bp
@@ -2024,8 +2004,8 @@ def guru_purnima():
     return render_template("guru_purnima.html")
 
 from src.chatbot_routes import chatbot_bp
-# Register blueprint
 app.register_blueprint(chatbot_bp, url_prefix='/chatbot')
+
 
 if __name__ == "__main__":
     app.run(debug=True)

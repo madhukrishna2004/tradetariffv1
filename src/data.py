@@ -42,6 +42,7 @@ def excel_to_json(input_file: str, output_file: str, sheet_name: str = "Sheet1")
             "atq_applies": str(row[8]).strip() if len(row) > 8 and row[8] else None,
             "product_specific_rule_of_origin": str(row[9]).strip() if len(row) > 9 and row[9] else None,
             "vat_rate": clean_tariff_rate(row[10]) if len(row) > 10 and row[10] else None,  # Add VAT Rate to JSON structure
+            "product_specific_rule_of_origin_japan": str(row[11]).strip() if len(row) > 11 and row[11] else None,
         }
         data.append(data_row)
 

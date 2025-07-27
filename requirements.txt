@@ -82,7 +82,7 @@ soupsieve==2.6
 typed-ast==1.5.5
 urllib3
 whitenoise==6.8.2
-
+uuid
 wcwidth==0.2.13
 wrapt==1.17.0
 zope.event==5.0
@@ -90,3 +90,4 @@ zope.interface==7.2
 ujson==5.9.0
 cryptography==45.0.5
 beautifulsoup4==4.9.1
+textwrap
